@@ -25,3 +25,16 @@
  *          "results": {}
  *      }
  */
+
+/**
+ * @apiDefine EntryExists
+ * @apiError (400) {Object} EntryExists entry is already in DB
+ *
+ * @apiErrorExample {json} Error-Response:
+ *      HTTP/1.1 400 BadRequest
+ *      {
+ *          "error": "ExtryExists",
+ *          "error_details": "This db entry already exists",
+ *          "results": {"id": "21dsa2t234tdsfsr141"}
+ *      }
+ */

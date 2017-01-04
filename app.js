@@ -41,6 +41,7 @@ module.exports = server;
 
 // API handlers
 var config = require('./backend/api/v1/config');
+var repo = require('./backend/api/v1/repo');
 
 
 // CORS for API
@@ -57,6 +58,7 @@ var corsOpts = {
 
 // API (v1)
 app.use('/api/v1/config', cors(), config.router);
+app.use('/api/v1/repo', cors(), repo.router);
 
 
 // Frontend (web)
