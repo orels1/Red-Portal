@@ -91,7 +91,7 @@ import config from 'backend/config.json'
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.find({}, (err, entries) => {
+    Repo.find({'parsed': true}, (err, entries) => {
         if (err) {
             console.log(err);
             return res.status(500).send({
@@ -481,11 +481,11 @@ function repoParser(repo, cb) {
     });
 }
 
-repoParserTask((err) => {
-    if (err) {
-        return;
-    }
-    return console.log('done parsing', '\n ===============\n');
-});
+// repoParserTask((err) => {
+//     if (err) {
+//         return;
+//     }
+//     return console.log('done parsing', '\n ===============\n');
+// });
 
 export {router, repoParser};
