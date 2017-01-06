@@ -45,7 +45,7 @@ var dependencies = [
     'react',
     'react-dom',
     'react-router',
-    'react-timeago',
+    'underscore',
 ];
 
 /**
