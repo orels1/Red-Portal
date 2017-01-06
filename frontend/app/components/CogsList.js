@@ -3,9 +3,6 @@ import CogsListActions from '../actions/CogsListActions';
 import CogsListStore from '../stores/CogsListStore';
 import {Link} from 'react-router';
 
-// components
-import RepoList from './items/ReposList';
-
 import List from './items/List';
 
 class CogsList extends React.Component {
