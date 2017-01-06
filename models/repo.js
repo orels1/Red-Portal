@@ -7,7 +7,9 @@ let RepoSchema = new mongoose.Schema({
     'description': String,
     'cogs': {default: {}, type: Object},
     'parsed': {default: false, type: Boolean},
-    'url': String
+    'type': {default: 'approved', type: String},
+    'url': String,
+    'updateUrl': String,
 });
 
 module.exports = mongoose.model('Repo', RepoSchema);

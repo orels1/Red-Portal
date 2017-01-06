@@ -42,6 +42,7 @@ module.exports = server;
 // API handlers
 var config = require('./backend/api/v1/config');
 var repo = require('./backend/api/v1/repo');
+var cog = require('./backend/api/v1/cog');
 
 
 // CORS for API
@@ -59,28 +60,29 @@ var corsOpts = {
 // API (v1)
 app.use('/api/v1/config', cors(), config.router);
 app.use('/api/v1/repo', cors(), repo.router);
+app.use('/api/v1/cog', cors(), cog.router);
 
 
 // Frontend (web)
-// var swig  = require('swig'),
-//     React = require('react'),
-//     ReactDOM = require('react-dom/server'),
-//     Router = require('react-router'),
-//     routes = require('frontend/app/routes');
+var swig  = require('swig'),
+    React = require('react'),
+    ReactDOM = require('react-dom/server'),
+    Router = require('react-router'),
+    routes = require('frontend/app/routes');
 
 // React Middleware
-// app.use(function(req, res) {
-//     Router.match({ 'routes': routes.default, 'location': req.url }, function(err, redirectLocation, renderProps) {
-//         if (err) {
-//             res.status(500).send(err.message);
-//         } else if (redirectLocation) {
-//             res.status(302).redirect(redirectLocation.pathname + redirectLocation.search);
-//         } else if (renderProps) {
-//             var html = ReactDOM.renderToString(React.createElement(Router.RouterContext, renderProps));
-//             var page = swig.renderFile('frontend/views/index.html', { 'html': html });
-//             res.status(200).send(page);
-//         } else {
-//             res.status(404).send('Page Not Found');
-//         }
-//     });
-// });
+app.use(function(req, res) {
+    Router.match({ 'routes': routes.default, 'location': req.url }, function(err, redirectLocation, renderProps) {
+        if (err) {
+            res.status(500).send(err.message);
+        } else if (redirectLocation) {
+            res.status(302).redirect(redirectLocation.pathname + redirectLocation.search);
+        } else if (renderProps) {
+            var html = ReactDOM.renderToString(React.createElement(Router.RouterContext, renderProps));
+            var page = swig.renderFile('frontend/views/index.html', { 'html': html });
+            res.status(200).send(page);
+        } else {
+            res.status(404).send('Page Not Found');
+        }
+    });
+});

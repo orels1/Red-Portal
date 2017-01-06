@@ -200,6 +200,7 @@ router.get('/:optionName', (req, res) => {
  * @apiUse ConfigRequestSuccess
  * @apiUse EntryNotFound
  */
+// TODO: Move to findById
 router.put('/', (req, res) => {
     // Check if we have that entry already
     Config.findOne({

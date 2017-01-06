@@ -4,7 +4,14 @@
 
 import express from 'express';
 let router = express.Router();
+import rp from 'request-promise';
+import {eachLimit} from 'async';
+import {findWhere, where, extend} from 'underscore';
+import atob from 'atob';
 import Repo from 'models/repo';
+
+// credentials
+import config from 'backend/config.json'
 
 /**
  * @apiDefine RepoRequestSuccess
@@ -31,13 +38,13 @@ import Repo from 'models/repo';
  *                   "dota": {
  *                        "author": "orels1",
  *                        "short": "Gets you item builds, hero info and more",
- *                        "description": "Dota 2 cog will get you the top item and skill-builds for any hero in game, as well as stats for your latest match + a dotabuff link. Enjoy"
- *                        "disabled": false,
+ *                        "description": "Dota 2 cog will get you the top item and skill-builds for any hero in game, as well as stats for your latest match + a dotabuff link. Enjoy",
  *                        "install_msg": "(orels1): Have fun!"
  *                    }
  *               },
  *               "parsed": true,
- *               "url": "https://github.com/orels1/ORELS-Cogs"
+ *               "url": "https://github.com/orels1/ORELS-Cogs",
+ *               "type": "approved"
  *           }
  *      }
  */
@@ -76,7 +83,8 @@ import Repo from 'models/repo';
  *                            }
  *                       },
  *                       "parsed": true,
- *                       "url": "https://github.com/orels1/ORELS-Cogs"
+ *                       "url": "https://github.com/orels1/ORELS-Cogs",
+ *                       "type": "approved"
  *                   }
  *               ]
  *           }
@@ -107,11 +115,13 @@ router.get('/', (req, res) => {
  * @apiName postRepo
  * @apiGroup repo
  *
- * @apiParam {String} url Cogs repo github URL
+ * @apiParam {String} url Repo github URL
+ * @apiParam {String} type Repo type, either approved or beta
  *
  * @apiParamExample {json} Request-Example:
  *      {
- *          "url": "https://github.com/orels1/ORELS-Cogs"
+ *          "url": "https://github.com/orels1/ORELS-Cogs",
+ *          "type": "approved"
  *      }
  *
  * @apiUse DBError
@@ -153,7 +163,8 @@ router.post('/', (req, res) => {
             });
         }
         return new Repo({
-            'url': req.body.url
+            'url': req.body.url,
+            'type': req.body.type
         }).save((err, entry) => {
             if (err) {
                 console.log(err);
@@ -183,8 +194,8 @@ router.post('/', (req, res) => {
  * @apiUse RepoRequestSuccess
  * @apiUse EntryNotFound
  */
-router.get('/:optionName', (req, res) => {
-    Config.findOne({
+router.get('/:repoName', (req, res) => {
+    Repo.findOne({
         'name': req.params.repoName,
     }, (err, entry) => {
         if (err) {
@@ -315,4 +326,166 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-export {router};
+function repoParserTask(cb) {
+    return Repo.find({})
+        .exec((err, repos) => {
+            if (err) {
+                console.log(err);
+                return cb(err);
+            }
+
+            if (!repos) {
+                // nothing to do here
+                return cb();
+            }
+
+            for (let repo of repos) {
+                repoParser(repo, (err) => {
+                    if (err) {
+                        return cb(err);
+                    }
+                    return cb();
+                })
+            }
+        })
+}
+
+function githubParser(url, callback) {
+    let options = {
+        uri: url.replace('github.com', 'api.github.com/repos') + '/contents',
+        headers: {
+            'User-Agent': 'Red-Portal',
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': config.githubToken,
+        },
+        json: true,
+    };
+
+    let result = {cogs: {}};
+
+    rp(options)
+        .then((repo) => {
+            // get info.json
+            let repoOpts = {
+                headers: {
+                    'User-Agent': 'Red-Portal',
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Authorization': config.githubToken,
+                },
+                    json: true,
+            };
+            let repoInfo = findWhere(repo, {name:'info.json'});
+            repoOpts.uri = repoInfo.url;
+            rp(repoOpts)
+                .then((infoJSON) => {
+                    let content = JSON.parse(atob(infoJSON.content));
+
+                    // add the main info.json to the result
+                    result.author = encodeURIComponent(content.AUTHOR);
+                    result.name = encodeURIComponent(content.NAME);
+                    result.short = encodeURIComponent(content.SHORT);
+                    result.description = encodeURIComponent(content.DESCRIPTION);
+                    result.updateUrl = repoOpts.uri;
+
+                    // get cogs
+                    let cogsList = where(repo, {type: 'dir'});
+                    let i = 1;
+                    for (let folder of cogsList) {
+                        // request cog's folder
+                        let opts = {
+                            headers: {
+                                'User-Agent': 'Red-Portal',
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Authorization': config.githubToken,
+                            },
+                            json: true,
+                        };
+                        opts.uri = folder.url;
+                        rp(opts)
+                            .then((cog) => {
+                                // find info.json
+                                let cogOpts = {
+                                    headers: {
+                                        'User-Agent': 'Red-Portal',
+                                        'Accept': 'application/vnd.github.v3+json',
+                                        'Authorization': config.githubToken,
+                                    },
+                                    json: true,
+                                };
+                                let cogInfo = findWhere(cog, {name:'info.json'});
+                                if (!cogInfo) {
+                                    console.log('No info.json!');
+                                    return callback('No info.json!');
+                                }
+                                cogOpts.uri = cogInfo.url;
+
+
+                                rp(cogOpts)
+                                    .then((infoJSON) => {
+                                        let cog = JSON.parse(atob(infoJSON.content));
+                                        // add the cog info to the result
+                                        result.cogs[folder.name] = {};
+                                        result.cogs[folder.name].name = encodeURIComponent(cog.NAME);
+                                        result.cogs[folder.name].author = encodeURIComponent(cog.AUTHOR);
+                                        result.cogs[folder.name].short = encodeURIComponent(cog.SHORT);
+                                        result.cogs[folder.name].description = encodeURIComponent(cog.DESCRIPTION);
+                                        result.cogs[folder.name].install_msg = encodeURIComponent(cog.INSTALL_MSG);
+                                        result.cogs[folder.name].updateUrl = cogOpts.uri;
+                                        result.cogs[folder.name].repoUrl = url;
+
+                                        if (i == cogsList.length) {
+                                            // done
+                                            return callback(null, result);
+                                        }
+                                        i++;
+                                    })
+                                    .catch((err) => {
+                                        console.log(err);
+                                        return callback(err);
+                                    })
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                                return callback(err);
+                            });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    return callback(err);
+                });
+        })
+        .catch((err) => {
+            console.log(err);
+            return callback(err);
+        });
+}
+
+function repoParser(repo, cb) {
+    githubParser(repo.url, (err, result) => {
+        if (err){
+            return cb(err);
+        }
+        repo = extend(repo, result);
+
+        // console.log(repo);
+        // set repo to parsed
+        repo.parsed = true;
+        repo.save((err, entry) => {
+            if (err) {
+                console.log(err);
+                return cb(err);
+            }
+            return cb();
+        });
+    });
+}
+
+repoParserTask((err) => {
+    if (err) {
+        return;
+    }
+    return console.log('done parsing', '\n ===============\n');
+});
+
+export {router, repoParser};
