@@ -8,24 +8,7 @@ class NavbarActions {
     constructor() {
         this.generateActions(
             'updateSearchQuery',
-            'findSuccess',
-            'findFail'
         );
-    }
-
-    // Search method. Should be pretty straightforward
-    find(query) {
-        $.ajax({
-            'type': 'GET',
-            'url': '/api/v1/cog/search/' + encodeURIComponent(query),
-        })
-            .done((data) => {
-                this.findSuccess(data);
-            })
-            .fail((jqXhr) => {
-                this.findFail(jqXhr);
-            });
-        return false;
     }
 }
 

@@ -6,6 +6,8 @@ import {Link} from 'react-router';
 // components
 import RepoList from './items/ReposList';
 
+import List from './items/List';
+
 class CogsList extends React.Component {
     constructor(props) {
         super(props);
@@ -15,15 +17,40 @@ class CogsList extends React.Component {
         this.onChange = this.onChange.bind(this);
     }
 
+    qs(key, props) {
+        if (!props) {
+            return false;
+        }
+        key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
+        let match = props.location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
+        return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+    }
+
     componentDidMount() {
         // Will fire once, after markup has been injected
         CogsListStore.listen(this.onChange);
         CogsListActions.getRepos();
+
+        let search = this.qs('search', this.props);
+        if (search && search.length !== 0) {
+            CogsListActions.find(search);
+        }
     }
 
     componentWillUnmount() {
         // Will fire once before markup has been removed
         CogsListStore.unlisten(this.onChange);
+        CogsListActions.resetShowCogs();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let search = this.qs('search', nextProps);
+        if (nextProps.location.search !== this.props.location.search && search && search.length !== 0) {
+            CogsListActions.find(search);
+        }
+        if (!search) {
+            CogsListActions.resetSearchResults();
+        }
     }
 
     onChange(state) {
@@ -57,18 +84,19 @@ class CogsList extends React.Component {
                 <p className="cog-info description">
                     These repositories are community made. We have no say over what goes into them. The author of Red and the contributors are not responsible for any damage caused by 3rd party cogs.
                 </p>
-                <div className="cogs-list">
-                    <h1 className="section-header">Cogs</h1>
-                    <div className="card-columns">
-                        {cogs.slice(0, this.state.showCogs)}
-                    </div>
-                    {cogs.length >= this.state.showCogs &&
-                        <button className="btn btn-default btn-square" onClick={this.handleShowMoreCogs.bind(this)}>
-                            Show more...
-                        </button>
-                    }
-                </div>
-                <RepoList repos={this.state.repos} />
+
+                {this.state.searchResults.length !== 0 &&
+                    <List title="Search results" keyName="search" list={this.state.searchResults} type="search"/>
+                }
+
+                <List title="Cogs" list={this.state.cogs} keyName="cog" type="cogs" limit={this.state.showCogs} />
+                {cogs.length >= this.state.showCogs &&
+                <button className="btn btn-default btn-square" onClick={this.handleShowMoreCogs.bind(this)}>
+                    Show more...
+                </button>
+                }
+
+                <List title="Repos" list={this.state.repos} keyName="repo" type="repos" />
             </div>
         )
     }

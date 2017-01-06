@@ -8,16 +8,9 @@ class NavbarStore {
         this.searchResults = [];
     }
 
-    onUpdateSearchQuery(event) {
-        this.searchQuery = event.target.value;
-    }
-
-    findSuccess(data) {
-        this.searchResults = data.results.list || [];
-    }
-
-    findFail(jqXhr) {
-        console.error(jqXhr.responseText);
+    onUpdateSearchQuery(payload) {
+        this.searchQuery = payload.event.target.value;
+        payload.router.push('/cogs/?search=' + encodeURIComponent(this.searchQuery));
     }
 }
 

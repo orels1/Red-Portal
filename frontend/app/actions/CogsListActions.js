@@ -5,7 +5,11 @@ class CogsListActions {
         this.generateActions(
             'getReposSuccess',
             'getReposFail',
-            'showMoreCogs'
+            'showMoreCogs',
+            'resetShowCogs',
+            'findSuccess',
+            'findFail',
+            'resetSearchResults'
         );
     }
 
@@ -19,6 +23,21 @@ class CogsListActions {
             })
             .fail((jqXhr) => {
                 this.getReposFail(jqXhr);
+            });
+        return false;
+    }
+
+    // Search method. Should be pretty straightforward
+    find(query) {
+        $.ajax({
+            'type': 'GET',
+            'url': '/api/v1/cog/search/' + query,
+        })
+            .done((data) => {
+                this.findSuccess(data);
+            })
+            .fail((jqXhr) => {
+                this.findFail(jqXhr);
             });
         return false;
     }

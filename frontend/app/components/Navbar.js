@@ -13,8 +13,28 @@ class Navbar extends React.Component {
         this.onChange = this.onChange.bind(this);
     }
 
+    qs(key, props) {
+        if (!props) {
+            return false;
+        }
+        key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
+        let match = props.location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
+        return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+    }
+
     componentDidMount() {
         NavbarStore.listen(this.onChange);
+        let search = this.qs('search', this.props.router);
+        if (search && search.length !== 0) {
+            NavbarActions.updateSearchQuery({
+                'event': {
+                    'target': {
+                        'value': search
+                    }
+                },
+                'router': this.props.router
+            });
+        }
     }
 
     componentWillUnmount() {
@@ -25,19 +45,17 @@ class Navbar extends React.Component {
         this.setState(state);
     }
 
-    // Search stuff. Was left here just to keep the useful code
-    handleSubmit(event) {
-        event.preventDefault();
+    handleUpdateSearchQuery(event) {
+        let payload = {
+            'event': event,
+            'router': this.props.router,
+        };
 
-        let searchQuery = this.state.searchQuery.trim();
-
-        if (searchQuery && searchQuery.length > 2) {
-            NavbarActions.find(searchQuery);
-        }
+        NavbarActions.updateSearchQuery(payload);
     }
 
-    handleUpdateSearchQuery(event) {
-        NavbarActions.updateSearchQuery(event);
+    handleSubmit(event) {
+        event.preventDefault();
     }
 
     render() {

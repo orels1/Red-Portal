@@ -12,6 +12,7 @@ class CogsListStore {
         this.repos = [];
         this.cogs = {};
         this.showCogs = 10;
+        this.searchResults = [];
     }
 
     getRepos() {
@@ -35,6 +36,22 @@ class CogsListStore {
 
     onShowMoreCogs() {
         this.showCogs += 10;
+    }
+
+    onResetShowCogs() {
+        this.showCogs = 10;
+    }
+
+    findSuccess(data) {
+        this.searchResults = data.results.list || [];
+    }
+
+    findFail(jqXhr) {
+        console.error(jqXhr.responseText);
+    }
+
+    onResetSearchResults() {
+        this.searchResults = [];
     }
 }
 
