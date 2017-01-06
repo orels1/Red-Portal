@@ -56,3 +56,6 @@ public/css/*
 # Editors and IDEs
 .vscode
 .idea
+
+# credentials
+config.json
