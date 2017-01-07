@@ -10,7 +10,7 @@
     "gendocs": "apidoc -i backend/api -o apidoc/",
     "rundocs": "node docs.js",
     "docs": "npm run gendocs && npm run rundocs",
-    "postinstall": "npm install --only=dev && gulp build"
+    "postinstall": "gulp build"
   },
   "repository": {
     "type": "git",
@@ -34,24 +34,7 @@
   },
   "homepage": "https://github.com/orels1/Red-Portal#readme",
   "devDependencies": {
-    "apidoc": "^0.16.1",
-    "babel-core": "^6.21.0",
-    "babel-polyfill": "^6.20.0",
-    "babel-preset-latest": "^6.16.0",
-    "babel-preset-react": "^6.16.0",
-    "babel-register": "^6.18.0",
-    "babelify": "^7.3.0",
-    "browserify": "^13.1.1",
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-cssmin": "^0.1.7",
-    "gulp-if": "^2.0.2",
-    "gulp-notify": "^2.2.0",
-    "gulp-plumber": "^1.1.0",
-    "gulp-sass": "^3.0.0",
-    "nodemon": "^1.11.0",
-    "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.8.0"
+    "apidoc": "^0.16.1"
   },
   "dependencies": {
     "alt": "^0.18.6",
@@ -74,6 +57,23 @@
     "request": "^2.79.0",
     "request-promise": "^4.1.1",
     "swig": "^1.4.2",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "babel-core": "^6.21.0",
+    "babel-polyfill": "^6.20.0",
+    "babel-preset-latest": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-register": "^6.18.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.1",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-cssmin": "^0.1.7",
+    "gulp-if": "^2.0.2",
+    "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-sass": "^3.0.0",
+    "nodemon": "^1.11.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.8.0"
   }
 }
