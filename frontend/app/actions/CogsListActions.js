@@ -13,7 +13,7 @@ class CogsListActions {
         );
     }
 
-    getRepos() {
+    getList() {
         $.ajax({
             'url': '/api/v1/repo/',
             'type': 'GET',

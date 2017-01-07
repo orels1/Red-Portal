@@ -30,7 +30,7 @@ class Cog extends React.Component {
     render() {
         return(
             <div className="cog">
-                <h1 className="display-3">{this.props.params.cogName}</h1>
+                <h1 className="display-3">{this.state.cog.id}</h1>
                 <p className="cog-info">
                     By&nbsp;
                     <a href={this.state.cog.repoUrl && this.state.cog.repoUrl.substr(0, this.state.cog.repoUrl.lastIndexOf('/'))} target="_blank">
@@ -41,11 +41,6 @@ class Cog extends React.Component {
                     Repo&nbsp;
                     <a href={this.state.cog.repoUrl} target="_blank">
                         {this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)}
-                    </a>
-                </p>
-                <p className="cog-info">
-                    <a href={this.state.cog.repoUrl} target="_blank">
-                        Support
                     </a>
                 </p>
                 <div className="clearfix"></div>

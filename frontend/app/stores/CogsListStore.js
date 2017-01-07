@@ -10,7 +10,7 @@ class CogsListStore {
         //     'getRepos': CogsListActions.GET_REPOS,
         // });
         this.repos = [];
-        this.cogs = {};
+        this.cogs = [];
         this.showCogs = 10;
         this.searchResults = [];
     }
@@ -21,13 +21,10 @@ class CogsListStore {
 
     onGetReposSuccess(data) {
         this.repos = data.results.list;
-        let cogsList = map(data.results.list, (repo, key) => {
-            return repo.cogs;
-        });
-        for (let cog of cogsList) {
-            extend(this.cogs, cog);
+        this.cogs = [];
+        for (let repo of data.results.list) {
+            this.cogs = this.cogs.concat(repo.cogs);
         }
-
     }
 
     onGetReposFail(jqXhr) {

@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var mongoose = require('mongoose');
 // Set promise library
 mongoose.Promise = require('bluebird');
-mongoose.connect('localhost/redportal');
+mongoose.connect(process.env.mlabUrl || 'localhost/redportal');
 
 mongoose.connection.on('error', function() {
     console.log('Error: Could not connect to MongoDB. Did you forget to run `mongod`?');

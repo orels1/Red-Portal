@@ -26,7 +26,7 @@ class CogsList extends React.Component {
     componentDidMount() {
         // Will fire once, after markup has been injected
         CogsListStore.listen(this.onChange);
-        CogsListActions.getRepos();
+        CogsListActions.getList();
 
         let search = this.qs('search', this.props);
         if (search && search.length !== 0) {

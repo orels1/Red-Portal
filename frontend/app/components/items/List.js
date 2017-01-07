@@ -26,22 +26,23 @@ class List extends React.Component {
     }
 
     render() {
-        let list = (this.props.type === 'cogs' && Object.keys(this.props.list) || this.props.list).map((item, index) => {
+        let list = this.props.list.map((item, index) => {
             return (
                 <div key={this.props.keyName + index} className="card">
                     <div className="card-block">
-                        {this.props.type === 'cogs' &&
-                            <Link to={`/cogs/${item}/`} activeClassName="active">
-                                <h4 className="card-title">{item}</h4>
+                        {(this.props.type === 'cogs' || this.props.type === 'search') &&
+                            <Link to={`/cogs/${item.id}/`} activeClassName="active">
+                                <h4 className="card-title">{item.id}</h4>
                             </Link>
                         }
-                        {this.props.type !== 'cogs' && <h4 className="card-title">{decodeURIComponent(this.props.type === 'search' && item.id || item.name)}</h4>}
+                        {this.props.type === 'repos' && <h4 className="card-title">{decodeURIComponent(item.name)}</h4>}
                         <p className="card-text short text-muted">
-                            {(this.props.type === 'cogs' && this.props.list[item].short || item.short) !== 'undefined' ?
-                                decodeURIComponent(this.props.type === 'cogs' && this.props.list[item].short || item.short) :
-                                decodeURIComponent(this.props.type === 'cogs' && this.props.list[item].description || item.description).substr(0, 75) + '...'}
+                            {item.short !== 'null' ?
+                                decodeURIComponent(item.short) :
+                                decodeURIComponent(item.description).substr(0, 75) + '...'
+                            }
                         </p>
-                        <p className="card-text"><small className="text-muted">{decodeURIComponent(this.props.type === 'cogs' && this.props.list[item].author || item.author)}</small></p>
+                        <p className="card-text"><small className="text-muted">{decodeURIComponent(item.author)}</small></p>
                     </div>
                 </div>
             )
