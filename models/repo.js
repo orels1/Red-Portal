@@ -5,7 +5,7 @@ let RepoSchema = new mongoose.Schema({
     'author': String,
     'short': String,
     'description': String,
-    'cogs': {default: {}, type: Object},
+    'cogs': {default: [], type: Array},
     'parsed': {default: false, type: Boolean},
     'type': {default: 'approved', type: String},
     'url': String,
