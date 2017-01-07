@@ -24,8 +24,8 @@ gulp.task('styles', function() {
     return gulp.src('frontend/app/stylesheets/*.sass')
         .pipe(plumber())
         .pipe(sass())
-        .pipe(gulpif(production, cssmin()))
-        .pipe(gulpif(production, rename({'suffix': '.min'})))
+        // .pipe(gulpif(production, cssmin()))
+        // .pipe(gulpif(production, rename({'suffix': '.min'})))
         .pipe(gulp.dest('public/css'));
 });
 
