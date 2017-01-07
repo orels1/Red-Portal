@@ -1,4 +1,5 @@
 // babel compiler
+require("babel-polyfill");
 require('babel-register');
 
 // paths
@@ -13,15 +14,21 @@ var cors = require('cors');
 
 var app = express();
 
-// App Middleware
+/*
+* App Middleware
+* */
 app.set('port', process.env.PORT || 3000);
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ 'extended': false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// DB
+/*
+* DB
+* */
 var mongoose = require('mongoose');
+// Set promise library
+mongoose.Promise = require('bluebird');
 mongoose.connect('localhost/redportal');
 
 mongoose.connection.on('error', function() {
@@ -36,16 +43,22 @@ server.listen(app.get('port'), function() {
 // export server for the modules which needs it
 module.exports = server;
 
-// modules
+/*
+* Modules
+* */
 //var twitchapi = require('./backend/twitchapi');
 
-// API handlers
+/*
+* API handlers
+* */
 var config = require('./backend/api/v1/config');
 var repo = require('./backend/api/v1/repo');
 var cog = require('./backend/api/v1/cog');
 
 
-// CORS for API
+/*
+* CORS for API
+* */
 // List of accepted domains
 var whitelist = ['http://localhost:4000', 'http://localhost:5000'];
 
@@ -57,20 +70,26 @@ var corsOpts = {
     },
 };
 
-// API (v1)
+/*
+* API (v1)
+* */
 app.use('/api/v1/config', cors(), config.router);
 app.use('/api/v1/repo', cors(), repo.router);
 app.use('/api/v1/cog', cors(), cog.router);
 
 
-// Frontend (web)
+/*
+* Frontend
+* */
 var swig  = require('swig'),
     React = require('react'),
     ReactDOM = require('react-dom/server'),
     Router = require('react-router'),
     routes = require('frontend/app/routes');
 
-// React Middleware
+/*
+* React Middleware
+* */
 app.use(function(req, res) {
     Router.match({ 'routes': routes.default, 'location': req.url }, function(err, redirectLocation, renderProps) {
         if (err) {

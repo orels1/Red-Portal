@@ -9,6 +9,7 @@ import {eachLimit} from 'async';
 import {findWhere, where, extend} from 'underscore';
 import atob from 'atob';
 import Repo from 'models/repo';
+import co from 'co';
 
 // credentials
 import config from 'backend/config.json'
@@ -91,7 +92,8 @@ import config from 'backend/config.json'
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.find({'parsed': true}, (err, entries) => {
+    Repo.find({'parsed': true})
+        .exec((err, entries) => {
         if (err) {
             console.log(err);
             return res.status(500).send({
@@ -326,30 +328,221 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-function repoParserTask(cb) {
-    return Repo.find({})
-        .exec((err, repos) => {
-            if (err) {
-                console.log(err);
-                return cb(err);
-            }
+// Repo parsing
 
-            if (!repos) {
-                // nothing to do here
-                return cb();
-            }
+function* getRepos(match) {
+    let repos = yield Repo.find(match);
 
-            for (let repo of repos) {
-                repoParser(repo, (err) => {
-                    if (err) {
-                        return cb(err);
-                    }
-                    return cb();
-                })
-            }
-        })
+    return repos;
 }
 
+function* getGithubRepo(url) {
+    url = url.replace('github.com', 'api.github.com/repos') + '/contents'
+    let options = {
+        headers: {
+            'User-Agent': 'Red-Portal',
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': config.githubToken,
+        },
+        json: true,
+        uri: url,
+    };
+
+    let githubRepo = yield rp(options);
+
+    return githubRepo;
+}
+
+function* getInfoJson(repo) {
+    let infoJsonDescription = findWhere(repo, {'name': 'info.json'});
+
+    // check if info.json is present, if it's not - skip cog
+    if (!infoJsonDescription) {
+        return {
+            'content': null,
+        };
+    }
+
+    let options = {
+        headers: {
+            'User-Agent': 'Red-Portal',
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': config.githubToken,
+        },
+        json: true,
+        uri: infoJsonDescription.url,
+    };
+
+    let infoJsonObject = yield rp(options);
+
+    let infoJsonContents;
+
+    try {
+        infoJsonContents = yield JSON.parse(atob(infoJsonObject.content));
+    } catch (e) {
+        return e;
+    }
+
+    return {
+        'updateUrl': infoJsonDescription.url,
+        'content': infoJsonContents,
+    };
+}
+
+function* getCogs(githubRepo, repoUrl) {
+    let cogsList = yield where(githubRepo, {'type': 'dir'});
+
+    let cogs = [];
+
+    let index = 0;
+    for (let cog of cogsList) {
+        let options = {
+            headers: {
+                'User-Agent': 'Red-Portal',
+                'Accept': 'application/vnd.github.v3+json',
+                'Authorization': config.githubToken,
+            },
+            json: true,
+            uri: cog.url,
+        };
+
+        let cogDir = yield rp(options);
+
+        let infoJsonContents = yield* getInfoJson(cogDir);
+
+        // if there is no info.json - ignore cog
+        if (!infoJsonContents.content) {
+            continue;
+        }
+
+        cogs[index] = {
+            'id': cog.name,
+            'name': infoJsonContents.content.NAME,
+            'author': infoJsonContents.content.AUTHOR,
+            'short': infoJsonContents.content.SHORT || null,
+            'description': infoJsonContents.content.DESCRIPTION || null,
+            'updateUrl': infoJsonContents.updateUrl,
+            'repoUrl': repoUrl,
+        };
+
+        index ++;
+    }
+
+    return cogs;
+}
+
+function* encodeValues(object) {
+    // encode main fields
+    for (let key of Object.keys(object)) {
+        if (key !== 'cogs' && key !== 'url' && key !== 'updateUrl') {
+            object[key] = encodeURIComponent(object[key]);
+        }
+    }
+
+    // encode cogs
+    for (let cog of object.cogs) {
+        for (let key of Object.keys(cog)) {
+            if (key !== 'updateUrl' && key !== 'repoUrl') {
+                cog[key] = encodeURIComponent(cog[key]);
+            }
+        }
+    }
+
+
+    return object;
+}
+
+function* parseRepo(match) {
+    let result;
+
+    // get repo from the DB by the match
+    let repos;
+
+    try {
+        repos = yield* getRepos(match);
+    } catch (e) {
+        return e;
+    }
+
+    for (let repo of repos) {
+        // get repo object from github
+        let githubRepo;
+
+        try {
+            githubRepo = yield* getGithubRepo(repo.url);
+        } catch (e) {
+            return e;
+        }
+
+        // find, get and parse info.json for the repo
+        let repoInfoJson;
+
+        try {
+            repoInfoJson = yield* getInfoJson(githubRepo);
+        } catch (e) {
+            return e;
+        }
+
+        console.log('repoInfoJson', repoInfoJson);
+
+        // save repo info
+        result = {
+            'name': repoInfoJson.content.NAME,
+            'author': repoInfoJson.content.AUTHOR,
+            'short': repoInfoJson.content.SHORT || null,
+            'description': repoInfoJson.content.DESCRIPTION || null,
+            'url': repo.url,
+            'updateUrl': repoInfoJson.updateUrl,
+        };
+
+        // get cogs list
+        let cogs;
+
+        try {
+            cogs = yield* getCogs(githubRepo, repo.url);
+        } catch (e) {
+            return e;
+        }
+
+        result.cogs = cogs;
+
+        // encode everything
+        let resultEncoded;
+
+        try {
+            resultEncoded = yield* encodeValues(result);
+        } catch (e) {
+            return e;
+        }
+
+        resultEncoded.parsed = true;
+
+        repo = extend(repo, resultEncoded);
+
+        // save
+        let repoSaved;
+
+        try {
+            repoSaved = yield repo.save();
+        } catch (e) {
+            return e;
+        }
+    }
+
+    return `Successfully parsed and saved ${repos.length} repos`;
+
+}
+
+// test CO
+// co(parseRepo({'parsed': false}))
+//     .then((value) => {
+//         console.log(value);
+//     })
+//     .catch((e) => {
+//         console.log(e);
+//     });
+
+// TODO: Rewrite that thing
 function githubParser(url, callback) {
     let options = {
         uri: url.replace('github.com', 'api.github.com/repos') + '/contents',
