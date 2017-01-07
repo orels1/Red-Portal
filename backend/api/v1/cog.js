@@ -4,7 +4,6 @@
 
 import express from 'express';
 let router = express.Router();
-import rp from 'request-promise';
 import {eachLimit} from 'async';
 import {findWhere, where, extend, filter} from 'underscore';
 import Repo from 'models/repo';
@@ -68,29 +67,33 @@ import config from 'backend/config.json'
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.find({}, (err, entries) => {
+    Repo.aggregate([
+        {$match: {
+            'cogs' : {$exists: true, $not: {$size: 0}}
+        }},
+        {$unwind: "$cogs"},
+        {$group: {_id: null, cgs: {$push: "$cogs"}}},
+        {$project: {_id: 0, cogs: "$cgs"}}
+    ]).exec((err, repos) => {
         if (err) {
             console.log(err);
             return res.status(500).send({
                 'error': 'DBError',
-                'error_details': 'Could not list entries',
-                'results': {},
+                'error_details': 'Could not list entries'
             });
         }
-        let cogs = {};
+        let cogs = [];
         let i = 1;
-        for (let entry of entries) {
-            extend(cogs, entry.cogs);
-            if (i === entries.length) {
-                return res.status(200).send({
-                    'error': false,
-                    'results': {
-                        'list': cogs,
-                    },
-                });
-            }
-            i++;
+        for (let repo of repos) {
+            cogs = cogs.concat(repo.cogs);
         }
+
+        res.status(200).send({
+            'error': false,
+            'results': {
+                'list': cogs,
+            }
+        })
 
     });
 });
@@ -108,7 +111,14 @@ router.get('/', (req, res) => {
  * @apiUse EntryNotFound
  */
 router.get('/:cogName', (req, res) => {
-    Repo.find({}, (err, entries) => {
+    Repo.aggregate([
+        {$match: {
+            'cogs' : {$exists: true, $not: {$size: 0}}
+        }},
+        {$unwind: "$cogs"},
+        {$group: {_id: null, cgs: {$push: "$cogs"}}},
+        {$project: {_id: 0, cogs: "$cgs"}}
+    ]).exec((err, cogs) => {
         if (err) {
             console.log(err);
             return res.status(500).send({
@@ -117,26 +127,24 @@ router.get('/:cogName', (req, res) => {
                 'results': {},
             });
         }
-        let i = 1;
-        for (let entry of entries) {
-            if (req.params.cogName in entry.cogs) {
-                return res.status(200).send({
-                    'error': false,
-                    'results': entry.cogs[req.params.cogName],
-                });
-            }
 
-            if (i === entries.length) {
-                // if does not exist - return NotFound
-                return res.status(400).send({
-                    'error': 'EntryNotFound',
-                    'error_details': 'There is no such cog, or it is being parsed currently',
-                    'results': {},
-                });
-            }
-            i++
+        cogs = cogs[0].cogs;
+
+        let result = findWhere(cogs, {'id': req.params.cogName});
+
+        if (!result) {
+            // if does not exist - return NotFound
+            return res.status(400).send({
+                'error': 'EntryNotFound',
+                'error_details': 'There is no such cog, or it is being parsed currently',
+                'results': {},
+            });
         }
 
+        return res.status(200).send({
+            'error': false,
+            'results': result,
+        });
     });
 });
 
@@ -153,7 +161,14 @@ router.get('/:cogName', (req, res) => {
  * @apiUse EntryNotFound
  */
 router.get('/search/:term', (req, res) => {
-    Repo.find({}, (err, entries) => {
+    Repo.aggregate([
+        {$match: {
+            'cogs' : {$exists: true, $not: {$size: 0}}
+        }},
+        {$unwind: "$cogs"},
+        {$group: {_id: null, cgs: {$push: "$cogs"}}},
+        {$project: {_id: 0, cogs: "$cgs"}}
+    ]).exec((err, cogs) => {
         if (err) {
             console.log(err);
             return res.status(500).send({
@@ -162,33 +177,19 @@ router.get('/search/:term', (req, res) => {
                 'results': {},
             });
         }
-        let cogs = {};
-        let i = 1;
-        for (let entry of entries) {
-            extend(cogs, entry.cogs);
-            if (i === entries.length) {
-                // when got list of cogs - match with our term
-                let search = filter(Object.keys(cogs), (cog) => {
-                    let re = new RegExp(req.params.term);
-                    return re.test(cog) || re.test(decodeURIComponent(cogs[cog].description));
-                });
 
-                let response = [];
+        // when got list of cogs - match with our term
+        let search = filter(cogs[0].cogs, (cog) => {
+            let re = new RegExp(req.params.term);
+            return re.test(cog.id) || re.test(decodeURIComponent(cog.description));
+        });
 
-                for (let result of search) {
-                    cogs[result].id = result;
-                    response.push(cogs[result]);
-                }
-
-                return res.status(200).send({
-                    'error': false,
-                    'results': {
-                        'list': response,
-                    },
-                });
-            }
-            i++;
-        }
+        return res.status(200).send({
+            'error': false,
+            'results': {
+                'list': search,
+            },
+        });
 
     });
 });

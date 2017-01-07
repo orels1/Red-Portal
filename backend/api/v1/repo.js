@@ -11,8 +11,9 @@ import atob from 'atob';
 import Repo from 'models/repo';
 import co from 'co';
 
-// credentials
-import config from 'backend/config.json'
+let config = {
+    'githubToken': process.env.githubToken,
+};
 
 /**
  * @apiDefine RepoRequestSuccess
@@ -221,6 +222,80 @@ router.get('/:repoName', (req, res) => {
             'results': entry,
         });
     });
+});
+
+/**
+ * @api {get} /repo/admin/parse Parse new repos
+ * @apiVersion 0.0.1
+ * @apiName parseRepos
+ * @apiGroup repo
+ *
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": 'Successfully parsed and saved 8 repos',
+ *      }
+ */
+router.get('/admin/parse', (req, res) => {
+    co(parseRepo({'parsed': false}))
+        .then((message) => {
+            return res.status(200).send({
+                'error': false,
+                'results': message,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            return res.status(500).send({
+                'error': 'DBError',
+                'error_details': 'Could not parse entries',
+                'results': {},
+            });
+        });
+});
+
+/**
+ * @api {get} /repo/admin/fetch Parse again
+ * @apiVersion 0.0.1
+ * @apiName fetchRepos
+ * @apiGroup repo
+ *
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": 'Successfully parsed and saved 8 repos',
+ *      }
+ */
+router.get('/admin/fetch', (req, res) => {
+    co(parseRepo({'parsed': true}))
+        .then((message) => {
+            return res.status(200).send({
+                'error': false,
+                'results': message,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            return res.status(500).send({
+                'error': 'DBError',
+                'error_details': 'Could not parse entries',
+                'results': {},
+            });
+        });
 });
 
 /**
@@ -483,8 +558,6 @@ function* parseRepo(match) {
             return e;
         }
 
-        console.log('repoInfoJson', repoInfoJson);
-
         // save repo info
         result = {
             'name': repoInfoJson.content.NAME,
@@ -533,152 +606,4 @@ function* parseRepo(match) {
 
 }
 
-// test CO
-// co(parseRepo({'parsed': false}))
-//     .then((value) => {
-//         console.log(value);
-//     })
-//     .catch((e) => {
-//         console.log(e);
-//     });
-
-// TODO: Rewrite that thing
-function githubParser(url, callback) {
-    let options = {
-        uri: url.replace('github.com', 'api.github.com/repos') + '/contents',
-        headers: {
-            'User-Agent': 'Red-Portal',
-            'Accept': 'application/vnd.github.v3+json',
-            'Authorization': config.githubToken,
-        },
-        json: true,
-    };
-
-    let result = {cogs: {}};
-
-    rp(options)
-        .then((repo) => {
-            // get info.json
-            let repoOpts = {
-                headers: {
-                    'User-Agent': 'Red-Portal',
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Authorization': config.githubToken,
-                },
-                    json: true,
-            };
-            let repoInfo = findWhere(repo, {name:'info.json'});
-            repoOpts.uri = repoInfo.url;
-            rp(repoOpts)
-                .then((infoJSON) => {
-                    let content = JSON.parse(atob(infoJSON.content));
-
-                    // add the main info.json to the result
-                    result.author = encodeURIComponent(content.AUTHOR);
-                    result.name = encodeURIComponent(content.NAME);
-                    result.short = encodeURIComponent(content.SHORT);
-                    result.description = encodeURIComponent(content.DESCRIPTION);
-                    result.updateUrl = repoOpts.uri;
-
-                    // get cogs
-                    let cogsList = where(repo, {type: 'dir'});
-                    let i = 1;
-                    for (let folder of cogsList) {
-                        // request cog's folder
-                        let opts = {
-                            headers: {
-                                'User-Agent': 'Red-Portal',
-                                'Accept': 'application/vnd.github.v3+json',
-                                'Authorization': config.githubToken,
-                            },
-                            json: true,
-                        };
-                        opts.uri = folder.url;
-                        rp(opts)
-                            .then((cog) => {
-                                // find info.json
-                                let cogOpts = {
-                                    headers: {
-                                        'User-Agent': 'Red-Portal',
-                                        'Accept': 'application/vnd.github.v3+json',
-                                        'Authorization': config.githubToken,
-                                    },
-                                    json: true,
-                                };
-                                let cogInfo = findWhere(cog, {name:'info.json'});
-                                if (!cogInfo) {
-                                    console.log('No info.json!');
-                                    return callback('No info.json!');
-                                }
-                                cogOpts.uri = cogInfo.url;
-
-
-                                rp(cogOpts)
-                                    .then((infoJSON) => {
-                                        let cog = JSON.parse(atob(infoJSON.content));
-                                        // add the cog info to the result
-                                        result.cogs[folder.name] = {};
-                                        result.cogs[folder.name].name = encodeURIComponent(cog.NAME);
-                                        result.cogs[folder.name].author = encodeURIComponent(cog.AUTHOR);
-                                        result.cogs[folder.name].short = encodeURIComponent(cog.SHORT);
-                                        result.cogs[folder.name].description = encodeURIComponent(cog.DESCRIPTION);
-                                        result.cogs[folder.name].install_msg = encodeURIComponent(cog.INSTALL_MSG);
-                                        result.cogs[folder.name].updateUrl = cogOpts.uri;
-                                        result.cogs[folder.name].repoUrl = url;
-
-                                        if (i == cogsList.length) {
-                                            // done
-                                            return callback(null, result);
-                                        }
-                                        i++;
-                                    })
-                                    .catch((err) => {
-                                        console.log(err);
-                                        return callback(err);
-                                    })
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                                return callback(err);
-                            });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                    return callback(err);
-                });
-        })
-        .catch((err) => {
-            console.log(err);
-            return callback(err);
-        });
-}
-
-function repoParser(repo, cb) {
-    githubParser(repo.url, (err, result) => {
-        if (err){
-            return cb(err);
-        }
-        repo = extend(repo, result);
-
-        // console.log(repo);
-        // set repo to parsed
-        repo.parsed = true;
-        repo.save((err, entry) => {
-            if (err) {
-                console.log(err);
-                return cb(err);
-            }
-            return cb();
-        });
-    });
-}
-
-// repoParserTask((err) => {
-//     if (err) {
-//         return;
-//     }
-//     return console.log('done parsing', '\n ===============\n');
-// });
-
-export {router, repoParser};
+export {router, parseRepo};
