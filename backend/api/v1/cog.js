@@ -8,9 +8,6 @@ import {eachLimit} from 'async';
 import {findWhere, where, extend, filter} from 'underscore';
 import Repo from 'models/repo';
 
-// credentials
-import config from 'backend/config.json'
-
 /**
  * @apiDefine CogRequestSuccess
  * @apiSuccess (200) {Boolean} error Should always be false

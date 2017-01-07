@@ -69,7 +69,6 @@
     "gulp-concat": "^2.6.1",
     "gulp-cssmin": "^0.1.7",
     "gulp-if": "^2.0.2",
-    "gulp-notify": "^2.2.0",
     "gulp-plumber": "^1.1.0",
     "gulp-sass": "^3.0.0",
     "nodemon": "^1.11.0",

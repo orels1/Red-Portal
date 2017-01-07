@@ -1,6 +1,5 @@
 // main dependencies
 var gulp = require('gulp'),
-    notify = require('gulp-notify'),
     gulpif = require('gulp-if'),
     plumber = require('gulp-plumber'),
     concat = require('gulp-concat'),
@@ -110,5 +109,5 @@ gulp.task('browserify-watch', ['browserify-vendor'], function() {
 // configure default tasks
 gulp.task('default', ['styles', 'browserify-watch', 'styles-watch']);
 gulp.task('build', ['styles', 'browserify'], function() {
-    gulp.src('public/js/bundle.js').pipe(notify({ 'message': 'Successfully built everything' }));
+    gulp.src('public/js/bundle.js');
 });
