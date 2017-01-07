@@ -4,12 +4,13 @@
   "description": "A cog-listing project for Red-DiscordBot",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "nodemon app.js",
     "gendocs": "apidoc -i backend/api -o apidoc/",
     "rundocs": "node docs.js",
     "docs": "npm run gendocs && npm run rundocs",
-    "postinstall": "gulp build"
+    "postinstall": "npm install --only=dev && gulp build"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,9 @@
   "keywords": [
     "node"
   ],
+  "engines": {
+    "node": ">=6.9.0 < 7.0.0"
+  },
   "author": "orels1",
   "license": "MIT",
   "bugs": {
