@@ -1,0 +1,8 @@
+version: '2'
+red-portal:
+  build: .
+  container_name: red-portal
+  hostname: red-portal
+  restart: always
+  ports:
+    - "3000:3000"
