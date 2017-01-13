@@ -27,25 +27,39 @@ class List extends React.Component {
 
     render() {
         let list = this.props.list.map((item, index) => {
-            return (
-                <div key={this.props.keyName + index} className="card">
-                    <div className="card-block">
-                        {(this.props.type === 'cogs' || this.props.type === 'search') &&
+            if ((this.props.filters && (this.props.filters.indexOf(item.repoType) !== -1)) || (!this.props.filters && true)) {
+                return (
+                    <div key={this.props.keyName + index} className="card">
+                        <div className="card-block">
+                            {(this.props.type === 'cogs' || this.props.type === 'search') &&
                             <Link to={`/cogs/${item.id}/`} activeClassName="active">
                                 <h4 className="card-title">{item.id}</h4>
                             </Link>
-                        }
-                        {this.props.type === 'repos' && <h4 className="card-title">{decodeURIComponent(item.name)}</h4>}
-                        <p className="card-text short text-muted">
-                            {item.short !== 'null' ?
-                                decodeURIComponent(item.short) :
-                                decodeURIComponent(item.description).substr(0, 75) + '...'
                             }
-                        </p>
-                        <p className="card-text"><small className="text-muted">{decodeURIComponent(item.author)}</small></p>
+                            {this.props.type === 'repos' &&
+                            <h4 className="card-title">{decodeURIComponent(item.name)}</h4>}
+                            <p className="card-text short text-muted">
+                                {item.short !== 'null' ?
+                                    ((decodeURIComponent(item.short).length > 70 && decodeURIComponent(item.short).substr(0,70) + '...') || decodeURIComponent(item.short))  :
+                                    decodeURIComponent(item.description).substr(0, 70) + '...'
+                                }
+                            </p>
+                            <p className="card-text">
+                                <small className="text-muted">{decodeURIComponent(item.author)}&nbsp;&nbsp;&nbsp;</small>
+                                {((item.type && item.type === 'approved') || (item.repoType === 'approved')) &&
+                                    <small className="text-success" title="approved"><i className="fa fa-check" aria-hidden="true"></i></small>
+                                }
+                                {((item.type && item.type === 'beta') || (item.repoType === 'beta')) &&
+                                    <small className="text-warning" title="beta">β</small>
+                                }
+                                {((item.type && item.type === 'unapproved') || (item.repoType === 'unapproved')) &&
+                                    <small className="text-danger" title="unapproved"><i className="fa fa-minus-circle" aria-hidden="true"></i></small>
+                                }
+                            </p>
+                        </div>
                     </div>
-                </div>
-            )
+                )
+            }
         });
         return (
             <div className="repos-list">

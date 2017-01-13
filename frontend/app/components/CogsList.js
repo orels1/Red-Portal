@@ -86,7 +86,7 @@ class CogsList extends React.Component {
                     <List title="Search results" keyName="search" list={this.state.searchResults} type="search"/>
                 }
 
-                <List title="Cogs" list={this.state.cogs} keyName="cog" type="cogs" limit={this.state.showCogs} />
+                <List title="Cogs" list={this.state.cogs} filers={['approved', 'beta']} keyName="cog" type="cogs" limit={this.state.showCogs} />
                 {cogs.length >= this.state.showCogs &&
                 <button className="btn btn-default btn-square" onClick={this.handleShowMoreCogs.bind(this)}>
                     Show more...

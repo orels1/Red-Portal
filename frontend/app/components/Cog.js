@@ -31,6 +31,21 @@ class Cog extends React.Component {
         return(
             <div className="cog">
                 <h1 className="display-3">{this.state.cog.id}</h1>
+                {this.state.cog.repoType === 'approved' &&
+                    <p className="cog-info">
+                        <span className="text-success">{this.state.cog.repoType}</span>
+                    </p>
+                }
+                {this.state.cog.repoType === 'beta' &&
+                    <p className="cog-info">
+                        <span className="text-warning">{this.state.cog.repoType}</span>
+                    </p>
+                }
+                {this.state.cog.repoType === 'unapproved' &&
+                    <p className="cog-info">
+                        <span className="text-danger">{this.state.cog.repoType}</span>
+                    </p>
+                }
                 <p className="cog-info">
                     By&nbsp;
                     <a href={this.state.cog.repoUrl && this.state.cog.repoUrl.substr(0, this.state.cog.repoUrl.lastIndexOf('/'))} target="_blank">
@@ -44,6 +59,17 @@ class Cog extends React.Component {
                     </a>
                 </p>
                 <div className="clearfix"></div>
+
+                {this.state.cog.repoType === 'unapproved' &&
+                    <div>
+                        <h2 className="display-4">Disclaimer</h2>
+                        <p className="cog-info description">
+                            This is a cog from an unapproved repo, it was not checked by members of either Red-DiscordBot or Cogs-Support staff and it can contain anything.
+                            <br/>
+                            <b className="text-danger">USE AT YOUR OWN RISK!</b>
+                        </p>
+                    </div>
+                }
 
                 <h2 className="display-4">Description</h2>
                 <p className="cog-info description" dangerouslySetInnerHTML={{__html: decodeURIComponent(this.state.cog.description || this.state.cog.short).replace(/(?:\r\n|\r|\n)/g, '<br />')}}>

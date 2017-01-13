@@ -464,7 +464,7 @@ function* getInfoJson(repo) {
     };
 }
 
-function* getCogs(githubRepo, repoUrl) {
+function* getCogs(githubRepo, repoUrl, repoType) {
     let cogsList = yield where(githubRepo, {'type': 'dir'});
 
     let cogs = [];
@@ -498,6 +498,7 @@ function* getCogs(githubRepo, repoUrl) {
             'description': infoJsonContents.content.DESCRIPTION || null,
             'updateUrl': infoJsonContents.updateUrl,
             'repoUrl': repoUrl,
+            'repoType': repoType,
         };
 
         index ++;
@@ -572,7 +573,7 @@ function* parseRepo(match) {
         let cogs;
 
         try {
-            cogs = yield* getCogs(githubRepo, repo.url);
+            cogs = yield* getCogs(githubRepo, repo.url, repo.type);
         } catch (e) {
             return e;
         }
