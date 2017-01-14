@@ -16,6 +16,10 @@ var browserify = require('browserify'),
     watchify = require('watchify'),
     source = require('vinyl-source-stream');
 
+// docker
+var Docker = require('dockerode'),
+    spawn = require('child_process').spawn;
+
 // check if set to build for production
 var production = process.env.NODE_ENV === 'production';
 
@@ -104,10 +108,53 @@ gulp.task('browserify-watch', ['browserify-vendor'], function() {
             .pipe(source('bundle.js'))
             .pipe(gulp.dest('public/js'))
     }
-})
+});
 
 // configure default tasks
 gulp.task('default', ['styles', 'browserify-watch', 'styles-watch']);
 gulp.task('build', ['styles', 'browserify'], function() {
     gulp.src('public/js/bundle.js');
+});
+
+// simple service function
+function execCommand(command, args, cb) {
+    var ctx = spawn(command, args);
+    ctx.stdout.on('data', function(data) {
+        process.stdout.write(data);
+    });
+    ctx.stderr.on('data', function(data) {
+        process.stderr.write(data);
+    });
+    ctx.on('close', function(code) {
+        if(cb){cb(code === 0 ? null : code);}
+    })
+}
+
+// Docker build
+var docker = new Docker(),
+    imageName = 'orels1/red-portal',
+    containerName = 'red-portal';
+
+gulp.task('docker-build', function(cb) {
+    execCommand('docker', ['build', '-t', imageName, '.'], cb);
+});
+
+gulp.task('docker-push', function(cb) {
+    execCommand('docker', ['push', imageName], cb);
+});
+
+gulp.task('kubernetes-update', function(cb) {
+    execCommand('kubectl', ['rolling-update', containerName, '--image=' + imageName, '--image-pull-policy=Always'], cb);
+});
+
+gulp.task('kubernetes-proxy', function(cb) {
+    execCommand('kubectl', ['proxy'], cb);
+});
+
+gulp.task('deploy', ['build'], function(cb) {
+    execCommand('docker', ['build', '-t', imageName, '.'], function() {
+        execCommand('docker', ['push', imageName], function() {
+            execCommand('kubectl', ['rolling-update', containerName, '--image=' + imageName, '--image-pull-policy=Always'], cb);
+        });
+    });
 });
