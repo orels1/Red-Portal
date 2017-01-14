@@ -23,6 +23,10 @@ var Docker = require('dockerode'),
 // check if set to build for production
 var production = process.env.NODE_ENV === 'production';
 
+// Webbhook operation
+var request = require('request'),
+    moment = require('moment');
+
 // compile sass files
 gulp.task('styles', function() {
     return gulp.src('frontend/app/stylesheets/*.sass')
@@ -130,6 +134,28 @@ function execCommand(command, args, cb) {
     })
 }
 
+var options = {
+    'method': 'POST',
+    'uri': process.env.gulpDiscordHook,
+    'headers': {
+        'Content-Type': 'application/json'
+    },
+    'body': {
+        'username': 'Gulp',
+        'avatar_url': 'http://i.imgur.com/58BHyM5.jpg',
+        'embeds': [
+            {
+                'title': 'Red-Portal docker build started',
+                'color': 4839423,
+                'footer': {
+                    'text': ''
+                }
+            }
+        ]
+    },
+    'json': true
+};
+
 // Docker build
 var docker = new Docker(),
     imageName = 'orels1/red-portal',
@@ -152,9 +178,49 @@ gulp.task('kubernetes-proxy', function(cb) {
 });
 
 gulp.task('deploy', ['build'], function(cb) {
+    // send to webhook
+    var t1 = Date.now(),
+        t0 = moment();
+    options.body.embeds[0].footer.text = t0.format('[At] HH:mm:ss');
+    request(options, function(err, resp) {
+        if (err) console.log(err);
+    });
+
     execCommand('docker', ['build', '-t', imageName, '.'], function() {
+        // send to webhook
+        var t2 = Date.now();
+        options.body.embeds[0].title = 'Red-Portal docker build finished';
+        options.body.embeds[0].color = 9240393;
+        options.body.embeds[0].footer.text = 'After ' + moment.duration(t2-t1).humanize();
+        request(options, function(err, resp) {
+            if (err) console.log(err);
+        });
+
+        // send to webhook
+        t1 = Date.now();
+        t0 = moment();
+        options.body.embeds[0].title = 'Red-Portal deploy started';
+        options.body.embeds[0].color = 4839423;
+        options.body.embeds[0].footer.text = t0.format('[At] HH:mm:ss');
+        request(options, function(err, resp) {
+            if (err) console.log(err);
+        });
         execCommand('docker', ['push', imageName], function() {
-            execCommand('kubectl', ['rolling-update', containerName, '--image=' + imageName, '--image-pull-policy=Always'], cb);
+            execCommand('kubectl', ['rolling-update', containerName, '--image=' + imageName, '--image-pull-policy=Always'], function(){
+                // send to webhook
+                var t2 = Date.now();
+                options.body.embeds[0].title = 'Red-Portal deployed';
+                options.body.embeds[0].url = 'https://cogs.red';
+                options.body.embeds[0].description = 'Changes are live now';
+                options.body.embeds[0].color = 9240393;
+                options.body.embeds[0].footer.text = 'After ' + moment.duration(t2-t1).humanize();
+                request(options, function(err, resp) {
+                    if (err) console.log(err);
+                });
+
+                cb();
+            });
         });
     });
 });
+
