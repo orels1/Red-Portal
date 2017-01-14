@@ -8,9 +8,9 @@ class CogActions {
         );
     }
 
-    getCog(cogName) {
+    getCog(payload) {
         $.ajax({
-            'url': '/api/v1/cog/' + cogName,
+            'url': `/api/v1/cogs/cog/${payload.repoName}/${payload.cogName}`,
             'type': 'GET',
         })
             .done((data) => {

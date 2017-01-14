@@ -60,21 +60,6 @@ class CogsList extends React.Component {
     }
 
     render() {
-        let cogs = Object.keys(this.state.cogs).map((key, index) => {
-            return (
-                <div key={'cog' + index} className="card">
-                    <div className="card-block">
-                        <Link to={`/cogs/${key}/`} activeClassName="active">
-                            <h4 className="card-title">{key}</h4>
-                        </Link>
-                        <p className="card-text short text-muted">
-                            {this.state.cogs[key].short !== 'undefined' ? decodeURIComponent(this.state.cogs[key].short) : decodeURIComponent(this.state.cogs[key].description).substr(0, 75) + '...'}
-                        </p>
-                        <p className="card-text"><small className="text-muted">{decodeURIComponent(this.state.cogs[key].author)}</small></p>
-                    </div>
-                </div>
-            )
-        });
         return(
             <div>
                 <h1 className="section-header" style={{paddingTop: '50px'}}>Disclaimer</h1>
@@ -83,17 +68,37 @@ class CogsList extends React.Component {
                 </p>
 
                 {this.state.searchResults.length !== 0 &&
-                    <List title="Search results" keyName="search" list={this.state.searchResults} type="search"/>
+                    <List
+                        title="Search results"
+                        keyName="search"
+                        list={this.state.searchResults}
+                        type="search"
+                        router={this.props.router}
+                    />
                 }
 
-                <List title="Cogs" list={this.state.cogs} filers={['approved', 'beta']} keyName="cog" type="cogs" limit={this.state.showCogs} />
-                {cogs.length >= this.state.showCogs &&
+                <List
+                    title="Cogs"
+                    list={this.state.cogs}
+                    filers={['approved', 'beta']}
+                    keyName="cog"
+                    type="cogs"
+                    limit={this.state.showCogs}
+                    router={this.props.router}
+                />
+                {this.state.cogs.length >= this.state.showCogs &&
                 <button className="btn btn-default btn-square" onClick={this.handleShowMoreCogs.bind(this)}>
                     Show more...
                 </button>
                 }
 
-                <List title="Repos" list={this.state.repos} keyName="repo" type="repos" />
+                <List
+                    title="Repos"
+                    list={this.state.repos}
+                    keyName="repo"
+                    type="repos"
+                    router={this.props.router}
+                />
             </div>
         )
     }

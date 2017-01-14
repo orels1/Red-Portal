@@ -31,7 +31,7 @@ class CogsListActions {
     find(query) {
         $.ajax({
             'type': 'GET',
-            'url': '/api/v1/cog/search/' + query,
+            'url': '/api/v1/cogs/search/' + query,
         })
             .done((data) => {
                 this.findSuccess(data);

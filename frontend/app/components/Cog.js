@@ -1,6 +1,8 @@
 import React from 'react';
 import CogActions from '../actions/CogActions';
 import CogStore from '../stores/CogStore';
+import DocumentMeta from 'react-document-meta';
+import {Link} from 'react-router';
 
 class Cog extends React.Component {
     constructor(props) {
@@ -14,7 +16,10 @@ class Cog extends React.Component {
     componentDidMount() {
         // Will fire once, after markup has been injected
         CogStore.listen(this.onChange);
-        CogActions.getCog(this.props.params.cogName);
+        CogActions.getCog({
+            'repoName': this.props.params.repoName,
+            'cogName': this.props.params.cogName
+        });
     }
 
     componentWillUnmount() {
@@ -30,7 +35,22 @@ class Cog extends React.Component {
     render() {
         return(
             <div className="cog">
-                <h1 className="display-3">{this.state.cog.id}</h1>
+                <DocumentMeta
+                    title={`Cogs.Red | Cog: ${this.props.params.cogName}`}
+                    meta={{
+                    'property': {
+                        'og:title': `Cog: ${this.props.params.cogName}`,
+                        'twitter:title': `Cog: ${this.props.params.cogName}`,
+                    }
+                }} />
+                <h1 className="display-3">
+                    {this.state.cog.id ||
+                        <span>
+                            <i className="fa fa-cog fa-spin" aria-hidden="true"></i>&nbsp;
+                            Loading
+                        </span>
+                    }
+                </h1>
                 {this.state.cog.repoType === 'approved' &&
                     <p className="cog-info">
                         <span className="text-success">{this.state.cog.repoType}</span>
@@ -54,9 +74,9 @@ class Cog extends React.Component {
                 </p>
                 <p className="cog-info">
                     Repo&nbsp;
-                    <a href={this.state.cog.repoUrl} target="_blank">
+                    <Link to={`/cogs/repo/${this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)}/`}>
                         {this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)}
-                    </a>
+                    </Link>
                 </p>
                 <div className="clearfix"></div>
 
@@ -72,16 +92,16 @@ class Cog extends React.Component {
                 }
 
                 <h2 className="display-4">Description</h2>
-                <p className="cog-info description" dangerouslySetInnerHTML={{__html: decodeURIComponent(this.state.cog.description || this.state.cog.short).replace(/(?:\r\n|\r|\n)/g, '<br />')}}>
+                <p className="cog-info description" dangerouslySetInnerHTML={{__html: decodeURIComponent((this.state.cog.description !== 'null' && this.state.cog.description) || this.state.cog.short).replace(/(?:\r\n|\r|\n)/g, '<br />')}}>
                 </p>
 
                 <h2 className="display-4">Installation</h2>
                 <small>Replace [p] with your bot's prefix and use these commands</small>
                 <p className="cog-info description code">
-                    [p]cog repo add {decodeURIComponent(this.state.cog.author)} {this.state.cog.repoUrl}
+                    [p]cog repo add {this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)} {this.state.cog.repoUrl}
                 </p>
                 <p className="cog-info description code">
-                    [p]cog install {decodeURIComponent(this.state.cog.author)} {this.props.params.cogName}
+                    [p]cog install {this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)} {this.props.params.cogName}
                 </p>
             </div>
         )

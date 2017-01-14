@@ -25,14 +25,29 @@ class List extends React.Component {
         this.setState(state);
     }
 
+    handleCogClick(type, item, router) {
+        event.preventDefault();
+
+        if (type === 'cogs' || type === 'search') {
+            router.push(`/cogs/cog/${item.repoUrl && item.repoUrl.substr(item.repoUrl.lastIndexOf('/') + 1)}/${item.id}/`);
+        } else {
+            router.push(`/cogs/repo/${item.url && item.url.substr(item.url.lastIndexOf('/') + 1)}/`);
+        }
+
+    }
+
     render() {
         let list = this.props.list.map((item, index) => {
             if ((this.props.filters && (this.props.filters.indexOf(item.repoType) !== -1)) || (!this.props.filters && true)) {
                 return (
-                    <div key={this.props.keyName + index} className="card">
+                    <div
+                        key={this.props.keyName + index}
+                        className="card"
+                        onClick={this.handleCogClick.bind(null, this.props.type, item, this.props.router)}
+                    >
                         <div className="card-block">
                             {(this.props.type === 'cogs' || this.props.type === 'search') &&
-                            <Link to={`/cogs/${item.id}/`} activeClassName="active">
+                            <Link to={`/cogs/cog/${item.repoUrl && item.repoUrl.substr(item.repoUrl.lastIndexOf('/') + 1)}/${item.id}/`} activeClassName="active">
                                 <h4 className="card-title">{item.id}</h4>
                             </Link>
                             }
