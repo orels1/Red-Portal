@@ -35,10 +35,10 @@ import Repo from 'models/repo';
  */
 
 /**
- * @api {get} /cog/ List all cogs
+ * @api {get} /cogs/ List all cogs
  * @apiVersion 0.0.1
  * @apiName getCogList
- * @apiGroup cog
+ * @apiGroup cogs
  *
  * @apiUse DBError
  *
@@ -96,20 +96,71 @@ router.get('/', (req, res) => {
 });
 
 /**
- * @api {get} /cog/:cogName Get cog
+ * @api {get} /cogs/repo/:repoName Get cogs from repo
+ * @apiVersion 0.0.1
+ * @apiName getCogFromRepo
+ * @apiGroup cogs
+ *
+ * @apiParam {String} repoName Name of the repo containing the cog
+ *
+ * @apiUse DBError
+ * @apiUse CogRequestSuccess
+ * @apiUse EntryNotFound
+ */
+router.get('/repo/:repoName', (req, res) => {
+    Repo.aggregate([
+        {$match: {
+            'url' : {$regex: req.params.repoName, $options: 'i'},
+            'cogs' : {$exists: true, $not: {$size: 0}}
+        }},
+        {$unwind: "$cogs"},
+        {$group: {_id: null, cgs: {$push: "$cogs"}}},
+        {$project: {_id: 0, cogs: "$cgs"}}
+    ]).exec((err, cogs) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send({
+                'error': 'DBError',
+                'error_details': 'Could not check for entry',
+                'results': {},
+            });
+        }
+
+        cogs = cogs[0].cogs;
+
+        if (!cogs) {
+            // if does not exist - return NotFound
+            return res.status(400).send({
+                'error': 'EntryNotFound',
+                'error_details': 'There is no such cog, or it is being parsed currently',
+                'results': {},
+            });
+        }
+
+        return res.status(200).send({
+            'error': false,
+            'results': cogs,
+        });
+    });
+});
+
+/**
+ * @api {get} /cogs/cog/:repoName/:cogName Get cog
  * @apiVersion 0.0.1
  * @apiName getCog
- * @apiGroup cog
+ * @apiGroup cogs
  *
+ * @apiParam {String} repoName Name of the repo containing the cog
  * @apiParam {String} cogName Name of the cog to get
  *
  * @apiUse DBError
  * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
  */
-router.get('/:cogName', (req, res) => {
+router.get('/cog/:repoName/:cogName', (req, res) => {
     Repo.aggregate([
         {$match: {
+            'url' : {$regex: req.params.repoName, $options: 'i'},
             'cogs' : {$exists: true, $not: {$size: 0}}
         }},
         {$unwind: "$cogs"},
@@ -146,10 +197,10 @@ router.get('/:cogName', (req, res) => {
 });
 
 /**
- * @api {get} /cog/search/:term Search for a cog
+ * @api {get} /cogs/search/:term Search for a cog
  * @apiVersion 0.0.1
  * @apiName searchCog
- * @apiGroup cog
+ * @apiGroup cogs
  *
  * @apiParam {String} term Term to search for
  *
@@ -177,7 +228,7 @@ router.get('/search/:term', (req, res) => {
 
         // when got list of cogs - match with our term
         let search = filter(cogs[0].cogs, (cog) => {
-            let re = new RegExp(req.params.term);
+            let re = new RegExp(req.params.term, 'i');
             return re.test(cog.id) || re.test(decodeURIComponent(cog.description));
         });
 
