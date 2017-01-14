@@ -77,6 +77,7 @@ class About extends React.Component {
                     </small>
                     - Repositories that haven't been screened. Quality / safety not guaranteed.
                     <br/>
+                    <br/>
                     <b className="text-danger">Despite the above categories each cog creator is responsible for the content of their own repository.
                         <br/>
                         The staff of Red and its community have no responsibilty for any potential damage caused by third party repositories.

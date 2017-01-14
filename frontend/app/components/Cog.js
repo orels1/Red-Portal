@@ -78,6 +78,11 @@ class Cog extends React.Component {
                         {this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)}
                     </Link>
                 </p>
+                <p className="cog-info">
+                    <a href={`${this.state.cog.repoUrl}/blob/master/${this.state.cog.id}/${this.state.cog.id}.py`} target="_blank">
+                        source
+                    </a>
+                </p>
                 <div className="clearfix"></div>
 
                 {this.state.cog.repoType === 'unapproved' &&
