@@ -53,7 +53,7 @@ module.exports = server;
 * */
 var config = require('./backend/api/v1/config');
 var repo = require('./backend/api/v1/repo');
-var cog = require('./backend/api/v1/cog');
+var cogs = require('./backend/api/v1/cogs');
 
 
 /*
@@ -75,7 +75,7 @@ var corsOpts = {
 * */
 app.use('/api/v1/config', cors(), config.router);
 app.use('/api/v1/repo', cors(), repo.router);
-app.use('/api/v1/cog', cors(), cog.router);
+app.use('/api/v1/cogs', cors(), cogs.router);
 
 
 /*
@@ -85,7 +85,8 @@ var swig  = require('swig'),
     React = require('react'),
     ReactDOM = require('react-dom/server'),
     Router = require('react-router'),
-    routes = require('frontend/app/routes');
+    routes = require('frontend/app/routes'),
+    DocumentMeta = require('react-document-meta');
 
 /*
 * React Middleware
@@ -98,7 +99,8 @@ app.use(function(req, res) {
             res.status(302).redirect(redirectLocation.pathname + redirectLocation.search);
         } else if (renderProps) {
             var html = ReactDOM.renderToString(React.createElement(Router.RouterContext, renderProps));
-            var page = swig.renderFile('frontend/views/index.html', { 'html': html });
+            var head = DocumentMeta.renderAsHTML();
+            var page = swig.renderFile('frontend/views/index.html', { 'html': html, 'head': head });
             res.status(200).send(page);
         } else {
             res.status(404).send('Page Not Found');
