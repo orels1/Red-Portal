@@ -31,7 +31,7 @@ class Home extends React.Component {
             <div className="home">
                 <h1 className="display-1">RED</h1>
                 <div className="excerpt col-md-8 offset-md-2">
-                    A fully modular <b>Discord</b> bot
+                    A fully customizable <b>Discord</b> bot<br/>
                     Created by <b>Twentysix</b>, made great by many
                 </div>
                 <div className="col-md-4 offset-md-4 download">

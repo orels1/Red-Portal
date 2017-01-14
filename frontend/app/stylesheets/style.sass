@@ -99,7 +99,6 @@ body
       font-weight: 500
       color: #fd2121
 
-
 // Headers
 h1.section-header
   text-transform: uppercase
@@ -132,6 +131,7 @@ h1.section-header
     border: 2px solid rgba(75,75,75,0.5)
     background: rgba(0,0,0,0.7)
     transition: border 300ms ease
+    cursor: pointer
 
     &:hover
       border: 2px solid #fd2121
@@ -181,13 +181,11 @@ h1.section-header
 
 // About
 .about
-  height: 80vh
-  width: 100vw
-  display: table-cell
-  vertical-align: middle
+  position: relative
   text-align: center
 
   .display-2
+    padding-top: 80px
     font-weight: 700
     color: #fff
     text-transform: uppercase
