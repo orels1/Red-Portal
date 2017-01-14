@@ -42,10 +42,28 @@ class CogsListStore {
 
         this.repos = data.results.list;
         this.cogs = [];
+
+        let approved = [],
+            beta = [],
+            unapproved = [];
+
         for (let repo of data.results.list) {
-            this.cogs = this.cogs.concat(repo.cogs);
+            switch (repo.type) {
+                case 'approved':
+                    approved = approved.concat(repo.cogs);
+                    break;
+                case 'beta':
+                    beta = beta.concat(repo.cogs);
+                    break;
+                case 'unapproved':
+                    unapproved = unapproved.concat(repo.cogs);
+                    break;
+                default:
+                    unapproved = unapproved.concat(repo.cogs);
+            }
         }
-        this.cogs = shuffle(this.cogs);
+
+        this.cogs = this.cogs.concat(shuffle(approved), shuffle(beta), shuffle(unapproved));
     }
 
     onGetReposFail(jqXhr) {
