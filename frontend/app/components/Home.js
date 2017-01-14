@@ -35,7 +35,7 @@ class Home extends React.Component {
                     Created by <b>Twentysix</b>, made great by many
                 </div>
                 <div className="col-md-4 offset-md-4 download">
-                    <a href="https://github.com/Twentysix26" className="btn btn-default btn-square">
+                    <a href="https://github.com/Twentysix26/Red-DiscordBot" className="btn btn-default btn-square">
                         <i className="fa fa-github" aria-hidden="true"></i>&nbsp;Download now
                     </a>
                 </div>
