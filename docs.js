@@ -10,7 +10,7 @@ app.set('port', process.env.PORT || 3500);
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ 'extended': false }));
-app.use(express.static(path.join(__dirname, 'apidoc')));
+app.use(express.static(path.join(__dirname, 'docs')));
 
 var server = require('http').createServer(app);
 server.listen(app.get('port'), function() {

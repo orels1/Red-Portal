@@ -475,6 +475,19 @@
     "version": "0.0.1",
     "name": "deleteConfig",
     "group": "config",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -564,6 +577,19 @@
     "version": "0.0.1",
     "name": "getConfig",
     "group": "config",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -674,6 +700,19 @@
     "version": "0.0.1",
     "name": "getConfigList",
     "group": "config",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "fields": {
         "200": [
@@ -743,6 +782,19 @@
     "version": "0.0.1",
     "name": "postConfig",
     "group": "config",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -867,6 +919,19 @@
     "version": "0.0.1",
     "name": "putConfig",
     "group": "config",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -991,6 +1056,19 @@
     "version": "0.0.1",
     "name": "deleteRepo",
     "group": "repo",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1404,6 +1482,19 @@
     "version": "0.0.1",
     "name": "postRepo",
     "group": "repo",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1507,6 +1598,19 @@
     "version": "0.0.1",
     "name": "putRepo",
     "group": "repo",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [
