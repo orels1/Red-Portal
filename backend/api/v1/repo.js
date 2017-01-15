@@ -118,6 +118,8 @@ router.get('/', (req, res) => {
  * @apiName postRepo
  * @apiGroup repo
  *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
  * @apiParam {String} url Repo github URL
  * @apiParam {String} type Repo type, either approved or beta
  *
@@ -304,6 +306,8 @@ router.get('/admin/fetch', (req, res) => {
  * @apiName putRepo
  * @apiGroup repo
  *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
  * @apiParam {String} id Repo id in DB
  * @apiParam {String} url New repo url
  *
@@ -337,7 +341,7 @@ router.put('/:id', (req, res) => {
             });
         }
         // update with the new values
-        entry.url = req.body.url;
+        entry = extend(entry, req.body);
         entry.parsed = false;
         return entry.save((err, entry) => {
             if (err) {
@@ -361,6 +365,8 @@ router.put('/:id', (req, res) => {
  * @apiVersion 0.0.1
  * @apiName deleteRepo
  * @apiGroup repo
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
  *
  * @apiParam {String} id Repo id in DB
  *

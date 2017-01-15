@@ -71,11 +71,28 @@ var corsOpts = {
 };
 
 /*
+* API access control*/
+
+var apiAccessControl = function(req, res, next) {
+    if (req.method != 'GET' || req.baseUrl == '/api/v1/config') {
+        if (req.get('Service-Token') == process.env.serviceToken) {
+            next();
+        } else {
+            res.status(401).send({
+                'error': 'Unauthorized',
+                'error_details': 'Please provide correect Service-Token header',
+                'results': {}
+            })
+        }
+    }
+};
+
+/*
 * API (v1)
 * */
-app.use('/api/v1/config', cors(), config.router);
-app.use('/api/v1/repo', cors(), repo.router);
-app.use('/api/v1/cogs', cors(), cogs.router);
+app.use('/api/v1/config', cors(), apiAccessControl, config.router);
+app.use('/api/v1/repo', cors(), apiAccessControl, repo.router);
+app.use('/api/v1/cogs', cors(), apiAccessControl, cogs.router);
 
 
 /*

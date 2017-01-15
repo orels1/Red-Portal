@@ -36,9 +36,6 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
-# apidocs directory
-apidoc/*
-
 # ignore future credentials updates
 credentials.json
 

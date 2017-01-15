@@ -32,6 +32,8 @@ import Config from 'models/config';
  * @apiName getConfigList
  * @apiGroup config
  *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
  * @apiUse DBError
  *
  * @apiSuccess (200) {Boolean} error Should always be false
@@ -77,6 +79,8 @@ router.get('/', (req, res) => {
  * @apiVersion 0.0.1
  * @apiName postConfig
  * @apiGroup config
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
  *
  * @apiParam {String} name Config entry unique name
  * @apiParam {String} value Config entry value
@@ -147,6 +151,8 @@ router.post('/', (req, res) => {
  * @apiName getConfig
  * @apiGroup config
  *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
  * @apiParam {String} optionName Config entry name to return
  *
  * @apiUse DBError
@@ -185,6 +191,8 @@ router.get('/:optionName', (req, res) => {
  * @apiVersion 0.0.1
  * @apiName putConfig
  * @apiGroup config
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
  *
  * @apiParam {String} optionName Config entry unique name
  * @apiParam {String} value Config entry value
@@ -246,6 +254,8 @@ router.put('/', (req, res) => {
  * @apiVersion 0.0.1
  * @apiName deleteConfig
  * @apiGroup config
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
  *
  * @apiParam {String} id Config entry id
  *
