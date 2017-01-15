@@ -29,6 +29,9 @@ Ever thought "it'd be cool if there was a place, where you can see a list of all
 - Google Container Engine (<3)
 - Kubernetes
 
+### API
+
+[Docs on the api are available here](https://orels1.github.io/Red-Portal/)
 
 ### Support
 If you like and/or use the project, consider supporting me on [patreon](https://www.patreon.com/orels1), a small donation can go a long way + for a bit extra, you can get something coded specially for you ;)
