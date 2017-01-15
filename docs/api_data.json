@@ -1152,12 +1152,25 @@
     }
   },
   {
-    "type": "get",
+    "type": "put",
     "url": "/repo/admin/fetch",
     "title": "Parse again",
     "version": "0.0.1",
     "name": "fetchRepos",
     "group": "repo",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "fields": {
         "200": [
@@ -1414,12 +1427,25 @@
     }
   },
   {
-    "type": "get",
+    "type": "put",
     "url": "/repo/admin/parse",
     "title": "Parse new repos",
     "version": "0.0.1",
     "name": "parseRepos",
     "group": "repo",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "string",
+            "optional": false,
+            "field": "Service-Token",
+            "description": "<p>Admin-oriented service token</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "fields": {
         "200": [

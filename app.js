@@ -80,11 +80,11 @@ var apiAccessControl = function(req, res, next) {
         } else {
             res.status(401).send({
                 'error': 'Unauthorized',
-                'error_details': 'Please provide correect Service-Token header',
+                'error_details': 'Please provide correct Service-Token header',
                 'results': {}
             })
         }
-    }
+    } else {next();}
 };
 
 /*

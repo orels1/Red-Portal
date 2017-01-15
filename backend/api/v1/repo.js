@@ -227,11 +227,12 @@ router.get('/:repoName', (req, res) => {
 });
 
 /**
- * @api {get} /repo/admin/parse Parse new repos
+ * @api {put} /repo/admin/parse Parse new repos
  * @apiVersion 0.0.1
  * @apiName parseRepos
  * @apiGroup repo
  *
+ * @apiHeader {string} Service-Token Admin-oriented service token
  *
  * @apiUse DBError
  *
@@ -245,7 +246,7 @@ router.get('/:repoName', (req, res) => {
  *          "results": 'Successfully parsed and saved 8 repos',
  *      }
  */
-router.get('/admin/parse', (req, res) => {
+router.put('/admin/parse', (req, res) => {
     co(parseRepo({'parsed': false}))
         .then((message) => {
             return res.status(200).send({
@@ -264,11 +265,12 @@ router.get('/admin/parse', (req, res) => {
 });
 
 /**
- * @api {get} /repo/admin/fetch Parse again
+ * @api {put} /repo/admin/fetch Parse again
  * @apiVersion 0.0.1
  * @apiName fetchRepos
  * @apiGroup repo
  *
+ * @apiHeader {string} Service-Token Admin-oriented service token
  *
  * @apiUse DBError
  *
@@ -282,7 +284,7 @@ router.get('/admin/parse', (req, res) => {
  *          "results": 'Successfully parsed and saved 8 repos',
  *      }
  */
-router.get('/admin/fetch', (req, res) => {
+router.put('/admin/fetch', (req, res) => {
     co(parseRepo({'parsed': true}))
         .then((message) => {
             return res.status(200).send({
