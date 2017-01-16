@@ -232,6 +232,14 @@ router.get('/search/:term', (req, res) => {
             return re.test(cog.id) || re.test(decodeURIComponent(cog.description));
         });
 
+        if (!search || search.length === 0) {
+            return res.status(404).send({
+                'error': 'EntryNotFound',
+                'error_details': 'No results for this search',
+                'results': {},
+            })
+        }
+
         return res.status(200).send({
             'error': false,
             'results': {
