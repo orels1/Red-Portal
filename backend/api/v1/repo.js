@@ -17,43 +17,62 @@ let config = {
 
 /**
  * @apiDefine RepoRequestSuccess
+ *
+ * @apiVersion 0.1.0
+ *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
  * @apiSuccess (200) {String} results.id Id of the repo in DB
  * @apiSuccess (200) {String} results.name Name of the repo
- * @apiSuccess (200) {String} results.author Author of the repo
+ * @apiSuccess (200) {Object} results.author Author of the repo
+ * @apiSuccess (200) {Object} results.author.name Author's name according to info.json
+ * @apiSuccess (200) {Object} results.author.url Author's github url
  * @apiSuccess (200) {String} results.short Short description of the repo
  * @apiSuccess (200) {String} results.description Full description of the repo
+ * @apiSuccess (200) {String} results.type Repo's type
+ * @apiSuccess (200) {String} results.parsed Repo's parsing status
  * @apiSuccess (200) {Object} results.cogs List of cogs in a JS object
+ * @apiSuccess (200) {Object} results.links Contains relevant links
+ * @apiSuccess (200) {String} results.links._self Link to repo's API endpoint
+ * @apiSuccess (200) {String} results.links._update Link to repo's update API endpoint
+ * @apiSuccess (200) {String} results.links.self Link to repo's webpage
+ * @apiSuccess (200) {Object} results.links.github Contains relevant github links
+ * @apiSuccess (200) {String} results.links.github.self Link to the repo on github
+ * @apiSuccess (200) {String} results.links.github._update Link to info.json github's api endpoint
  *
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
  *      {
  *          "error": false,
  *          "results": {
- *               "_id": "21fsdkg9342ijhgh9sf0234",
- *               "name": "ORELS-Cogs",
- *               "author": "orels1",
- *               "short": "Mainly gaming/data oriented cogs",
- *               "description": "(orels1): Thanks for using my repo, hope you have fun!",
- *               "cogs": {
- *                   "dota": {
- *                        "author": "orels1",
- *                        "short": "Gets you item builds, hero info and more",
- *                        "description": "Dota 2 cog will get you the top item and skill-builds for any hero in game, as well as stats for your latest match + a dotabuff link. Enjoy",
- *                        "install_msg": "(orels1): Have fun!"
- *                    }
- *               },
- *               "parsed": true,
- *               "url": "https://github.com/orels1/ORELS-Cogs",
- *               "type": "approved"
- *           }
+ *              "_id": "587d62b4c54cad51845ae101",
+ *              "name": "ORELS-Cogs",
+ *              "__v": 4,
+ *              "description": "Repository of mainly gaming/data based cogs, with a bit of some fun stuff. Use as you like.",
+ *              "short": "Data scraping cogs with a bit of extra",
+ *              "links": {
+ *                  "_self": "/api/v1/repo/ORELS-Cogs",
+ *                  "_update": "/api/v1/repo/ORELS-Cogs/fetch",
+ *                  "self": "cogs/repo/ORELS-Cogs/",
+ *                  "github": {
+ *                      "self": "https://github.com/orels1/ORELS-Cogs",
+ *                      "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"
+ *                  }
+ *              },
+ *              "type": "unapproved",
+ *              "parsed": false,
+ *              "cogs": [],
+ *              "author": {
+ *                  "name": "orels",
+ *                  "url": "https://github.com/orels1"
+ *              }
+ *          }
  *      }
  */
 
 /**
  * @api {get} /repo/ List all repos
- * @apiVersion 0.0.1
+ * @apiVersion 0.1.0
  * @apiName getRepoList
  * @apiGroup repo
  *
@@ -70,23 +89,27 @@ let config = {
  *          "results": {
  *               "list": [
  *                   {
- *                       "_id": "21fsdkg9342ijhgh9sf0234",
+ *                       "_id": "587d62b4c54cad51845ae101",
  *                       "name": "ORELS-Cogs",
- *                       "author": "orels1",
- *                       "short": "Mainly gaming/data oriented cogs",
- *                       "description": "(orels1): Thanks for using my repo, hope you have fun!",
- *                       "cogs": {
- *                           "dota": {
- *                                "author": "orels1",
- *                                "short": "Gets you item builds, hero info and more",
- *                                "description": "Dota 2 cog will get you the top item and skill-builds for any hero in game, as well as stats for your latest match + a dotabuff link. Enjoy"
- *                                "disabled": false,
- *                                "install_msg": "(orels1): Have fun!"
- *                            }
+ *                       "__v": 4,
+ *                       "description": "Repository of mainly gaming/data based cogs, with a bit of some fun stuff. Use as you like.",
+ *                       "short": "Data scraping cogs with a bit of extra",
+ *                       "links": {
+ *                           "_self": "/api/v1/repo/ORELS-Cogs",
+ *                           "_update": "/api/v1/repo/ORELS-Cogs/fetch",
+ *                           "self": "cogs/repo/ORELS-Cogs/",
+ *                           "github": {
+ *                               "self": "https://github.com/orels1/ORELS-Cogs",
+ *                               "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"
+ *                           }
  *                       },
- *                       "parsed": true,
- *                       "url": "https://github.com/orels1/ORELS-Cogs",
- *                       "type": "approved"
+ *                       "type": "unapproved",
+ *                       "parsed": false,
+ *                       "cogs": [],
+ *                       "author": {
+ *                           "name": "orels",
+ *                           "url": "https://github.com/orels1"
+ *                       }
  *                   }
  *               ]
  *           }
@@ -114,7 +137,7 @@ router.get('/', (req, res) => {
 
 /**
  * @api {post} /repo/ Add new repo to DB
- * @apiVersion 0.0.1
+ * @apiVersion 0.1.0
  * @apiName postRepo
  * @apiGroup repo
  *
@@ -140,9 +163,20 @@ router.get('/', (req, res) => {
  *      {
  *          "error": false,
  *          "results": {
- *              "id": "21fsdkg9342ijhgh9sf0234",
+ *              "__v": 0,
+ *              "name": "ORELS-Cogs",
+ *              "_id": "587d7a9d13893158907d1729",
+ *              "links": {
+ *                  "github": {
+ *                      "self": "https://github.com/orels1/ORELS-Cogs"
+ *                  }
+ *              },
+ *              "type": "unapproved",
  *              "parsed": false,
- *              "url": "https://github.com/orels1/ORELS-Cogs"
+ *              "cogs": [],
+ *              "author": {
+ *                  "url": "https://github.com/orels1"
+ *              }
  *          }
  *      }
  */
@@ -167,8 +201,19 @@ router.post('/', (req, res) => {
                 'results': {'id': entry._id},
             });
         }
+
+        let name = req.body.url.substr(req.body.url.lastIndexOf('/') + 1),
+            authorUrl = req.body.url.substr(0, req.body.url.lastIndexOf('/'));
         return new Repo({
-            'url': req.body.url,
+            'name': name,
+            'author': {
+                'url': authorUrl,
+            },
+            'links': {
+                'github': {
+                    'self': req.body.url,
+                },
+            },
             'type': req.body.type
         }).save((err, entry) => {
             if (err) {
@@ -189,7 +234,7 @@ router.post('/', (req, res) => {
 
 /**
  * @api {get} /repo/:repoName Get repo
- * @apiVersion 0.0.1
+ * @apiVersion 0.1.0
  * @apiName getRepo
  * @apiGroup repo
  *
@@ -304,18 +349,20 @@ router.put('/admin/fetch', (req, res) => {
 
 /**
  * @api {put} /repo/:id Update repo
- * @apiVersion 0.0.1
+ * @apiVersion 0.1.0
  * @apiName putRepo
  * @apiGroup repo
  *
  * @apiHeader {string} Service-Token Admin-oriented service token
  *
  * @apiParam {String} id Repo id in DB
- * @apiParam {String} url New repo url
+ * @apiParam {JSON} payload Object containing the new repo data
  *
  * @apiParamExample {json} Request-Example:
  *      {
- *          "url": "https://github.com/orels1/ORELS-C",
+ *          "payload": {
+ *              "parsed": false
+ *          }
  *      }
  *
  *
@@ -344,7 +391,6 @@ router.put('/:id', (req, res) => {
         }
         // update with the new values
         entry = extend(entry, req.body);
-        entry.parsed = false;
         return entry.save((err, entry) => {
             if (err) {
                 console.log(err);
@@ -472,7 +518,7 @@ function* getInfoJson(repo) {
     };
 }
 
-function* getCogs(githubRepo, repoUrl, repoType) {
+function* getCogs(githubRepo, repo) {
     let cogsList = yield where(githubRepo, {'type': 'dir'});
 
     let cogs = [];
@@ -499,14 +545,26 @@ function* getCogs(githubRepo, repoUrl, repoType) {
         }
 
         cogs[index] = {
-            'id': cog.name,
-            'name': infoJsonContents.content.NAME,
-            'author': infoJsonContents.content.AUTHOR,
+            'name': cog.name,
+            'repo': {
+                'name': repo.name,
+                'type': repo.type,
+            },
+            'author': repo.author,
             'short': infoJsonContents.content.SHORT || null,
             'description': infoJsonContents.content.DESCRIPTION || null,
-            'updateUrl': infoJsonContents.updateUrl,
-            'repoUrl': repoUrl,
-            'repoType': repoType,
+            'links': {
+                '_self': `/api/v1/cogs/cog/${repo.name}/${cog.name}`,
+                '_repo': repo.links._self,
+                '_update': `/api/v1/cogs/cog/${repo.name}/${cog.name}/fetch`,
+                'self': `/cogs/cog/${repo.name}/${cog.name}/`,
+                'repo': repo.links.self,
+                'github': {
+                    'self': `${repo.links.github.self}/blob/master/${cog.name}/${cog.name}.py`,
+                    'repo': repo.links.github.self,
+                    '_update': infoJsonContents.updateUrl,
+                },
+            },
         };
 
         index ++;
@@ -519,7 +577,7 @@ function* encodeValues(object) {
     // encode main fields
     for (let key of Object.keys(object)) {
         if (key !== 'cogs' && key !== 'url' && key !== 'updateUrl') {
-            object[key] = encodeURIComponent(object[key]);
+            object[key] = JSON.stringify(object[key]);
         }
     }
 
@@ -527,7 +585,7 @@ function* encodeValues(object) {
     for (let cog of object.cogs) {
         for (let key of Object.keys(cog)) {
             if (key !== 'updateUrl' && key !== 'repoUrl') {
-                cog[key] = encodeURIComponent(cog[key]);
+                cog[key] = JSON.stringify(cog[key]);
             }
         }
     }
@@ -553,7 +611,7 @@ function* parseRepo(match) {
         let githubRepo;
 
         try {
-            githubRepo = yield* getGithubRepo(repo.url);
+            githubRepo = yield* getGithubRepo(repo.links.github.self);
         } catch (e) {
             return e;
         }
@@ -569,37 +627,49 @@ function* parseRepo(match) {
 
         // save repo info
         result = {
-            'name': repoInfoJson.content.NAME,
-            'author': repoInfoJson.content.AUTHOR,
-            'short': repoInfoJson.content.SHORT || null,
-            'description': repoInfoJson.content.DESCRIPTION || null,
-            'url': repo.url,
-            'updateUrl': repoInfoJson.updateUrl,
+            'name': repo.name,
+            'author': {
+                'name': repoInfoJson.content.AUTHOR,
+                'url': repo.author.url,
+            },
+            'short': repoInfoJson.content.SHORT || undefined,
+            'description': repoInfoJson.content.DESCRIPTION || undefined,
+            'links': {
+                '_self': `/api/v1/repo/${repo.name}`,
+                '_update': `/api/v1/repo/${repo.name}/fetch`,
+                'self': `/cogs/repo/${repo.name}/`,
+                'github': {
+                    'self': repo.links.github.self,
+                    '_update': repoInfoJson.updateUrl,
+                }
+            },
+            'type': repo.type,
         };
 
         // get cogs list
         let cogs;
 
         try {
-            cogs = yield* getCogs(githubRepo, repo.url, repo.type);
+            cogs = yield* getCogs(githubRepo, result);
         } catch (e) {
             return e;
         }
 
         result.cogs = cogs;
 
+        // TODO: figure out if it's still needed
         // encode everything
-        let resultEncoded;
+        // let resultEncoded;
+        //
+        // try {
+        //     resultEncoded = yield* encodeValues(result);
+        // } catch (e) {
+        //     return e;
+        // }
 
-        try {
-            resultEncoded = yield* encodeValues(result);
-        } catch (e) {
-            return e;
-        }
+        result.parsed = true;
 
-        resultEncoded.parsed = true;
-
-        repo = extend(repo, resultEncoded);
+        repo = extend(repo, result);
 
         // save
         let repoSaved;
