@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var swig = require('swig');
 var cors = require('cors');
+var session = require('express-session');
 
 var app = express();
 
@@ -54,7 +55,14 @@ module.exports = server;
 var config = require('./backend/api/v1/config');
 var repo = require('./backend/api/v1/repo');
 var cogs = require('./backend/api/v1/cogs');
+var auth = require('./backend/api/v1/auth');
 
+/*
+* Passport
+* */
+app.use(session({ secret: 'red is bae', resave: false, saveUninitialized: false }));
+app.use(auth.passport.initialize());
+app.use(auth.passport.session());
 
 /*
 * CORS for API
@@ -74,7 +82,7 @@ var corsOpts = {
 * API access control*/
 
 var apiAccessControl = function(req, res, next) {
-    if (req.method != 'GET' || req.baseUrl == '/api/v1/config') {
+    if (req.method != 'GET' || req.baseUrl == '/api/v1/config' || req.baseUrl == '/api/v1/auth') {
         if (req.get('Service-Token') == process.env.serviceToken) {
             next();
         } else {
@@ -93,6 +101,7 @@ var apiAccessControl = function(req, res, next) {
 app.use('/api/v1/config', cors(), apiAccessControl, config.router);
 app.use('/api/v1/repo', cors(), apiAccessControl, repo.router);
 app.use('/api/v1/cogs', cors(), apiAccessControl, cogs.router);
+app.use('/api/v1/auth', cors(), auth.router);
 
 
 /*
