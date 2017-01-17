@@ -44,48 +44,48 @@ class Cog extends React.Component {
                     }
                 }} />
                 <h1 className="display-3">
-                    {this.state.cog.id ||
+                    {this.state.cog.name ||
                         <span>
                             <i className="fa fa-cog fa-spin" aria-hidden="true"></i>&nbsp;
                             Loading
                         </span>
                     }
                 </h1>
-                {this.state.cog.repoType === 'approved' &&
+                {this.state.cog.repo && this.state.cog.repo.type === 'approved' &&
                     <p className="cog-info">
-                        <span className="text-success">{this.state.cog.repoType}</span>
+                        <span className="text-success">{this.state.cog.repo.type}</span>
                     </p>
                 }
-                {this.state.cog.repoType === 'beta' &&
+                {this.state.cog.repo && this.state.cog.repo.type === 'beta' &&
                     <p className="cog-info">
-                        <span className="text-warning">{this.state.cog.repoType}</span>
+                        <span className="text-warning">{this.state.cog.repo.type}</span>
                     </p>
                 }
-                {this.state.cog.repoType === 'unapproved' &&
+                {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&
                     <p className="cog-info">
-                        <span className="text-danger">{this.state.cog.repoType}</span>
+                        <span className="text-danger">{this.state.cog.repo.type}</span>
                     </p>
                 }
                 <p className="cog-info">
                     By&nbsp;
-                    <a href={this.state.cog.repoUrl && this.state.cog.repoUrl.substr(0, this.state.cog.repoUrl.lastIndexOf('/'))} target="_blank">
-                        {decodeURIComponent(this.state.cog.author)}
+                    <a href={this.state.cog.author && this.state.cog.author.url} target="_blank">
+                        {this.state.cog.author && this.state.cog.author.name}
                     </a>
                 </p>
                 <p className="cog-info">
                     Repo&nbsp;
-                    <Link to={`/cogs/repo/${this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)}/`}>
-                        {this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)}
+                    <Link to={this.state.cog.links && this.state.cog.links.repo}>
+                        {this.state.cog.repo && this.state.cog.repo.name}
                     </Link>
                 </p>
                 <p className="cog-info">
-                    <a href={`${this.state.cog.repoUrl}/blob/master/${this.state.cog.id}/${this.state.cog.id}.py`} target="_blank">
+                    <a href={this.state.cog.links && this.state.cog.links.github.self} target="_blank">
                         source
                     </a>
                 </p>
                 <div className="clearfix"></div>
 
-                {this.state.cog.repoType === 'unapproved' &&
+                {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&
                     <div>
                         <h2 className="display-4">Disclaimer</h2>
                         <p className="cog-info description">
@@ -97,16 +97,16 @@ class Cog extends React.Component {
                 }
 
                 <h2 className="display-4">Description</h2>
-                <p className="cog-info description" dangerouslySetInnerHTML={{__html: decodeURIComponent((this.state.cog.description !== 'null' && this.state.cog.description) || this.state.cog.short).replace(/(?:\r\n|\r|\n)/g, '<br />')}}>
+                <p className="cog-info description" dangerouslySetInnerHTML={{__html: (this.state.cog.description || this.state.cog.short || '').replace(/(?:\r\n|\r|\n)/g, '<br />')}}>
                 </p>
 
                 <h2 className="display-4">Installation</h2>
                 <small>Replace [p] with your bot's prefix and use these commands</small>
                 <p className="cog-info description code">
-                    [p]cog repo add {this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)} {this.state.cog.repoUrl}
+                    [p]cog repo add {`${this.state.cog.repo && this.state.cog.repo.name} ${this.state.cog.links && this.state.cog.links.github.repo}`}
                 </p>
                 <p className="cog-info description code">
-                    [p]cog install {this.state.cog.repoUrl && this.state.cog.repoUrl.substr(this.state.cog.repoUrl.lastIndexOf('/') + 1)} {this.props.params.cogName}
+                    [p]cog install {`${this.state.cog.repo && this.state.cog.repo.name} ${this.state.cog.name}`}
                 </p>
             </div>
         )
