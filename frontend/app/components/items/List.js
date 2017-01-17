@@ -25,49 +25,36 @@ class List extends React.Component {
         this.setState(state);
     }
 
-    handleCogClick(type, item, router) {
+    handleCogClick(item, router) {
         event.preventDefault();
 
-        if (type === 'cogs' || type === 'search') {
-            router.push(`/cogs/cog/${item.repoUrl && item.repoUrl.substr(item.repoUrl.lastIndexOf('/') + 1)}/${item.id}/`);
-        } else {
-            router.push(`/cogs/repo/${item.url && item.url.substr(item.url.lastIndexOf('/') + 1)}/`);
-        }
+        router.push(item.links.self);
 
     }
 
     render() {
         let list = this.props.list.map((item, index) => {
-            if ((this.props.filters && (this.props.filters.indexOf(item.repoType) !== -1)) || (!this.props.filters && true)) {
+            if ((this.props.filters && (this.props.filters.indexOf(item.type || item.repo.type) !== -1)) || (!this.props.filters && true)) {
                 return (
                     <div
                         key={this.props.keyName + index}
                         className="card"
-                        onClick={this.handleCogClick.bind(null, this.props.type, item, this.props.router)}
+                        onClick={this.handleCogClick.bind(null, item, this.props.router)}
                     >
                         <div className="card-block">
-                            {(this.props.type === 'cogs' || this.props.type === 'search') &&
-                            <Link to={`/cogs/cog/${item.repoUrl && item.repoUrl.substr(item.repoUrl.lastIndexOf('/') + 1)}/${item.id}/`} activeClassName="active">
-                                <h4 className="card-title">{item.id}</h4>
-                            </Link>
-                            }
-                            {this.props.type === 'repos' &&
-                            <h4 className="card-title">{decodeURIComponent(item.name)}</h4>}
+                            <h4 className="card-title">{item.name}</h4>
                             <p className="card-text short text-muted">
-                                {item.short !== 'null' ?
-                                    ((decodeURIComponent(item.short).length > 70 && decodeURIComponent(item.short).substr(0,70) + '...') || decodeURIComponent(item.short))  :
-                                    decodeURIComponent(item.description).substr(0, 70) + '...'
-                                }
+                                {item.short || item.description.substr(0, 70) + '...'}
                             </p>
                             <p className="card-text">
-                                <small className="text-muted">{decodeURIComponent(item.author)}&nbsp;&nbsp;&nbsp;</small>
-                                {((item.type && item.type === 'approved') || (item.repoType === 'approved')) &&
+                                <small className="text-muted">{item.author.name}&nbsp;&nbsp;&nbsp;</small>
+                                {((item.type && item.type === 'approved') || (item.repo && item.repo.type === 'approved')) &&
                                     <small className="text-success" title="approved"><i className="fa fa-check" aria-hidden="true"></i></small>
                                 }
-                                {((item.type && item.type === 'beta') || (item.repoType === 'beta')) &&
+                                {((item.type && item.type === 'beta') || (item.repo && item.repo.type === 'beta')) &&
                                     <small className="text-warning" title="beta">β</small>
                                 }
-                                {((item.type && item.type === 'unapproved') || (item.repoType === 'unapproved')) &&
+                                {((item.type && item.type === 'unapproved') || (item.repo && item.repo.type === 'unapproved')) &&
                                     <small className="text-danger" title="unapproved"><i className="fa fa-minus-circle" aria-hidden="true"></i></small>
                                 }
                             </p>
