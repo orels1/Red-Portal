@@ -293,13 +293,13 @@ router.get('/search/:term', (req, res) => {
                 'results': {},
             })
         }
+        let offset = parseInt(req.query.offset || 0),
+            limit = parseInt(req.query.limit || 20) + offset;
 
         return res.status(200).send({
             'error': false,
             'results': {
-                'list': search.slice(
-                    parseInt(req.query.offset, 10) || 0,
-                    (parseInt(req.query.limit, 10) || 20) + parseInt(req.query.offset, 10)),
+                'list': search.slice(offset, limit),
             },
         });
 
