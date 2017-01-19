@@ -26,10 +26,7 @@ class List extends React.Component {
     }
 
     handleCogClick(item, router) {
-        event.preventDefault();
-
         router.push(item.links.self);
-
     }
 
     render() {
