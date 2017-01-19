@@ -13,6 +13,10 @@ Ever thought "it'd be cool if there was a place, where you can see a list of all
 
 [Docs on the api are available here](https://orels1.github.io/Red-Portal/)
 
+## Wiki
+
+More info on building and deployment process can be find [on the wiki](https://github.com/orels1/Red-Portal/wiki)
+
 ## Tech used
 ### Built with
 
