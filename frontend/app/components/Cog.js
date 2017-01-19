@@ -97,7 +97,8 @@ class Cog extends React.Component {
                 }
 
                 <h2 className="display-4">Description</h2>
-                <p className="cog-info description" dangerouslySetInnerHTML={{__html: (this.state.cog.description || this.state.cog.short || '').replace(/(?:\r\n|\r|\n)/g, '<br />')}}>
+                <p className="cog-info description display-linebreak">
+                    {(this.state.cog.description || this.state.cog.short || '')}
                 </p>
 
                 <h2 className="display-4">Installation</h2>
