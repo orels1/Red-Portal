@@ -44,11 +44,7 @@ import Hook from 'models/hook';
  *                  "name": "ORELS-Cogs",
  *                  "_id": "587d62b4c54cad51845ae101",
  *                  "links": {
- *                      "_self": "/api/v1/repo/ORELS-Cogs",
- *                      "self": "/cogs/repo/ORELS-Cogs/,
- *                      "github": {
- *                          "self": "https://github.com/orels1/ORELS-Cogs"
- *                      }
+ *                      "_self": "/api/v1/repo/ORELS-Cogs"
  *                  }
  *              }
  *          }
@@ -88,11 +84,7 @@ import Hook from 'models/hook';
  *                           "name": "ORELS-Cogs",
  *                           "_id": "587d62b4c54cad51845ae101",
  *                           "links": {
- *                               "_self": "/api/v1/repo/ORELS-Cogs",
- *                               "self": "/cogs/repo/ORELS-Cogs/,
- *                               "github": {
- *                                   "self": "https://github.com/orels1/ORELS-Cogs"
- *                               }
+ *                               "_self": "/api/v1/repo/ORELS-Cogs"
  *                           }
  *                       }
  *                   }
@@ -102,5 +94,51 @@ import Hook from 'models/hook';
  *
  */
 router.get('/', (req, res) => {
-
+    Hook.find({'parsed': true})
+        .exec((err, entries) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send({
+                    'error': 'DBError',
+                    'error_details': 'Could not list entries',
+                    'results': {},
+                });
+            }
+            return res.status(200).send({
+                'error': false,
+                'results': {
+                    'list': entries,
+                },
+            });
+        });
 });
+
+/*
+* Create new hook
+* Not available through public API
+* Should be only used by other modules
+* */
+function createHook(name, type, repo, cb) {
+    let hook = new Hook({
+        'name': name || `${repo.name}-hook`,
+        'type': type || 'repo-update',
+        'links': {
+            '_self': `/api/v1/hooks/${repo._id}`
+        },
+        'repo': {
+            'name': repo.name,
+            '_id': repo._id,
+            'links': {
+                '_self': repo.links._self
+            }
+        }
+    });
+
+    return hook.save((err, hook) => {
+        if (err) cb(err);
+
+        return cb(false, hook);
+    })
+}
+
+export {router, createHook};
