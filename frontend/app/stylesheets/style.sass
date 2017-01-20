@@ -1,9 +1,12 @@
+html
+  min-height: 100%
+
 body
   font-family: 'Montserrat', sans-serif
   color: #fff
   background: url('/img/bg.jpg') center top no-repeat, #000000
   background-size: 1920px
-  min-height: 80vh
+  min-height: 100%
 
   &:after
     content: ''
@@ -18,9 +21,14 @@ body
 #app
   position: relative
   z-index: 10
+  min-height: 100%
+
+  & > :first-child
+    min-height: 100%
 
 #main
-  margin-top: 80px
+  min-height: 100vh
+  margin-top: -64px
 
 // Navbar
 .navbar
@@ -78,7 +86,7 @@ body
 
 // Home
 .home
-  height: 80vh
+  height: 100vh
   width: 100vw
   display: table-cell
   vertical-align: middle
@@ -210,3 +218,17 @@ h1.section-header
 
 .display-linebreak
   white-space: pre-line
+
+.inner-page
+  margin-top: 150px
+
+// Footer
+.footer
+  width: 100%
+  padding: 20px 0
+  background: rgba(0,0,0,0.5)
+  text-align: center
+
+  .footer-text
+    color: #ffffff
+    text-transform: uppercase

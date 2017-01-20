@@ -34,7 +34,7 @@ class Cog extends React.Component {
 
     render() {
         return(
-            <div className="cog">
+            <div className="cog inner-page">
                 <DocumentMeta
                     title={`Cogs.Red | Cog: ${this.props.params.cogName}`}
                     meta={{

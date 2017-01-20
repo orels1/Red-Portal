@@ -61,7 +61,7 @@ class CogsList extends React.Component {
 
     render() {
         return(
-            <div>
+            <div className="inner-page">
                 <h1 className="section-header" style={{paddingTop: '50px'}}>Disclaimer</h1>
                 <p className="cog-info description">
                     These repositories are community made. We have no say over what goes into them. The author of Red and the contributors are not responsible for any damage caused by 3rd party cogs.

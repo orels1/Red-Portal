@@ -32,7 +32,7 @@ class Repo extends React.Component {
 
     render() {
         return(
-            <div>
+            <div className="inner-page">
                 <List
                     title={`Cogs from ${this.props.params.repoName}`}
                     list={this.state.cogs}
