@@ -14,10 +14,15 @@ var cors = require('cors');
 
 var app = express();
 
+// Sentry
+var Raven = require('raven');
+Raven.config(process.env.DSN).install();
+
 /*
 * App Middleware
 * */
 app.set('port', process.env.PORT || 3000);
+app.use(Raven.requestHandler());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ 'extended': false }));
@@ -123,4 +128,15 @@ app.use(function(req, res) {
             res.status(404).send('Page Not Found');
         }
     });
+});
+
+// Error handler
+app.use(Raven.errorHandler());
+
+// Optional fallthrough error handler
+app.use(function onError(err, req, res, next) {
+    // The error id is attached to `res.sentry` to be returned
+    // and optionally displayed to the user for support.
+    res.statusCode = 500;
+    res.end(res.sentry + '\n');
 });
