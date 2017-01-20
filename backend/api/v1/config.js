@@ -58,12 +58,7 @@ import Config from 'models/config';
 router.get('/', (req, res) => {
     Config.find({}, (err, entries) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not list entries',
-                'results': {},
-            });
+            throw err;
         }
         return res.status(200).send({
             'error': false,
@@ -110,12 +105,7 @@ router.post('/', (req, res) => {
         'name': req.body.name
     }, (err, entry) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
+            throw err;
         }
         if (entry) {
             // if exists return id for future requests
@@ -130,12 +120,7 @@ router.post('/', (req, res) => {
             'value': req.body.value,
         }).save((err, entry) => {
             if (err) {
-                console.log(err);
-                return res.status(500).send({
-                    'error': 'DBError',
-                    'error_details': 'Could not save new entry',
-                    'results': {},
-                });
+                throw err;
             }
             return res.status(200).send({
                 'error': false,
@@ -164,12 +149,7 @@ router.get('/:optionName', (req, res) => {
         'name': req.params.optionName,
     }, (err, entry) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
+            throw err;
         }
         if (!entry) {
             // if does not exist - return NotFound
@@ -215,12 +195,7 @@ router.put('/', (req, res) => {
         'name': req.body.optionName
     }, (err, entry) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
+            throw err;
         }
         if (!entry) {
             // if does not exist - return NotFound
@@ -234,12 +209,7 @@ router.put('/', (req, res) => {
         entry.value = req.body.value;
         return entry.save((err, entry) => {
             if (err) {
-                console.log(err);
-                return res.status(500).send({
-                    'error': 'DBError',
-                    'error_details': 'Could not update entry',
-                    'results': {},
-                });
+                throw err;
             }
             return res.status(200).send({
                 'error': false,
@@ -275,12 +245,7 @@ router.put('/', (req, res) => {
 router.delete('/:id', (req, res) => {
     Config.findByIdAndRemove(req.params.id, (err, entry) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not get entry',
-                'results': {},
-            });
+            throw err;
         }
         if (!entry) {
             // if does not exist - return NotFound

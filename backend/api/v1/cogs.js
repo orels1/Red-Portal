@@ -125,11 +125,7 @@ router.get('/', (req, res) => {
         {$project: {_id: 0, cogs: "$cgs"}}
     ]).exec((err, repos) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not list entries'
-            });
+            throw err;
         }
         let cogs = [];
         let i = 1;
@@ -170,12 +166,7 @@ router.get('/repo/:repoName', (req, res) => {
         {$project: {_id: 0, cogs: "$cgs"}}
     ]).exec((err, cogs) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
+            throw err;
         }
 
         cogs = cogs[0].cogs;
@@ -220,12 +211,7 @@ router.get('/cog/:repoName/:cogName', (req, res) => {
         {$project: {_id: 0, cogs: "$cgs"}}
     ]).exec((err, cogs) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
+            throw err;
         }
 
         cogs = cogs[0].cogs;
@@ -272,12 +258,7 @@ router.get('/search/:term', (req, res) => {
         {$project: {_id: 0, cogs: "$cgs"}},
     ]).exec((err, cogs) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not list entries',
-                'results': {},
-            });
+            throw err;
         }
 
         // when got list of cogs - match with our term

@@ -119,12 +119,7 @@ router.get('/', (req, res) => {
     Repo.find({'parsed': true})
         .exec((err, entries) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not list entries',
-                'results': {},
-            });
+            throw err;
         }
         return res.status(200).send({
             'error': false,
@@ -186,12 +181,7 @@ router.post('/', (req, res) => {
         'url': req.body.url
     }, (err, entry) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
+            throw err;
         }
         if (entry) {
             // if exists return id for future requests
@@ -217,12 +207,7 @@ router.post('/', (req, res) => {
             'type': req.body.type
         }).save((err, entry) => {
             if (err) {
-                console.log(err);
-                return res.status(500).send({
-                    'error': 'DBError',
-                    'error_details': 'Could not save new entry',
-                    'results': {},
-                });
+                throw err;
             }
             return res.status(200).send({
                 'error': false,
@@ -249,12 +234,7 @@ router.get('/:repoName', (req, res) => {
         'name': req.params.repoName,
     }, (err, entry) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
+            throw err;
         }
         if (!entry) {
             // if does not exist - return NotFound
@@ -300,12 +280,7 @@ router.put('/admin/parse', (req, res) => {
             });
         })
         .catch((err) => {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not parse entries',
-                'results': {},
-            });
+            throw err;
         });
 });
 
@@ -338,12 +313,7 @@ router.put('/admin/fetch', (req, res) => {
             });
         })
         .catch((err) => {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not parse entries',
-                'results': {},
-            });
+            throw err;
         });
 });
 
@@ -374,12 +344,7 @@ router.put('/:id', (req, res) => {
     // Check if we have that entry already
     Repo.findById(req.params.id, (err, entry) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
+            throw err;
         }
         if (!entry) {
             // if does not exist - return NotFound
@@ -393,12 +358,7 @@ router.put('/:id', (req, res) => {
         entry = extend(entry, req.body);
         return entry.save((err, entry) => {
             if (err) {
-                console.log(err);
-                return res.status(500).send({
-                    'error': 'DBError',
-                    'error_details': 'Could not update entry',
-                    'results': {},
-                });
+                throw err;
             }
             return res.status(200).send({
                 'error': false,
@@ -434,12 +394,7 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
     Repo.findByIdAndRemove(req.params.id, (err, entry) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not get entry',
-                'results': {},
-            });
+            throw err;
         }
         if (!entry) {
             // if does not exist - return NotFound
@@ -509,7 +464,7 @@ function* getInfoJson(repo) {
     try {
         infoJsonContents = yield JSON.parse(atob(infoJsonObject.content));
     } catch (e) {
-        return e;
+        throw e;
     }
 
     return {
@@ -603,7 +558,7 @@ function* parseRepo(match) {
     try {
         repos = yield* getRepos(match);
     } catch (e) {
-        return e;
+        throw e;
     }
 
     for (let repo of repos) {
@@ -613,7 +568,7 @@ function* parseRepo(match) {
         try {
             githubRepo = yield* getGithubRepo(repo.links.github.self);
         } catch (e) {
-            return e;
+            throw e;
         }
 
         // find, get and parse info.json for the repo
@@ -622,7 +577,7 @@ function* parseRepo(match) {
         try {
             repoInfoJson = yield* getInfoJson(githubRepo);
         } catch (e) {
-            return e;
+            throw e;
         }
 
         // save repo info
@@ -652,7 +607,7 @@ function* parseRepo(match) {
         try {
             cogs = yield* getCogs(githubRepo, result);
         } catch (e) {
-            return e;
+            throw e;
         }
 
         result.cogs = cogs;
@@ -664,7 +619,7 @@ function* parseRepo(match) {
         // try {
         //     resultEncoded = yield* encodeValues(result);
         // } catch (e) {
-        //     return e;
+        //     throw e;
         // }
 
         result.parsed = true;
@@ -677,7 +632,7 @@ function* parseRepo(match) {
         try {
             repoSaved = yield repo.save();
         } catch (e) {
-            return e;
+            throw e;
         }
     }
 
