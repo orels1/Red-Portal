@@ -56,6 +56,8 @@ var config = require('./backend/api/v1/config');
 var repo = require('./backend/api/v1/repo');
 var cogs = require('./backend/api/v1/cogs');
 var auth = require('./backend/api/v1/auth');
+var hooks = require('./backend/api/v1/hooks');
+var users = require('./backend/api/v1/users');
 
 /*
 * Passport
@@ -81,8 +83,12 @@ var corsOpts = {
 /*
 * API access control*/
 
-var apiAccessControl = function(req, res, next) {
-    if (req.method != 'GET' || req.baseUrl == '/api/v1/config' || req.baseUrl == '/api/v1/auth') {
+var apiAccessControl = function(restricted, cors, req, res, next) {
+    if (
+        (req.method != 'GET' || restricted)
+        &&
+        (req.method != 'POST' && !cors)
+    ) {
         if (req.get('Service-Token') == process.env.serviceToken) {
             next();
         } else {
@@ -98,10 +104,34 @@ var apiAccessControl = function(req, res, next) {
 /*
 * API (v1)
 * */
-app.use('/api/v1/config', cors(), apiAccessControl, config.router);
-app.use('/api/v1/repo', cors(), apiAccessControl, repo.router);
-app.use('/api/v1/cogs', cors(), apiAccessControl, cogs.router);
-app.use('/api/v1/auth', cors(), auth.router);
+app.use('/api/v1/config',
+    cors(),
+    function(req, res, next) {apiAccessControl(true, false, req, res, next)},
+    config.router);
+
+app.use('/api/v1/repo',
+    cors(),
+    function(req, res, next) {apiAccessControl(false, false, req, res, next)},
+    repo.router);
+
+app.use('/api/v1/cogs',
+    cors(),
+    function(req, res, next) {apiAccessControl(false, false, req, res, next)},
+    cogs.router);
+
+app.use('/api/v1/auth',
+    cors(),
+    auth.router);
+
+app.use('/api/v1/hooks',
+    cors(),
+    function(req, res, next) {apiAccessControl(true, true, req, res, next)},
+    hooks.router);
+
+app.use('/api/v1/users',
+    cors(),
+    function(req, res, next) {apiAccessControl(true, false, req, res, next)},
+    users.router);
 
 
 /*

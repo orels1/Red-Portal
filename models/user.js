@@ -9,7 +9,8 @@ let UserSchema = new mongoose.Schema({
     '_json': Object,
     'tokens': {
         'access_token': String,
-    }
+    },
+    'repos': {type: Array, default: []}
 });
 
 module.exports = mongoose.model('User', UserSchema);
