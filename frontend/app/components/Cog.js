@@ -32,6 +32,22 @@ class Cog extends React.Component {
         this.setState(state);
     }
 
+    handleVote() {
+        if (this.state.cog.voted) {
+            CogActions.voteCog({
+                'repoName': this.props.params.repoName,
+                'cogName': this.props.params.cogName,
+                'choice': 0
+            });
+        } else {
+            CogActions.voteCog({
+                'repoName': this.props.params.repoName,
+                'cogName': this.props.params.cogName,
+                'choice': 1
+            });
+        }
+    }
+
     render() {
         return(
             <div className="cog inner-page">
@@ -64,6 +80,13 @@ class Cog extends React.Component {
                 {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&
                     <p className="cog-info">
                         <span className="text-danger">{this.state.cog.repo.type}</span>
+                    </p>
+                }
+                {this.state.cog.votes &&
+                    <p className="cog-info vote" onClick={this.handleVote.bind(this)}>
+                        <i className={`fa ${this.state.cog.voted && 'fa-star' || 'fa-star-o'}`} aria-hidden="true"></i>
+                        &nbsp;
+                        {this.state.cog.votes}
                     </p>
                 }
                 <p className="cog-info">

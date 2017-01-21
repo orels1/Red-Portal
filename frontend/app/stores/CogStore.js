@@ -24,6 +24,16 @@ class CogStore {
     onGetReposFail(jqXhr) {
         console.error(jqXhr.reponseText);
     }
+
+    onVoteCogSuccess(data) {
+        this.cog.voted = data.results.voted;
+        this.cog.votes = data.results.votes;
+
+    }
+
+    onVoteReposFail(jqXhr) {
+        console.error(jqXhr.reponseText);
+    }
 }
 
 export default alt.createStore(CogStore);

@@ -5,6 +5,8 @@ class CogActions {
         this.generateActions(
             'getCogSuccess',
             'getCogFail',
+            'voteCogSuccess',
+            'voteCogFail',
         );
     }
 
@@ -21,6 +23,20 @@ class CogActions {
             });
         return false;
     }
+
+    voteCog(payload) {
+        $.ajax({
+            'url': `/api/v1/cogs/cog/${payload.repoName}/${payload.cogName}/vote?choice=${payload.choice}`,
+            'type': 'GET',
+        })
+            .done((data) => {
+                this.voteCogSuccess(data);
+            })
+            .fail((jqXhr) => {
+                this.voteCogFail(jqXhr);
+            });
+        return false;
+    };
 }
 
 export default alt.createActions(CogActions);
