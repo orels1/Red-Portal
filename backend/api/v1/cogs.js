@@ -12,7 +12,7 @@ import Vote from 'models/vote';
 /**
  * @apiDefine CogRequestSuccess
  *
- * @apiVersion 0.1.0
+ * @apiVersion 0.1.1
  *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
@@ -35,6 +35,7 @@ import Vote from 'models/vote';
  * @apiSuccess (200) {Object} results.repo Contains info about cog's repo
  * @apiSuccess (200) {String} results.repo.type Cog's repo type
  * @apiSuccess (200) {String} results.repo.name Cog's repo name
+ * @apiSuccess (200) {Boolean} results.voted Cog vote status for request's IP
  *
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
@@ -63,7 +64,8 @@ import Vote from 'models/vote';
  *                  "type": "unapproved",
  *                  "name": "ORELS-Cogs"
  *              },
- *              "name": "dota"
+ *              "name": "dota",
+ *              "voted": false
  *              }
  *          }
  *      }
@@ -71,7 +73,7 @@ import Vote from 'models/vote';
 
 /**
  * @api {get} /cogs/ List all cogs
- * @apiVersion 0.1.0
+ * @apiVersion 0.1.1
  * @apiName getCogList
  * @apiGroup cogs
  *
@@ -110,7 +112,8 @@ import Vote from 'models/vote';
  *                            "type": "unapproved",
  *                            "name": "ORELS-Cogs"
  *                        },
- *                        "name": "dota"
+ *                        "name": "dota",
+ *                        "voted": false
  *                   }
  *               ]
  *           }
@@ -202,37 +205,41 @@ router.get('/repo/:repoName', (req, res) => {
  * @apiUse EntryNotFound
  */
 router.get('/cog/:repoName/:cogName', (req, res) => {
-    Repo.aggregate([
-        {$match: {
-            'name': req.params.repoName,
-            'cogs' : {$exists: true, $not: {$size: 0}}
-        }},
-        {$unwind: "$cogs"},
-        {$group: {_id: null, cgs: {$push: "$cogs"}}},
-        {$project: {_id: 0, cogs: "$cgs"}}
-    ]).exec((err, cogs) => {
-        if (err) {
+    Repo.findOne({
+        'name': req.params.repoName
+    }).exec()
+        .then((repo) => {
+            let cog = findWhere(repo.cogs, {'name': req.params.cogName});
+
+            if (!cog) {
+                // if does not exist - return NotFound
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'results': {},
+                });
+            }
+
+            // check if voted for cog
+            Vote.findOne({
+                'repo': req.params.repoName,
+                'cog': req.params.cogName
+            }).exec()
+                .then((vote) => {
+                    cog.voted = vote && vote.IPs.indexOf(req.ip) != -1;
+
+                    return res.status(200).send({
+                        'error': false,
+                        'results': cog,
+                    });
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        })
+        .catch((err) => {
             throw err;
-        }
-
-        cogs = cogs[0].cogs;
-
-        let result = findWhere(cogs, {'name': req.params.cogName});
-
-        if (!result) {
-            // if does not exist - return NotFound
-            return res.status(404).send({
-                'error': 'EntryNotFound',
-                'error_details': 'There is no such cog, or it is being parsed currently',
-                'results': {},
-            });
-        }
-
-        return res.status(200).send({
-            'error': false,
-            'results': result,
-        });
-    });
+        })
 });
 
 /**
@@ -302,11 +309,13 @@ router.get('/cog/:repoName/:cogName/vote', (req, res) => {
                         // vote and save IP
                         if (req.query.choice === '1') {
                             cog.votes += 1;
+                            cog.voted = true;
                             vote.IPs.push(req.ip);
 
                         // only decrease votes if IP is in DB
                         } else if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) != -1) {
                             cog.votes -= 1;
+                            cog.voted = false;
                             let ipIndex = vote.IPs.indexOf(req.ip);
                             vote.IPs.splice(ipIndex, 1);
                         }
