@@ -82,13 +82,11 @@ class Cog extends React.Component {
                         <span className="text-danger">{this.state.cog.repo.type}</span>
                     </p>
                 }
-                {this.state.cog.votes &&
-                    <p className="cog-info vote" onClick={this.handleVote.bind(this)}>
-                        <i className={`fa ${this.state.cog.voted && 'fa-star' || 'fa-star-o'}`} aria-hidden="true"></i>
-                        &nbsp;
-                        {this.state.cog.votes}
-                    </p>
-                }
+                <p className="cog-info vote" onClick={this.handleVote.bind(this)}>
+                    <i className={`fa ${this.state.cog.voted && 'fa-star' || 'fa-star-o'}`} aria-hidden="true"></i>
+                    &nbsp;
+                    {this.state.cog.votes || 0}
+                </p>
                 <p className="cog-info">
                     By&nbsp;
                     <a href={this.state.cog.author && this.state.cog.author.url} target="_blank">

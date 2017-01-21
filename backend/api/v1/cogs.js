@@ -281,11 +281,6 @@ router.get('/cog/:repoName/:cogName/vote', (req, res) => {
                 cog.votes = 0;
             }
 
-            // add list of voted IPs if not there already
-            if (!cog.voteIPs) {
-                cog.voteIPs = [];
-            }
-
             Vote.findOne({
                 'repo': req.params.repoName,
                 'cog': req.params.cogName
@@ -305,17 +300,16 @@ router.get('/cog/:repoName/:cogName/vote', (req, res) => {
                             'results': {},
                         });
                     } else {
-
+                        let voted = false;
                         // vote and save IP
                         if (req.query.choice === '1') {
                             cog.votes += 1;
-                            cog.voted = true;
+                            voted = true;
                             vote.IPs.push(req.ip);
 
                         // only decrease votes if IP is in DB
                         } else if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) != -1) {
                             cog.votes -= 1;
-                            cog.voted = false;
                             let ipIndex = vote.IPs.indexOf(req.ip);
                             vote.IPs.splice(ipIndex, 1);
                         }
@@ -326,6 +320,7 @@ router.get('/cog/:repoName/:cogName/vote', (req, res) => {
 
                                 repo.save()
                                     .then((repoSaved) => {
+                                        repoSaved.cogs[index].voted = voted;
                                         res.status(200).send({
                                             'error': false,
                                             'results': repoSaved.cogs[index],
