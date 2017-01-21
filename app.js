@@ -22,6 +22,7 @@ Raven.config(process.env.DSN).install();
 * App Middleware
 * */
 app.set('port', process.env.PORT || 3000);
+app.set('trust proxy', process.env.NODE_ENV == 'production' || false);
 app.use(Raven.requestHandler());
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -138,7 +139,7 @@ app.use(function onError(err, req, res, next) {
     // The error id is attached to `res.sentry` to be returned
     // and optionally displayed to the user for support.
 
-    if (process.env.ENVIRONMENT == 'dev') {
+    if (process.env.NODE_ENV == 'development') {
         console.log(err);
     }
     res.status(500).send({
