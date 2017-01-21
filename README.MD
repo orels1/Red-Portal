@@ -37,6 +37,10 @@ More info on building and deployment process can be find [on the wiki](https://g
 - Google Container Engine (<3)
 - Kubernetes
 
+### Kept alive with
+
+- Sentry
+
 ### Support
 If you like and/or use the project, consider supporting me on [patreon](https://www.patreon.com/orels1), a small donation can go a long way + for a bit extra, you can get something coded specially for you ;)
 
