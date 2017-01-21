@@ -72,6 +72,15 @@ import Vote from 'models/vote';
  */
 
 /**
+ * Escapes string for use with regexp
+ * @param str
+ * @returns String
+ */
+function escapeRegExp(str) {
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+/**
  * @api {get} /cogs/ List all cogs
  * @apiVersion 0.1.1
  * @apiName getCogList
@@ -373,9 +382,11 @@ router.get('/search/:term', (req, res) => {
             throw err;
         }
 
+        let term = escapeRegExp(decodeURIComponent(req.params.term));
+
         // when got list of cogs - match with our term
         let search = filter(cogs[0].cogs, (cog) => {
-            let re = new RegExp(req.params.term, 'i');
+            let re = new RegExp(term, 'i');
             return re.test(cog.id) || re.test(cog.description) || re.test(cog.short);
         });
 

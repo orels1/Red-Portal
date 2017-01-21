@@ -78,11 +78,11 @@ class CogsListStore {
         this.showCogs = 10;
     }
 
-    findSuccess(data) {
-        this.searchResults = data.results.list || [];
+    onFindSuccess(data) {
+        this.searchResults = data.results && data.results.list || [];
     }
 
-    findFail(jqXhr) {
+    onFindFail(jqXhr) {
         console.error(jqXhr.responseText);
     }
 
