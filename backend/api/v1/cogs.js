@@ -7,6 +7,7 @@ let router = express.Router();
 import {eachLimit} from 'async';
 import {findWhere, where, extend, filter} from 'underscore';
 import Repo from 'models/repo';
+import Vote from 'models/vote';
 
 /**
  * @apiDefine CogRequestSuccess
@@ -232,6 +233,113 @@ router.get('/cog/:repoName/:cogName', (req, res) => {
             'results': result,
         });
     });
+});
+
+/**
+ * @api {get} /cogs/cog/:repoName/:cogName/vote Vote for cog with ?choice=[0|1]
+ * @apiVersion 0.1.0
+ * @apiName voteCog
+ * @apiGroup cogs
+ *
+ * @apiParam {String} repoName Name of the repo containing the cog
+ * @apiParam {String} cogName Name of the cog to get
+ *
+ * @apiUse DBError
+ * @apiUse CogRequestSuccess
+ * @apiUse EntryNotFound
+ *
+ * TODO: Refactor
+ */
+router.get('/cog/:repoName/:cogName/vote', (req, res) => {
+    Repo.findOne({
+        'name': req.params.repoName,
+    }).exec()
+        .then((repo) => {
+            let cog = findWhere(repo.cogs, {'name': req.params.cogName});
+
+            if (!cog) {
+                // if does not exist - return NotFound
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'results': {},
+                });
+            }
+
+            // save index for future update
+            let index = repo.cogs.indexOf(cog);
+
+            // add votecount if not present
+            if (!cog.votes) {
+                cog.votes = 0;
+            }
+
+            // add list of voted IPs if not there already
+            if (!cog.voteIPs) {
+                cog.voteIPs = [];
+            }
+
+            Vote.findOne({
+                'repo': req.params.repoName,
+                'cog': req.params.cogName
+            }).exec()
+                .then((vote) => {
+                    if (!vote) {
+                        vote = new Vote({
+                            'repo': req.params.repoName,
+                            'cog': req.params.cogName
+                        });
+                    }
+
+                    if (vote.IPs.indexOf(req.ip) != -1 && req.query.choice === '1') {
+                        res.status(400).send({
+                            'error': 'AlreadyVoted',
+                            'error_details': 'You have already voted for this cog',
+                            'results': {},
+                        });
+                    } else {
+
+                        // vote and save IP
+                        if (req.query.choice === '1') {
+                            cog.votes += 1;
+                            vote.IPs.push(req.ip);
+
+                        // only decrease votes if IP is in DB
+                        } else if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) != -1) {
+                            cog.votes -= 1;
+                            let ipIndex = vote.IPs.indexOf(req.ip);
+                            vote.IPs.splice(ipIndex, 1);
+                        }
+
+                        vote.save()
+                            .then((vote) => {
+                                repo.cogs.set(index, cog);
+
+                                repo.save()
+                                    .then((repoSaved) => {
+                                        res.status(200).send({
+                                            'error': false,
+                                            'results': repoSaved.cogs[index],
+                                        });
+                                    })
+                                    .catch((err) => {
+                                        throw err;
+                                            })
+                                    })
+                        .catch((err) => {
+                            throw err;
+                        })
+
+                    }
+                })
+                .catch((err) => {
+                    throw err;
+                });
+    })
+        .catch((err) => {
+            throw err;
+        })
+
 });
 
 /**

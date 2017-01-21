@@ -138,6 +138,9 @@ app.use(function onError(err, req, res, next) {
     // The error id is attached to `res.sentry` to be returned
     // and optionally displayed to the user for support.
 
+    if (process.env.ENVIRONMENT == 'dev') {
+        console.log(err);
+    }
     res.status(500).send({
         'error': 'DBError',
         'error_details': 'Could not get data from db, contact support and provide the error_id',
