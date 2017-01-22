@@ -62,6 +62,12 @@ class CogsList extends React.Component {
     render() {
         return(
             <div className="inner-page">
+                <h1 className="section-header" style={{paddingTop: '50px'}}>Add cogs.red to your bot</h1>
+                <p className="cog-info description">
+                    There is an option to interact with cogs.red without leaving discord!
+                    <br />
+                    Install <Link to="/cogs/cog/Red-Portal-Cogs/redportal/">redportal cog</Link> to search through all the cogs listed one the website.
+                </p>
                 <h1 className="section-header" style={{paddingTop: '50px'}}>Disclaimer</h1>
                 <p className="cog-info description">
                     These repositories are community made. We have no say over what goes into them. The author of Red and the contributors are not responsible for any damage caused by 3rd party cogs.
