@@ -14,6 +14,7 @@ class Home extends React.Component {
     componentDidMount() {
         // Will fire once, after markup has been injected
         HomeStore.listen(this.onChange);
+        HomeActions.getStats();
     }
 
     componentWillUnmount() {
@@ -38,6 +39,9 @@ class Home extends React.Component {
                     <a href="https://github.com/Twentysix26/Red-DiscordBot" className="btn btn-default btn-square">
                         <i className="fa fa-github" aria-hidden="true"></i>&nbsp;Download now
                     </a>
+                </div>
+                <div className="stats col-md-8 offset-md-2">
+                    <span>{this.state.cog_count}</span> cogs in <span>{this.state.repo_count}</span> repos and counting
                 </div>
             </div>
         );
