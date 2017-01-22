@@ -387,7 +387,7 @@ router.get('/search/:term', (req, res) => {
         // when got list of cogs - match with our term
         let search = filter(cogs[0].cogs, (cog) => {
             let re = new RegExp(term, 'i');
-            return re.test(cog.id) || re.test(cog.description) || re.test(cog.short);
+            return re.test(cog.name) || re.test(cog.description) || re.test(cog.short);
         });
 
         if (!search || search.length === 0) {
