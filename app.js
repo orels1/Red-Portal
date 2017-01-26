@@ -57,9 +57,14 @@ module.exports = server;
 /*
 * API handlers
 * */
+
+// Main
 var config = require('./backend/api/v1/config');
 var repo = require('./backend/api/v1/repo');
 var cogs = require('./backend/api/v1/cogs');
+
+// Misc
+var count = require('./backend/api/v1/misc/count');
 
 
 /*
@@ -96,10 +101,14 @@ var apiAccessControl = function(req, res, next) {
 /*
 * API (v1)
 * */
+
+// Main
 app.use('/api/v1/config', cors(), apiAccessControl, config.router);
 app.use('/api/v1/repo', cors(), apiAccessControl, repo.router);
 app.use('/api/v1/cogs', cors(), apiAccessControl, cogs.router);
 
+// Misc
+app.use('/api/v1/misc/count', cors(), apiAccessControl, count.router);
 
 /*
 * Frontend

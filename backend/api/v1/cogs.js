@@ -12,7 +12,7 @@ import Vote from 'models/vote';
 /**
  * @apiDefine CogRequestSuccess
  *
- * @apiVersion 0.1.1
+ * @apiVersion 0.2.0
  *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
@@ -56,6 +56,7 @@ import Vote from 'models/vote';
  *              },
  *              "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
  *              "short": null,
+ *              "updated_at": "Fri Jan 27 2017 00:10:15 GMT+0300",
  *              "author": {
  *                  "url": "https://github.com/orels1",
  *                  "name": "orels"
@@ -65,7 +66,8 @@ import Vote from 'models/vote';
  *                  "name": "ORELS-Cogs"
  *              },
  *              "name": "dota",
- *              "voted": false
+ *              "voted": false,
+ *              "votes": 0,
  *              }
  *          }
  *      }
@@ -82,7 +84,7 @@ function escapeRegExp(str) {
 
 /**
  * @api {get} /cogs/ List all cogs
- * @apiVersion 0.1.1
+ * @apiVersion 0.2.0
  * @apiName getCogList
  * @apiGroup cogs
  *
@@ -113,6 +115,7 @@ function escapeRegExp(str) {
  *                        },
  *                        "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
  *                        "short": null,
+ *                        "updated_at": "Fri Jan 27 2017 00:10:15 GMT+0300",
  *                        "author": {
  *                            "url": "https://github.com/orels1",
  *                            "name": "orels"
@@ -122,7 +125,8 @@ function escapeRegExp(str) {
  *                            "name": "ORELS-Cogs"
  *                        },
  *                        "name": "dota",
- *                        "voted": false
+ *                        "voted": false,
+ *                        "votes": 0
  *                   }
  *               ]
  *           }
@@ -157,11 +161,12 @@ router.get('/', (req, res) => {
 });
 
 /**
- * @api {get} /cogs/repo/:repoName Get cogs from repo
- * @apiVersion 0.1.0
+ * @api {get} /cogs/:author/:repoName Get cogs from repo
+ * @apiVersion 0.2.0
  * @apiName getCogFromRepo
  * @apiGroup cogs
  *
+ * @apiParam {String} author Cog author github username
  * @apiParam {String} repoName Name of the repo containing the cog
  *
  * @apiUse DBError
@@ -201,11 +206,12 @@ router.get('/repo/:repoName', (req, res) => {
 });
 
 /**
- * @api {get} /cogs/cog/:repoName/:cogName Get cog
- * @apiVersion 0.1.0
+ * @api {get} /cogs/:author/:repoName/:cogName Get cog
+ * @apiVersion 0.2.0
  * @apiName getCog
  * @apiGroup cogs
  *
+ * @apiParam {String} author Cog author github username
  * @apiParam {String} repoName Name of the repo containing the cog
  * @apiParam {String} cogName Name of the cog to get
  *
@@ -252,11 +258,12 @@ router.get('/cog/:repoName/:cogName', (req, res) => {
 });
 
 /**
- * @api {get} /cogs/cog/:repoName/:cogName/vote Vote for cog with ?choice=[0|1]
- * @apiVersion 0.1.0
+ * @api {get} /cogs/:author/:repoName/:cogName/vote Vote for cog with ?choice=[0|1]
+ * @apiVersion 0.2.0
  * @apiName voteCog
  * @apiGroup cogs
  *
+ * @apiParam {String} author Cog author github username
  * @apiParam {String} repoName Name of the repo containing the cog
  * @apiParam {String} cogName Name of the cog to get
  *
@@ -355,6 +362,7 @@ router.get('/cog/:repoName/:cogName/vote', (req, res) => {
 
 });
 
+// TODO: Move search to it's own module
 /**
  * @api {get} /cogs/search/:term Search for a cog
  * @apiVersion 0.1.0
