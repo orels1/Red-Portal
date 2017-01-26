@@ -10,6 +10,7 @@ class HomeStore {
 
     onGetStatsSuccess(data) {
         this.repo_count = data.results && data.results.list.length || 0;
+        this.cog_count = 0;
 
         for (let repo of (data.results && data.results.list || [])) {
             this.cog_count += repo.cogs.length;
