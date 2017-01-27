@@ -69,9 +69,10 @@ function* getInfoJson(repo) {
     let infoJsonContents;
 
     try {
-        infoJsonContents = yield JSON.parse(atob(infoJsonObject.content));
+        infoJsonContents = JSON.parse(atob(infoJsonObject.content));
     } catch (e) {
-        throw e;
+        console.log(e);
+        return {};
     }
 
     return {

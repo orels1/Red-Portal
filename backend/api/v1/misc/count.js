@@ -40,7 +40,7 @@ import Cog from 'models/cog';
  * @apiSuccess (200) {Object} results Contains the results of Request
  * @apiSuccess (200) {Object} results.count The amount of requested items in the DB
  * @apiSuccess (200) {Number} results.count.repos The amount of repos in DB
- * @apiSuccess (200 {Number} results.count.cogs The amount of cogs in DB
+ * @apiSuccess (200) {Number} results.count.cogs The amount of cogs in DB
  *
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK

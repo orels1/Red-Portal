@@ -52,6 +52,15 @@ class Cog extends React.Component {
     }
 
     render() {
+        let tags = this.state.cog.tags && this.state.cog.tags.map((item, index) => {
+                return(
+                    <p key={`${item}-1`} className="cog-info">
+                        <Link to={`/cogs/?search=${encodeURIComponent(item)}`}>
+                            {item}
+                        </Link>
+                    </p>
+                )
+            });
         return(
             <div className="cog inner-page">
                 <DocumentMeta
@@ -107,6 +116,13 @@ class Cog extends React.Component {
                         source
                     </a>
                 </p>
+                <div className="clearfix"></div>
+                <div className="tags-block">
+                    <p className="cog-info">
+                        Tags
+                    </p>
+                    {tags}
+                </div>
                 <div className="clearfix"></div>
 
                 {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&

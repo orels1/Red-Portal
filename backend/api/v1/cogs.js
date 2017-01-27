@@ -315,8 +315,8 @@ router.put('/:author/:repoName/parse', (req, res) => {
  * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
  *
- * TODO: Refactor
  */
+// TODO: Refactor
 router.get('/:author/:repoName/:cogName/vote', (req, res) => {
     Cog.findOne({
         'name': req.params.cogName,
