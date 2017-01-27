@@ -15,25 +15,6 @@ class CogsListStore {
         this.searchResults = [];
     }
 
-    static shuffle(array) {
-        var currentIndex = array.length, temporaryValue, randomIndex;
-
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-            // And swap it with the current element.
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }
-
-        return array;
-    }
-
     getRepos() {
         this.repos = [];
     }
@@ -50,6 +31,24 @@ class CogsListStore {
         let approved = [],
             unapproved = [];
 
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
 
         for (let cog of data.results.list) {
             switch (cog.repo.type) {
@@ -66,7 +65,7 @@ class CogsListStore {
                     unapproved.push(cog);
             }
         }
-        this.cogs = this.cogs.concat(this.shuffle(approved), this.shuffle(unapproved));
+        this.cogs = this.cogs.concat(shuffle(approved), shuffle(unapproved));
     }
 
     onGetCogsFail(jqXhr) {
