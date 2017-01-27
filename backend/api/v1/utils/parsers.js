@@ -134,7 +134,7 @@ function* getCogs(githubRepo, repo) {
                     '_update': infoJsonContents.updateUrl,
                 },
             },
-            'tags': infoJsonContents.content.TAGS || null
+            'tags': infoJsonContents.content.TAGS || []
         };
 
         index ++;
@@ -182,7 +182,7 @@ function* parseRepos(repos) {
                     '_update': repoInfoJson.updateUrl,
                 })
             }),
-            'tags': repoInfoJson.content.TAGS || undefined
+            'tags': repoInfoJson.content.TAGS || []
         };
 
         result.parsed = true;
