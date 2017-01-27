@@ -29,6 +29,58 @@ import Cog from 'models/cog';
  */
 
 /**
+ * @api {get} /count/ Count cogs in DB
+ * @apiVersion 0.2.0
+ * @apiName getTotalCount
+ * @apiGroup misc
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ * @apiSuccess (200) {Object} results.count The amount of requested items in the DB
+ * @apiSuccess (200 {Number} results.count.repos The amount of repos in DB
+ * @apiSuccess (200 {Number} results.count.cogs The amount of cogs in DB
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {
+ *              "count": {
+ *                  "repos": 2,
+ *                  "cogs": 16
+ *              }
+ *          }
+ *      }
+ */
+router.get('/', (req, res) => {
+    Cog.count()
+        .exec()
+        .then((cogCount) => {
+            return Repo.count()
+                .exec()
+                .then((repoCount) => {
+                    return res.status(200).send({
+                        'error': false,
+                        'results': {
+                            'count': {
+                                'repos': repoCount,
+                                'cogs': cogCount
+                            }
+                        }
+                    })
+                })
+                .catch((err) => {
+                    throw err;
+                })
+        })
+        .catch((err) => {
+            throw err;
+        });
+});
+
+/**
  * @api {get} /count/cogs Count cogs in DB
  * @apiVersion 0.2.0
  * @apiName getCogsCount
