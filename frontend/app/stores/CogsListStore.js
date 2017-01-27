@@ -48,7 +48,6 @@ class CogsListStore {
 
     onGetCogsSuccess(data) {
         let approved = [],
-            beta = [],
             unapproved = [];
 
 
@@ -58,7 +57,7 @@ class CogsListStore {
                     approved.push(cog);
                     break;
                 case 'beta':
-                    beta.push(cog);
+                    approved.push(cog);
                     break;
                 case 'unapproved':
                     unapproved.push(cog);
@@ -67,7 +66,7 @@ class CogsListStore {
                     unapproved.push(cog);
             }
         }
-        this.cogs = this.cogs.concat(approved, beta, unapproved);
+        this.cogs = this.cogs.concat(this.shuffle(approved), this.shuffle(unapproved));
     }
 
     onGetCogsFail(jqXhr) {
