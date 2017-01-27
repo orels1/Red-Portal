@@ -4,21 +4,16 @@
 
 import express from 'express';
 let router = express.Router();
-import rp from 'request-promise';
-import {eachLimit} from 'async';
-import {findWhere, where, extend} from 'underscore';
-import atob from 'atob';
+import {extend} from 'underscore';
+import {parseRepos} from './utils/parsers';
 import Repo from 'models/repo';
 import co from 'co';
 
-let config = {
-    'githubToken': process.env.githubToken,
-};
 
 /**
  * @apiDefine RepoRequestSuccess
  *
- * @apiVersion 0.1.0
+ * @apiVersion 0.2.0
  *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
@@ -51,9 +46,10 @@ let config = {
  *              "description": "Repository of mainly gaming/data based cogs, with a bit of some fun stuff. Use as you like.",
  *              "short": "Data scraping cogs with a bit of extra",
  *              "links": {
- *                  "_self": "/api/v1/repo/ORELS-Cogs",
- *                  "_update": "/api/v1/repo/ORELS-Cogs/fetch",
- *                  "self": "cogs/repo/ORELS-Cogs/",
+ *                  "_self": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                  "_update": "/api/v1/repos/orels1/ORELS-Cogs/fetch",
+ *                  "_cogs": "/api/v1/cogs/orels1/ORELS-Cogs
+ *                  "self": "cogs/repo/orels1/ORELS-Cogs/",
  *                  "github": {
  *                      "self": "https://github.com/orels1/ORELS-Cogs",
  *                      "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"
@@ -65,16 +61,22 @@ let config = {
  *              "author": {
  *                  "name": "orels",
  *                  "url": "https://github.com/orels1"
- *              }
+ *              },
+ *              "tags": [
+ *                  "api",
+ *                  "tools",
+ *                  "fun",
+ *                  "gaming"
+ *              ]
  *          }
  *      }
  */
 
 /**
- * @api {get} /repo/ List all repos
- * @apiVersion 0.1.0
+ * @api {get} /repos/ List all repos
+ * @apiVersion 0.2.0
  * @apiName getRepoList
- * @apiGroup repo
+ * @apiGroup repos
  *
  * @apiUse DBError
  *
@@ -95,9 +97,10 @@ let config = {
  *                       "description": "Repository of mainly gaming/data based cogs, with a bit of some fun stuff. Use as you like.",
  *                       "short": "Data scraping cogs with a bit of extra",
  *                       "links": {
- *                           "_self": "/api/v1/repo/ORELS-Cogs",
- *                           "_update": "/api/v1/repo/ORELS-Cogs/fetch",
- *                           "self": "cogs/repo/ORELS-Cogs/",
+ *                           "_self": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                           "_update": "/api/v1/repos/orels1/ORELS-Cogs/fetch",
+ *                           "_cogs": "/api/v1/cogs/orels1/ORELS-Cogs
+ *                           "self": "cogs/repo/orels1/ORELS-Cogs/",
  *                           "github": {
  *                               "self": "https://github.com/orels1/ORELS-Cogs",
  *                               "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"
@@ -109,7 +112,13 @@ let config = {
  *                       "author": {
  *                           "name": "orels",
  *                           "url": "https://github.com/orels1"
- *                       }
+ *                       },
+ *                       "tags": [
+ *                          "api",
+ *                          "tools",
+ *                          "fun",
+ *                          "gaming"
+ *                       ]
  *                   }
  *               ]
  *           }
@@ -131,10 +140,10 @@ router.get('/', (req, res) => {
 });
 
 /**
- * @api {post} /repo/ Add new repo to DB
- * @apiVersion 0.1.0
+ * @api {post} /repos/ Add new repo to DB
+ * @apiVersion 0.2.0
  * @apiName postRepo
- * @apiGroup repo
+ * @apiGroup repos
  *
  * @apiHeader {string} Service-Token Admin-oriented service token
  *
@@ -170,7 +179,8 @@ router.get('/', (req, res) => {
  *              "parsed": false,
  *              "cogs": [],
  *              "author": {
- *                  "url": "https://github.com/orels1"
+ *                  "url": "https://github.com/orels1",
+ *                  "username": "orels1"
  *              }
  *          }
  *      }
@@ -193,13 +203,19 @@ router.post('/', (req, res) => {
         }
 
         let name = req.body.url.substr(req.body.url.lastIndexOf('/') + 1),
-            authorUrl = req.body.url.substr(0, req.body.url.lastIndexOf('/'));
+            authorUrl = req.body.url.substr(0, req.body.url.lastIndexOf('/')),
+            username = authorUrl.substr(authorUrl.lastIndexOf('/') + 1);
         return new Repo({
             'name': name,
             'author': {
                 'url': authorUrl,
+                'username': username,
             },
             'links': {
+                '_self': `/api/v1/repos/${username}/${name}`,
+                '_update': `/api/v1/repos/${username}/${name}/fetch`,
+                '_cogs': `/api/v1/cogs/${username}/${name}`,
+                'self': `/cogs/${username}/${name}/`,
                 'github': {
                     'self': req.body.url,
                 },
@@ -218,18 +234,19 @@ router.post('/', (req, res) => {
 });
 
 /**
- * @api {get} /repo/:repoName Get repo
- * @apiVersion 0.1.0
+ * @api {get} /repo/:author/:repoName Get repo
+ * @apiVersion 0.2.0
  * @apiName getRepo
- * @apiGroup repo
+ * @apiGroup repos
  *
+ * @apiParam {String} author Author's username on github
  * @apiParam {String} repoName name of the repo to get
  *
  * @apiUse DBError
  * @apiUse RepoRequestSuccess
  * @apiUse EntryNotFound
  */
-router.get('/:repoName', (req, res) => {
+router.get('/:author/:repoName', (req, res) => {
     Repo.findOne({
         'name': req.params.repoName,
     }, (err, entry) => {
@@ -252,10 +269,13 @@ router.get('/:repoName', (req, res) => {
 });
 
 /**
- * @api {put} /repo/admin/parse Parse new repos
- * @apiVersion 0.0.1
+ * @api {put} /repos/:author/:repoName/parse Parse repo
+ * @apiVersion 0.2.0
  * @apiName parseRepos
- * @apiGroup repo
+ * @apiGroup repos
+ *
+ * @apiParam {String} author Author's username on github
+ * @apiParam {String} repoName name of the repo to get
  *
  * @apiHeader {string} Service-Token Admin-oriented service token
  *
@@ -268,60 +288,40 @@ router.get('/:repoName', (req, res) => {
  *      HTTP/1.1 200 OK
  *      {
  *          "error": false,
- *          "results": 'Successfully parsed and saved 8 repos',
+ *          "results": 'Parsing started',
  *      }
  */
-router.put('/admin/parse', (req, res) => {
-    co(parseRepo({'parsed': false}))
-        .then((message) => {
-            return res.status(200).send({
-                'error': false,
-                'results': message,
-            });
-        })
-        .catch((err) => {
-            throw err;
+router.put('/:author/:repoName/parse', (req, res) => {
+    Repo.find({
+        'author.username': req.params.author,
+        'name': req.params.repoName
+    })
+        .exec()
+        .then((repos) => {
+            return co(parseRepos(repos))
+                .then((repos) => {
+                    for (let repo of repos) {
+                        return repo.save()
+                            .then((repo) => {
+                                return repo;
+                            })
+                            .catch((err) => {
+                                throw err;
+                            })
+                    }
+                })
+                .catch((err) => {
+                    throw err;
+                })
         });
+    res.status(200).send('Parsing started');
 });
 
 /**
- * @api {put} /repo/admin/fetch Parse again
- * @apiVersion 0.0.1
- * @apiName fetchRepos
- * @apiGroup repo
- *
- * @apiHeader {string} Service-Token Admin-oriented service token
- *
- * @apiUse DBError
- *
- * @apiSuccess (200) {Boolean} error Should always be false
- * @apiSuccess (200) {Object} results Contains the results of Request
- *
- * @apiSuccessExample {json} Success-Response:
- *      HTTP/1.1 200 OK
- *      {
- *          "error": false,
- *          "results": 'Successfully parsed and saved 8 repos',
- *      }
- */
-router.put('/admin/fetch', (req, res) => {
-    co(parseRepo({'parsed': true}))
-        .then((message) => {
-            return res.status(200).send({
-                'error': false,
-                'results': message,
-            });
-        })
-        .catch((err) => {
-            throw err;
-        });
-});
-
-/**
- * @api {put} /repo/:id Update repo
- * @apiVersion 0.1.0
+ * @api {put} /repos/:id Update repo
+ * @apiVersion 0.2.0
  * @apiName putRepo
- * @apiGroup repo
+ * @apiGroup repos
  *
  * @apiHeader {string} Service-Token Admin-oriented service token
  *
@@ -369,10 +369,10 @@ router.put('/:id', (req, res) => {
 });
 
 /**
- * @api {delete} /repo/:id Delete repo by id
- * @apiVersion 0.0.1
+ * @api {delete} /repos/:id Delete repo by id
+ * @apiVersion 0.2.0
  * @apiName deleteRepo
- * @apiGroup repo
+ * @apiGroup repos
  *
  * @apiHeader {string} Service-Token Admin-oriented service token
  *
@@ -412,232 +412,4 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-// Repo parsing
-
-function* getRepos(match) {
-    let repos = yield Repo.find(match);
-
-    return repos;
-}
-
-function* getGithubRepo(url) {
-    url = url.replace('github.com', 'api.github.com/repos') + '/contents'
-    let options = {
-        headers: {
-            'User-Agent': 'Red-Portal',
-            'Accept': 'application/vnd.github.v3+json',
-            'Authorization': config.githubToken,
-        },
-        json: true,
-        uri: url,
-    };
-
-    let githubRepo = yield rp(options);
-
-    return githubRepo;
-}
-
-function* getInfoJson(repo) {
-    let infoJsonDescription = findWhere(repo, {'name': 'info.json'});
-
-    // check if info.json is present, if it's not - skip cog
-    if (!infoJsonDescription) {
-        return {
-            'content': null,
-        };
-    }
-
-    let options = {
-        headers: {
-            'User-Agent': 'Red-Portal',
-            'Accept': 'application/vnd.github.v3+json',
-            'Authorization': config.githubToken,
-        },
-        json: true,
-        uri: infoJsonDescription.url,
-    };
-
-    let infoJsonObject = yield rp(options);
-
-    let infoJsonContents;
-
-    try {
-        infoJsonContents = yield JSON.parse(atob(infoJsonObject.content));
-    } catch (e) {
-        throw e;
-    }
-
-    return {
-        'updateUrl': infoJsonDescription.url,
-        'content': infoJsonContents,
-    };
-}
-
-function* getCogs(githubRepo, repo) {
-    let cogsList = yield where(githubRepo, {'type': 'dir'});
-
-    let cogs = [];
-
-    let index = 0;
-    for (let cog of cogsList) {
-        let options = {
-            headers: {
-                'User-Agent': 'Red-Portal',
-                'Accept': 'application/vnd.github.v3+json',
-                'Authorization': config.githubToken,
-            },
-            json: true,
-            uri: cog.url,
-        };
-
-        let cogDir = yield rp(options);
-
-        let infoJsonContents = yield* getInfoJson(cogDir);
-
-        // if there is no info.json - ignore cog
-        if (!infoJsonContents.content) {
-            continue;
-        }
-
-        cogs[index] = {
-            'name': cog.name,
-            'repo': {
-                'name': repo.name,
-                'type': repo.type,
-            },
-            'author': repo.author,
-            'short': infoJsonContents.content.SHORT || null,
-            'description': infoJsonContents.content.DESCRIPTION || null,
-            'links': {
-                '_self': `/api/v1/cogs/cog/${repo.name}/${cog.name}`,
-                '_repo': repo.links._self,
-                '_update': `/api/v1/cogs/cog/${repo.name}/${cog.name}/fetch`,
-                'self': `/cogs/cog/${repo.name}/${cog.name}/`,
-                'repo': repo.links.self,
-                'github': {
-                    'self': `${repo.links.github.self}/blob/master/${cog.name}/${cog.name}.py`,
-                    'repo': repo.links.github.self,
-                    '_update': infoJsonContents.updateUrl,
-                },
-            },
-        };
-
-        index ++;
-    }
-
-    return cogs;
-}
-
-function* encodeValues(object) {
-    // encode main fields
-    for (let key of Object.keys(object)) {
-        if (key !== 'cogs' && key !== 'url' && key !== 'updateUrl') {
-            object[key] = JSON.stringify(object[key]);
-        }
-    }
-
-    // encode cogs
-    for (let cog of object.cogs) {
-        for (let key of Object.keys(cog)) {
-            if (key !== 'updateUrl' && key !== 'repoUrl') {
-                cog[key] = JSON.stringify(cog[key]);
-            }
-        }
-    }
-
-
-    return object;
-}
-
-function* parseRepo(match) {
-    let result;
-
-    // get repo from the DB by the match
-    let repos;
-
-    try {
-        repos = yield* getRepos(match);
-    } catch (e) {
-        throw e;
-    }
-
-    for (let repo of repos) {
-        // get repo object from github
-        let githubRepo;
-
-        try {
-            githubRepo = yield* getGithubRepo(repo.links.github.self);
-        } catch (e) {
-            throw e;
-        }
-
-        // find, get and parse info.json for the repo
-        let repoInfoJson;
-
-        try {
-            repoInfoJson = yield* getInfoJson(githubRepo);
-        } catch (e) {
-            throw e;
-        }
-
-        // save repo info
-        result = {
-            'name': repo.name,
-            'author': {
-                'name': repoInfoJson.content.AUTHOR,
-                'url': repo.author.url,
-            },
-            'short': repoInfoJson.content.SHORT || undefined,
-            'description': repoInfoJson.content.DESCRIPTION || undefined,
-            'links': {
-                '_self': `/api/v1/repo/${repo.name}`,
-                '_update': `/api/v1/repo/${repo.name}/fetch`,
-                'self': `/cogs/repo/${repo.name}/`,
-                'github': {
-                    'self': repo.links.github.self,
-                    '_update': repoInfoJson.updateUrl,
-                }
-            },
-            'type': repo.type,
-        };
-
-        // get cogs list
-        let cogs;
-
-        try {
-            cogs = yield* getCogs(githubRepo, result);
-        } catch (e) {
-            throw e;
-        }
-
-        result.cogs = cogs;
-
-        // TODO: figure out if it's still needed
-        // encode everything
-        // let resultEncoded;
-        //
-        // try {
-        //     resultEncoded = yield* encodeValues(result);
-        // } catch (e) {
-        //     throw e;
-        // }
-
-        result.parsed = true;
-
-        repo = extend(repo, result);
-
-        // save
-        let repoSaved;
-
-        try {
-            repoSaved = yield repo.save();
-        } catch (e) {
-            throw e;
-        }
-    }
-
-    return `Successfully parsed and saved ${repos.length} repos`;
-
-}
-
-export {router, parseRepo};
+export {router};

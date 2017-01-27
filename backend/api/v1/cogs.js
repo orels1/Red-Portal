@@ -7,7 +7,10 @@ let router = express.Router();
 import {eachLimit} from 'async';
 import {findWhere, where, extend, filter} from 'underscore';
 import Repo from 'models/repo';
+import Cog from 'models/cog';
 import Vote from 'models/vote';
+import {parseCogs} from './utils/parsers';
+import co from 'co';
 
 /**
  * @apiDefine CogRequestSuccess
@@ -74,15 +77,6 @@ import Vote from 'models/vote';
  */
 
 /**
- * Escapes string for use with regexp
- * @param str
- * @returns String
- */
-function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-}
-
-/**
  * @api {get} /cogs/ List all cogs
  * @apiVersion 0.2.0
  * @apiName getCogList
@@ -133,31 +127,19 @@ function escapeRegExp(str) {
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.aggregate([
-        {$match: {
-            'cogs' : {$exists: true, $not: {$size: 0}}
-        }},
-        {$unwind: "$cogs"},
-        {$group: {_id: null, cgs: {$push: "$cogs"}}},
-        {$project: {_id: 0, cogs: "$cgs"}}
-    ]).exec((err, repos) => {
-        if (err) {
-            throw err;
-        }
-        let cogs = [];
-        let i = 1;
-        for (let repo of repos) {
-            cogs = cogs.concat(repo.cogs);
-        }
-
-        res.status(200).send({
-            'error': false,
-            'results': {
-                'list': cogs,
-            }
+    Cog.find({})
+        .exec()
+        .then((cogs) => {
+            res.status(200).send({
+                'error': false,
+                'results': {
+                    'list': cogs,
+                }
+            })
         })
-
-    });
+        .catch((err) => {
+            throw err;
+        })
 });
 
 /**
@@ -173,36 +155,30 @@ router.get('/', (req, res) => {
  * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
  */
-router.get('/repo/:repoName', (req, res) => {
-    Repo.aggregate([
-        {$match: {
-            'name': req.params.repoName,
-            'cogs' : {$exists: true, $not: {$size: 0}}
-        }},
-        {$unwind: "$cogs"},
-        {$group: {_id: null, cgs: {$push: "$cogs"}}},
-        {$project: {_id: 0, cogs: "$cgs"}}
-    ]).exec((err, cogs) => {
-        if (err) {
-            throw err;
-        }
+router.get('/:author/:repoName', (req, res) => {
+    Cog.find({
+        'author.username': req.params.author,
+        'repo.name': req.params.repoName
+    }).exec()
+        .then((cogs) => {
 
-        cogs = cogs[0].cogs;
+            if (!cogs) {
+                // if does not exist - return NotFound
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'results': {},
+                });
+            }
 
-        if (!cogs) {
-            // if does not exist - return NotFound
-            return res.status(404).send({
-                'error': 'EntryNotFound',
-                'error_details': 'There is no such cog, or it is being parsed currently',
-                'results': {},
+            return res.status(200).send({
+                'error': false,
+                'results': cogs,
             });
-        }
-
-        return res.status(200).send({
-            'error': false,
-            'results': cogs,
-        });
-    });
+        })
+        .catch((err) => {
+            throw err;
+        })
 });
 
 /**
@@ -219,12 +195,13 @@ router.get('/repo/:repoName', (req, res) => {
  * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
  */
-router.get('/cog/:repoName/:cogName', (req, res) => {
-    Repo.findOne({
-        'name': req.params.repoName
+router.get('/:author/:repoName/:cogName', (req, res) => {
+    Cog.findOne({
+        'name': req.params.cogName,
+        'author.username': req.params.author,
+        'repo.name': req.params.repoName
     }).exec()
-        .then((repo) => {
-            let cog = findWhere(repo.cogs, {'name': req.params.cogName});
+        .then((cog) => {
 
             if (!cog) {
                 // if does not exist - return NotFound
@@ -258,6 +235,73 @@ router.get('/cog/:repoName/:cogName', (req, res) => {
 });
 
 /**
+ * @api {put} /cogs/:author/:repoName/fetch Parse new cogs
+ * @apiVersion 0.2.0
+ * @apiName parseCogs
+ * @apiGroup cogs
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
+ * @apiParam {String} author Cog author github username
+ * @apiParam {String} repoName Name of the repo containing the cog
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": 'Parsing started',
+ *      }
+ */
+router.put('/:author/:repoName/parse', (req, res) => {
+    Repo.findOne({
+        'author.username': req.params.author,
+        'name': req.params.repoName
+    })
+        .exec()
+        .then((repo) => {
+            co(parseCogs(repo))
+                .then((cogs) => {
+                    for (let cog of cogs) {
+                        // check if we have such cog
+                        Cog.findOne({
+                            'name': cog.name,
+                            'author.username': cog.author.username,
+                            'repo.name': cog.repo.name
+                        })
+                            .exec()
+                            .then((dbCog) => {
+                                if (!dbCog) {
+                                    cog = new Cog(cog);
+                                } else {
+                                    cog = extend(dbCog, cog);
+                                }
+
+                                return cog.save()
+                                    .then((cog) => {
+                                        return true;
+                                    })
+                                    .catch((err) => {
+                                        throw err;
+                                    })
+                            })
+                            .catch((err) => {
+                                throw err;
+                            })
+                    }
+                })
+                .catch((err) => {
+                    throw err;
+                })
+        });
+    res.status(200).send('Parsing started');
+});
+
+/**
  * @api {get} /cogs/:author/:repoName/:cogName/vote Vote for cog with ?choice=[0|1]
  * @apiVersion 0.2.0
  * @apiName voteCog
@@ -273,12 +317,13 @@ router.get('/cog/:repoName/:cogName', (req, res) => {
  *
  * TODO: Refactor
  */
-router.get('/cog/:repoName/:cogName/vote', (req, res) => {
-    Repo.findOne({
-        'name': req.params.repoName,
+router.get('/:author/:repoName/:cogName/vote', (req, res) => {
+    Cog.findOne({
+        'name': req.params.cogName,
+        'author.username': req.params.author,
+        'repo.name': req.params.repoName
     }).exec()
-        .then((repo) => {
-            let cog = findWhere(repo.cogs, {'name': req.params.cogName});
+        .then((cog) => {
 
             if (!cog) {
                 // if does not exist - return NotFound
@@ -289,28 +334,22 @@ router.get('/cog/:repoName/:cogName/vote', (req, res) => {
                 });
             }
 
-            // save index for future update
-            let index = repo.cogs.indexOf(cog);
-
-            // add votecount if not present
-            if (!cog.votes) {
-                cog.votes = 0;
-            }
-
-            Vote.findOne({
+            return Vote.findOne({
+                'username': req.params.author,
                 'repo': req.params.repoName,
                 'cog': req.params.cogName
             }).exec()
                 .then((vote) => {
                     if (!vote) {
                         vote = new Vote({
+                            'username': req.params.author,
                             'repo': req.params.repoName,
                             'cog': req.params.cogName
                         });
                     }
 
                     if (vote.IPs.indexOf(req.ip) != -1 && req.query.choice === '1') {
-                        res.status(400).send({
+                        return res.status(400).send({
                             'error': 'AlreadyVoted',
                             'error_details': 'You have already voted for this cog',
                             'results': {},
@@ -327,28 +366,27 @@ router.get('/cog/:repoName/:cogName/vote', (req, res) => {
                         } else if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) != -1) {
                             cog.votes -= 1;
                             let ipIndex = vote.IPs.indexOf(req.ip);
+                            voted = false;
                             vote.IPs.splice(ipIndex, 1);
                         }
 
-                        vote.save()
+                        return vote.save()
                             .then((vote) => {
-                                repo.cogs.set(index, cog);
-
-                                repo.save()
-                                    .then((repoSaved) => {
-                                        repoSaved.cogs[index].voted = voted;
-                                        res.status(200).send({
+                                return cog.save()
+                                    .then((cogSaved) => {
+                                        cog.voted = voted;
+                                        return res.status(200).send({
                                             'error': false,
-                                            'results': repoSaved.cogs[index],
+                                            'results': cogSaved,
                                         });
                                     })
                                     .catch((err) => {
                                         throw err;
-                                            })
-                                    })
-                        .catch((err) => {
-                            throw err;
-                        })
+                                        })
+                                })
+                            .catch((err) => {
+                                throw err;
+                            })
 
                     }
                 })
@@ -360,62 +398,6 @@ router.get('/cog/:repoName/:cogName/vote', (req, res) => {
             throw err;
         })
 
-});
-
-// TODO: Move search to it's own module
-/**
- * @api {get} /cogs/search/:term Search for a cog
- * @apiVersion 0.1.0
- * @apiName searchCog
- * @apiGroup cogs
- *
- * @apiDescription Supports offset and limit query params, by default set to offset=0 and limit=20
- *
- * @apiParam {String} term Term to search for
- *
- * @apiUse DBError
- * @apiUse CogRequestSuccess
- * @apiUse EntryNotFound
- */
-router.get('/search/:term', (req, res) => {
-    Repo.aggregate([
-        {$match: {
-            'cogs' : {$exists: true, $not: {$size: 0}}
-        }},
-        {$unwind: "$cogs"},
-        {$group: {_id: null, cgs: {$push: "$cogs"}}},
-        {$project: {_id: 0, cogs: "$cgs"}},
-    ]).exec((err, cogs) => {
-        if (err) {
-            throw err;
-        }
-
-        let term = escapeRegExp(decodeURIComponent(req.params.term));
-
-        // when got list of cogs - match with our term
-        let search = filter(cogs[0].cogs, (cog) => {
-            let re = new RegExp(term, 'i');
-            return re.test(cog.name) || re.test(cog.description) || re.test(cog.short);
-        });
-
-        if (!search || search.length === 0) {
-            return res.status(404).send({
-                'error': 'EntryNotFound',
-                'error_details': 'No results for this search',
-                'results': {},
-            })
-        }
-        let offset = parseInt(req.query.offset || 0),
-            limit = parseInt(req.query.limit || 20) + offset;
-
-        return res.status(200).send({
-            'error': false,
-            'results': {
-                'list': search.slice(offset, limit),
-            },
-        });
-
-    });
 });
 
 export {router};

@@ -510,3 +510,247 @@
  * @apiUse EntryNotFound
  *
  */
+
+/**
+ * @api {get} /cogs/search/:term Search for a cog
+ * @apiVersion 0.1.0
+ * @apiName searchCog
+ * @apiGroup cogs
+ *
+ * @apiDescription Supports offset and limit query params, by default set to offset=0 and limit=20
+ *
+ * @apiParam {String} term Term to search for
+ *
+ * @apiUse DBError
+ * @apiUse CogRequestSuccess
+ * @apiUse EntryNotFound
+ */
+
+/**
+ * @api {get} /repo/ List all repos
+ * @apiVersion 0.1.0
+ * @apiName getRepoList
+ * @apiGroup repo
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ * @apiSuccess (200) {Array} results.list List of entries
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {
+ *               "list": [
+ *                   {
+ *                       "_id": "587d62b4c54cad51845ae101",
+ *                       "name": "ORELS-Cogs",
+ *                       "__v": 4,
+ *                       "description": "Repository of mainly gaming/data based cogs, with a bit of some fun stuff. Use as you like.",
+ *                       "short": "Data scraping cogs with a bit of extra",
+ *                       "links": {
+ *                           "_self": "/api/v1/repo/ORELS-Cogs",
+ *                           "_update": "/api/v1/repo/ORELS-Cogs/fetch",
+ *                           "self": "cogs/repo/ORELS-Cogs/",
+ *                           "github": {
+ *                               "self": "https://github.com/orels1/ORELS-Cogs",
+ *                               "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"
+ *                           }
+ *                       },
+ *                       "type": "unapproved",
+ *                       "parsed": false,
+ *                       "cogs": [],
+ *                       "author": {
+ *                           "name": "orels",
+ *                           "url": "https://github.com/orels1"
+ *                       }
+ *                   }
+ *               ]
+ *           }
+ *      }
+ */
+
+/**
+ * @apiDefine RepoRequestSuccess
+ *
+ * @apiVersion 0.1.0
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ * @apiSuccess (200) {String} results.id Id of the repo in DB
+ * @apiSuccess (200) {String} results.name Name of the repo
+ * @apiSuccess (200) {Object} results.author Author of the repo
+ * @apiSuccess (200) {Object} results.author.name Author's name according to info.json
+ * @apiSuccess (200) {Object} results.author.url Author's github url
+ * @apiSuccess (200) {String} results.short Short description of the repo
+ * @apiSuccess (200) {String} results.description Full description of the repo
+ * @apiSuccess (200) {String} results.type Repo's type
+ * @apiSuccess (200) {String} results.parsed Repo's parsing status
+ * @apiSuccess (200) {Object} results.cogs List of cogs in a JS object
+ * @apiSuccess (200) {Object} results.links Contains relevant links
+ * @apiSuccess (200) {String} results.links._self Link to repo's API endpoint
+ * @apiSuccess (200) {String} results.links._update Link to repo's update API endpoint
+ * @apiSuccess (200) {String} results.links.self Link to repo's webpage
+ * @apiSuccess (200) {Object} results.links.github Contains relevant github links
+ * @apiSuccess (200) {String} results.links.github.self Link to the repo on github
+ * @apiSuccess (200) {String} results.links.github._update Link to info.json github's api endpoint
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {
+ *              "_id": "587d62b4c54cad51845ae101",
+ *              "name": "ORELS-Cogs",
+ *              "__v": 4,
+ *              "description": "Repository of mainly gaming/data based cogs, with a bit of some fun stuff. Use as you like.",
+ *              "short": "Data scraping cogs with a bit of extra",
+ *              "links": {
+ *                  "_self": "/api/v1/repo/ORELS-Cogs",
+ *                  "_update": "/api/v1/repo/ORELS-Cogs/fetch",
+ *                  "self": "cogs/repo/ORELS-Cogs/",
+ *                  "github": {
+ *                      "self": "https://github.com/orels1/ORELS-Cogs",
+ *                      "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"
+ *                  }
+ *              },
+ *              "type": "unapproved",
+ *              "parsed": false,
+ *              "cogs": [],
+ *              "author": {
+ *                  "name": "orels",
+ *                  "url": "https://github.com/orels1"
+ *              }
+ *          }
+ *      }
+ */
+
+/**
+ * @api {post} /repo/ Add new repo to DB
+ * @apiVersion 0.1.0
+ * @apiName postRepo
+ * @apiGroup repo
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
+ * @apiParam {String} url Repo github URL
+ * @apiParam {String} type Repo type, either approved or beta
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "url": "https://github.com/orels1/ORELS-Cogs",
+ *          "type": "approved"
+ *      }
+ *
+ * @apiUse DBError
+ * @apiUse EntryExists
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {
+ *              "__v": 0,
+ *              "name": "ORELS-Cogs",
+ *              "_id": "587d7a9d13893158907d1729",
+ *              "links": {
+ *                  "github": {
+ *                      "self": "https://github.com/orels1/ORELS-Cogs"
+ *                  }
+ *              },
+ *              "type": "unapproved",
+ *              "parsed": false,
+ *              "cogs": [],
+ *              "author": {
+ *                  "url": "https://github.com/orels1"
+ *              }
+ *          }
+ *      }
+ */
+
+/**
+ * @api {get} /repo/:repoName Get repo
+ * @apiVersion 0.1.0
+ * @apiName getRepo
+ * @apiGroup repo
+ *
+ * @apiParam {String} repoName name of the repo to get
+ *
+ * @apiUse DBError
+ * @apiUse RepoRequestSuccess
+ * @apiUse EntryNotFound
+ */
+
+/**
+ * @api {put} /repo/:id Update repo
+ * @apiVersion 0.1.0
+ * @apiName putRepo
+ * @apiGroup repo
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
+ * @apiParam {String} id Repo id in DB
+ * @apiParam {JSON} payload Object containing the new repo data
+ *
+ * @apiParamExample {json} Request-Example:
+ *      {
+ *          "payload": {
+ *              "parsed": false
+ *          }
+ *      }
+ *
+ *
+ * @apiUse DBError
+ * @apiUse RepoRequestSuccess
+ * @apiUse EntryNotFound
+ */
+
+/**
+ * @api {delete} /repo/:id Delete repo by id
+ * @apiVersion 0.0.1
+ * @apiName deleteRepo
+ * @apiGroup repo
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
+ * @apiParam {String} id Repo id in DB
+ *
+ * @apiUse DBError
+ * @apiUse EntryNotFound
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {}
+ *      }
+ */
+
+/**
+ * @api {put} /repo/admin/parse Parse new repos
+ * @apiVersion 0.0.1
+ * @apiName parseRepos
+ * @apiGroup repo
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": 'Parsing started',
+ *      }
+ */

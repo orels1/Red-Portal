@@ -9,7 +9,6 @@ var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var express = require('express');
-var swig = require('swig');
 var cors = require('cors');
 
 var app = express();
@@ -59,9 +58,11 @@ module.exports = server;
 * */
 
 // Main
-var config = require('./backend/api/v1/config');
-var repo = require('./backend/api/v1/repo');
-var cogs = require('./backend/api/v1/cogs');
+var config = require('./backend/api/v1/config'),
+    repos = require('./backend/api/v1/repos'),
+    cogs = require('./backend/api/v1/cogs'),
+    search = require('./backend/api/v1/search'),
+    admin = require('./backend/api/v1/admin');
 
 // Misc
 var count = require('./backend/api/v1/misc/count');
@@ -104,8 +105,10 @@ var apiAccessControl = function(req, res, next) {
 
 // Main
 app.use('/api/v1/config', cors(), apiAccessControl, config.router);
-app.use('/api/v1/repo', cors(), apiAccessControl, repo.router);
+app.use('/api/v1/repos', cors(), apiAccessControl, repos.router);
 app.use('/api/v1/cogs', cors(), apiAccessControl, cogs.router);
+app.use('/api/v1/search', cors(), apiAccessControl, search.router);
+app.use('/api/v1/admin', cors(), apiAccessControl, admin.router);
 
 // Misc
 app.use('/api/v1/misc/count', cors(), apiAccessControl, count.router);

@@ -4,15 +4,13 @@ let CogSchema = new mongoose.Schema({
     'name': String,
     'author': {
         'name': String,
-        'url': String
+        'url': String,
+        'username': String
     },
-    'repo': {
-        'name': String,
-        'type': String
-    },
+    'repo': Object,
     'short': String,
     'description': String,
-    'updated_at': Date,
+    'updated_at': {type: Date, default: new Date()},
     'links': { // All the API endpoints have _ in the name
         '_self': String, // This cog api endpoint
         '_update': String, // This cog update api handler (uses PUT, requires access-token)
@@ -26,7 +24,8 @@ let CogSchema = new mongoose.Schema({
         },
     },
     'votes': {type: Number, default: 0},
-    'voted': {type: Boolean, default: false} // This is constructed for the individual user
+    'voted': {type: Boolean, default: false}, // This is constructed for the individual user
+    'tags': {default: [], type: [String]}
 });
 
 module.exports = mongoose.model('Cog', CogSchema);
