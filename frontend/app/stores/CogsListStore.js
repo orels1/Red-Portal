@@ -15,58 +15,62 @@ class CogsListStore {
         this.searchResults = [];
     }
 
+    static shuffle(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+
+        return array;
+    }
+
     getRepos() {
         this.repos = [];
     }
 
     onGetReposSuccess(data) {
-        // shuffling
-        function shuffle(array) {
-            var currentIndex = array.length, temporaryValue, randomIndex;
-
-            // While there remain elements to shuffle...
-            while (0 !== currentIndex) {
-
-                // Pick a remaining element...
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex -= 1;
-
-                // And swap it with the current element.
-                temporaryValue = array[currentIndex];
-                array[currentIndex] = array[randomIndex];
-                array[randomIndex] = temporaryValue;
-            }
-
-            return array;
-        }
-
         this.repos = data.results.list;
-        this.cogs = [];
+    }
 
+    onGetReposFail(jqXhr) {
+        console.error(jqXhr.reponseText);
+    }
+
+    onGetCogsSuccess(data) {
         let approved = [],
             beta = [],
             unapproved = [];
 
-        for (let repo of data.results.list) {
-            switch (repo.type) {
+
+        for (let cog of data.results.list) {
+            switch (cog.repo.type) {
                 case 'approved':
-                    approved = approved.concat(repo.cogs);
+                    approved.push(cog);
                     break;
                 case 'beta':
-                    beta = beta.concat(repo.cogs);
+                    beta.push(cog);
                     break;
                 case 'unapproved':
-                    unapproved = unapproved.concat(repo.cogs);
+                    unapproved.push(cog);
                     break;
                 default:
-                    unapproved = unapproved.concat(repo.cogs);
+                    unapproved.push(cog);
             }
         }
-
-        this.cogs = this.cogs.concat(shuffle(approved), shuffle(beta), shuffle(unapproved));
+        this.cogs = this.cogs.concat(approved, beta, unapproved);
     }
 
-    onGetReposFail(jqXhr) {
+    onGetCogsFail(jqXhr) {
         console.error(jqXhr.reponseText);
     }
 

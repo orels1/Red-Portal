@@ -10,7 +10,7 @@ class HomeActions {
 
     getStats() {
         $.ajax({
-            'url': '/api/v1/repo/',
+            'url': '/api/v1/misc/count',
             'type': 'GET',
         })
             .done((data) => {

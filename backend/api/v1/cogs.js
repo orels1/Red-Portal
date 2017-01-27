@@ -51,11 +51,11 @@ import co from 'co';
  *                      "repo": "https://github.com/orels1/ORELS-Cogs",
  *                      "self": "https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py"
  *                  },
- *                  "repo": "cogs/repo/ORELS-Cogs/",
- *                  "self": "/cogs/cog/ORELS-Cogs/dota/",
- *                  "_update": "/api/v1/cogs/cog/ORELS-Cogs/dota/fetch",
- *                  "_repo": "/api/v1/repo/ORELS-Cogs",
- *                  "_self": "/api/v1/cogs/cog/ORELS-Cogs/dota"
+ *                  "repo": "cogs/orels1/ORELS-Cogs/",
+ *                  "self": "/cogs/orels1/ORELS-Cogs/dota/",
+ *                  "_update": "/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch",
+ *                  "_repo": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                  "_self": "/api/v1/cogs/orels1/ORELS-Cogs/dota"
  *              },
  *              "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
  *              "short": null,
@@ -101,11 +101,11 @@ import co from 'co';
  *                               "repo": "https://github.com/orels1/ORELS-Cogs",
  *                               "self": "https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py"
  *                           },
- *                           "repo": "cogs/repo/ORELS-Cogs/",
- *                           "self": "/cogs/cog/ORELS-Cogs/dota/",
- *                           "_update": "/api/v1/cogs/cog/ORELS-Cogs/dota/fetch",
- *                           "_repo": "/api/v1/repo/ORELS-Cogs",
- *                           "_self": "/api/v1/cogs/cog/ORELS-Cogs/dota"
+ *                           "repo": "cogs/orels1/ORELS-Cogs/",
+ *                           "self": "/cogs/orels1/ORELS-Cogs/dota/",
+ *                           "_update": "/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch",
+ *                           "_repo": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                           "_self": "/api/v1/cogs/orels1/ORELS-Cogs/dota"
  *                        },
  *                        "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
  *                        "short": null,

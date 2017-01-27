@@ -13,8 +13,8 @@ export default (
     <Route component={App}>
         <Route path="/" component={Home} />
         <Route path="/cogs/" component={CogsList} />
-        <Route path="/cogs/cog/:repoName/:cogName/" component={Cog} />
-        <Route path="/cogs/repo/:repoName/" component={Repo} />
+        <Route path="/cogs/:author/:repoName/:cogName/" component={Cog} />
+        <Route path="/cogs/:author/:repoName/" component={Repo} />
         <Route path="/about/" component={About} />
         <Route path="*" component={Home} />
     </Route>

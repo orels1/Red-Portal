@@ -122,10 +122,10 @@ function* getCogs(githubRepo, repo) {
             'short': infoJsonContents.content.SHORT || null,
             'description': infoJsonContents.content.DESCRIPTION || null,
             'links': {
-                '_self': `/api/v1/cogs/cog/${repo.name}/${cog.name}`,
+                '_self': `/api/v1/cogs/${repo.author.username}/${repo.name}/${cog.name}`,
                 '_repo': repo.links._self,
-                '_update': `/api/v1/cogs/cog/${repo.name}/${cog.name}/fetch`,
-                'self': `/cogs/cog/${repo.name}/${cog.name}/`,
+                '_update': `/api/v1/cogs/${repo.author.username}/${repo.name}/${cog.name}/fetch`,
+                'self': `/cogs/${repo.author.username}/${repo.name}/${cog.name}/`,
                 'repo': repo.links.self,
                 'github': {
                     'self': `${repo.links.github.self}/blob/master/${cog.name}/${cog.name}.py`,

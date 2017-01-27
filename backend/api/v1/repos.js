@@ -49,7 +49,7 @@ import co from 'co';
  *                  "_self": "/api/v1/repos/orels1/ORELS-Cogs",
  *                  "_update": "/api/v1/repos/orels1/ORELS-Cogs/fetch",
  *                  "_cogs": "/api/v1/cogs/orels1/ORELS-Cogs
- *                  "self": "cogs/repo/orels1/ORELS-Cogs/",
+ *                  "self": "/cogs/orels1/ORELS-Cogs/",
  *                  "github": {
  *                      "self": "https://github.com/orels1/ORELS-Cogs",
  *                      "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"
@@ -100,7 +100,7 @@ import co from 'co';
  *                           "_self": "/api/v1/repos/orels1/ORELS-Cogs",
  *                           "_update": "/api/v1/repos/orels1/ORELS-Cogs/fetch",
  *                           "_cogs": "/api/v1/cogs/orels1/ORELS-Cogs
- *                           "self": "cogs/repo/orels1/ORELS-Cogs/",
+ *                           "self": "/cogs/orels1/ORELS-Cogs/",
  *                           "github": {
  *                               "self": "https://github.com/orels1/ORELS-Cogs",
  *                               "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"

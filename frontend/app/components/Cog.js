@@ -17,6 +17,7 @@ class Cog extends React.Component {
         // Will fire once, after markup has been injected
         CogStore.listen(this.onChange);
         CogActions.getCog({
+            'author': this.props.params.author,
             'repoName': this.props.params.repoName,
             'cogName': this.props.params.cogName
         });
@@ -35,12 +36,14 @@ class Cog extends React.Component {
     handleVote() {
         if (this.state.cog.voted) {
             CogActions.voteCog({
+                'author': this.props.params.author,
                 'repoName': this.props.params.repoName,
                 'cogName': this.props.params.cogName,
                 'choice': 0
             });
         } else {
             CogActions.voteCog({
+                'author': this.props.params.author,
                 'repoName': this.props.params.repoName,
                 'cogName': this.props.params.cogName,
                 'choice': 1

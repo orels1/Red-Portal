@@ -17,7 +17,10 @@ class Repo extends React.Component {
     componentDidMount() {
         // Will fire once, after markup has been injected
         RepoStore.listen(this.onChange);
-        RepoActions.getCogs(this.props.params.repoName);
+        RepoActions.getCogs({
+            'author': this.props.params.author,
+            'repoName': this.props.params.repoName
+        });
     }
 
     componentWillUnmount() {

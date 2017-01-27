@@ -12,7 +12,7 @@ class CogActions {
 
     getCog(payload) {
         $.ajax({
-            'url': `/api/v1/cogs/cog/${payload.repoName}/${payload.cogName}`,
+            'url': `/api/v1/cogs/${payload.author}/${payload.repoName}/${payload.cogName}`,
             'type': 'GET',
         })
             .done((data) => {
@@ -26,7 +26,7 @@ class CogActions {
 
     voteCog(payload) {
         $.ajax({
-            'url': `/api/v1/cogs/cog/${payload.repoName}/${payload.cogName}/vote?choice=${payload.choice}`,
+            'url': `/api/v1/cogs/${payload.author}/${payload.repoName}/${payload.cogName}/vote?choice=${payload.choice}`,
             'type': 'GET',
         })
             .done((data) => {

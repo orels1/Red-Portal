@@ -8,9 +8,9 @@ class RepoActions {
         );
     }
 
-    getCogs(repoName) {
+    getCogs(payload) {
         $.ajax({
-            'url': `/api/v1/cogs/repo/${repoName}`,
+            'url': `/api/v1/cogs/${payload.author}/${payload.repoName}`,
             'type': 'GET',
         })
             .done((data) => {
