@@ -67,7 +67,7 @@ class CogsList extends React.Component {
                 <p className="cog-info description">
                     There is an option to interact with cogs.red without leaving discord!
                     <br />
-                    Install <Link to="/cogs/cog/Red-Portal-Cogs/redportal/">redportal cog</Link> to search through all the cogs listed one the website.
+                    Install <Link to="/cogs/orels1/Red-Portal-Cogs/redportal/">redportal cog</Link> to search through all the cogs listed one the website.
                 </p>
                 <h1 className="section-header" style={{paddingTop: '50px'}}>Disclaimer</h1>
                 <p className="cog-info description">
