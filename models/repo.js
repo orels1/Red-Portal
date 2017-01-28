@@ -22,7 +22,7 @@ let RepoSchema = new mongoose.Schema({
             '_update': String, // This object's github api update link
         },
     },
-    'tags': {default: [], type: [String]}
+    'tags': {default: [], type: [String]},
 });
 
 module.exports = mongoose.model('Repo', RepoSchema);
