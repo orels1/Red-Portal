@@ -16,7 +16,7 @@ import Cog from 'models/cog';
  * @returns String
  */
 function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
 
 /**
@@ -37,10 +37,10 @@ router.get('/cogs/:term', (req, res) => {
     let term = escapeRegExp(decodeURIComponent(req.params.term));
     let re = new RegExp(term, 'i');
     Cog.find({
-        $or: [
+        '$or': [
             {'name': re},
-            {'tags': re}
-        ]
+            {'tags': re},
+        ],
     })
         .exec()
         .then((cogs) => {
@@ -49,10 +49,10 @@ router.get('/cogs/:term', (req, res) => {
                     'error': 'EntryNotFound',
                     'error_details': 'No results for this search',
                     'results': {},
-                })
+                });
             }
-            let offset = parseInt(req.query.offset || 0),
-                limit = parseInt(req.query.limit || 20) + offset;
+            let offset = parseInt(req.query.offset || 0, 10),
+                limit = parseInt(req.query.limit || 20, 10) + offset;
 
             return res.status(200).send({
                 'error': false,

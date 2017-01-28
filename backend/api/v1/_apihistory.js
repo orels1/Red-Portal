@@ -1,6 +1,21 @@
 /**
  * Created by orel- on 17/Jan/17.
  */
+
+/**
+ * @apiDefine EntryExists
+ * @apiError (400) {Object} EntryExists entry is already in DB
+ * @apiVersion 0.0.1
+ *
+ * @apiErrorExample {json} Error-Response:
+ *      HTTP/1.1 400 BadRequest
+ *      {
+ *          "error": "ExtryExists",
+ *          "error_details": "This db entry already exists",
+ *          "results": {"id": "21dsa2t234tdsfsr141"}
+ *      }
+ */
+
 /**
  * @api {get} /cogs/ List all cogs
  * @apiVersion 0.0.1

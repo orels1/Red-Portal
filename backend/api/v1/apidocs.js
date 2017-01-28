@@ -29,12 +29,13 @@
 /**
  * @apiDefine EntryExists
  * @apiError (400) {Object} EntryExists entry is already in DB
+ * @apiVersion 0.2.0
  *
  * @apiErrorExample {json} Error-Response:
  *      HTTP/1.1 400 BadRequest
  *      {
  *          "error": "ExtryExists",
  *          "error_details": "This db entry already exists",
- *          "results": {"id": "21dsa2t234tdsfsr141"}
+ *          "results": {"link": "/api/v1/repo/orels1/ORELS-Cogs"}
  *      }
  */

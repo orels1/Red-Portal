@@ -66,14 +66,14 @@ router.get('/', (req, res) => {
                         'results': {
                             'count': {
                                 'repos': repoCount,
-                                'cogs': cogCount
-                            }
-                        }
-                    })
+                                'cogs': cogCount,
+                            },
+                        },
+                    });
                 })
                 .catch((err) => {
                     throw err;
-                })
+                });
         })
         .catch((err) => {
             throw err;
@@ -96,9 +96,9 @@ router.get('/cogs', (req, res) => {
             return res.status(200).send({
                 'error': false,
                 'results': {
-                    'count': count
-                }
-            })
+                    'count': count,
+                },
+            });
         })
         .catch((err) => {
             throw err;
@@ -121,9 +121,9 @@ router.get('/repos', (req, res) => {
             return res.status(200).send({
                 'error': false,
                 'results': {
-                    'count': count
-                }
-            })
+                    'count': count,
+                },
+            });
         })
         .catch((err) => {
             throw err;

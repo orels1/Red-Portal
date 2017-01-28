@@ -1,15 +1,15 @@
 // babel compiler
-require("babel-polyfill");
+require('babel-polyfill');
 require('babel-register');
 
 // paths
 require('app-module-path').addPath(__dirname + '/');
 
-var path = require('path');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
-var express = require('express');
-var cors = require('cors');
+var path = require('path'),
+    logger = require('morgan'),
+    bodyParser = require('body-parser'),
+    express = require('express'),
+    cors = require('cors');
 
 var app = express();
 
@@ -21,7 +21,7 @@ Raven.config(process.env.DSN).install();
 * App Middleware
 * */
 app.set('port', process.env.PORT || 3000);
-app.set('trust proxy', process.env.NODE_ENV == 'production' || false);
+app.set('trust proxy', process.env.NODE_ENV === 'production' || false);
 app.use(Raven.requestHandler());
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -51,7 +51,7 @@ module.exports = server;
 /*
 * Modules
 * */
-//var twitchapi = require('./backend/twitchapi');
+// var twitchapi = require('./backend/twitchapi');
 
 /*
 * API handlers
@@ -76,7 +76,7 @@ var whitelist = ['http://localhost:4000', 'http://localhost:5000'];
 
 // Custom matcher function
 var corsOpts = {
-    origin: function(origin, cb) {
+    'origin': function(origin, cb) {
         var isWhitelisted = whitelist.indexOf(origin) !== -1;
         cb(isWhitelisted ? null : 'Bad Request', isWhitelisted);
     },
@@ -85,19 +85,19 @@ var corsOpts = {
 /*
 * API access control*/
 
-var apiAccessControl = function(req, res, next) {
-    if (req.method != 'GET' || req.baseUrl == '/api/v1/config') {
-        if (req.get('Service-Token') == process.env.serviceToken) {
+function apiAccessControl(req, res, next) {
+    if (req.method !== 'GET' || req.baseUrl === '/api/v1/config') {
+        if (req.get('Service-Token') === process.env.serviceToken) {
             next();
         } else {
             res.status(401).send({
                 'error': 'Unauthorized',
                 'error_details': 'Please provide correct Service-Token header',
-                'results': {}
-            })
+                'results': {},
+            });
         }
     } else {next();}
-};
+}
 
 /*
 * API (v1)
@@ -151,13 +151,13 @@ app.use(function onError(err, req, res, next) {
     // The error id is attached to `res.sentry` to be returned
     // and optionally displayed to the user for support.
 
-    if (process.env.NODE_ENV == 'development') {
+    if (process.env.NODE_ENV === 'dev') {
         console.log(err);
     }
     res.status(500).send({
         'error': 'DBError',
         'error_details': 'Could not get data from db, contact support and provide the error_id',
         'error_id': res.sentry,
-        'results': {}
-    })
+        'results': {},
+    });
 });

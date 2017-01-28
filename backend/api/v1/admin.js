@@ -8,7 +8,7 @@ import Repo from 'models/repo';
 import Cog from 'models/cog';
 import {extend} from 'underscore';
 import {parseCogs, parseRepos} from './utils/parsers';
-import co from 'co'
+import co from 'co';
 
 /**
  * @api {put} /admin/batch/parse Parse all repos in batch
@@ -46,7 +46,7 @@ router.put('/batch/parse', (req, res) => {
                                             Cog.findOne({
                                                 'name': cog.name,
                                                 'author.username': cog.author.username,
-                                                'repo.name': cog.repo.name
+                                                'repo.name': cog.repo.name,
                                             })
                                                 .exec()
                                                 .then((dbCog) => {
@@ -62,26 +62,26 @@ router.put('/batch/parse', (req, res) => {
                                                         })
                                                         .catch((err) => {
                                                             throw err;
-                                                        })
+                                                        });
                                                 })
                                                 .catch((err) => {
                                                     throw err;
-                                                })
+                                                });
                                         }
                                         return true;
                                     })
                                     .catch((err) => {
                                         throw err;
-                                    })
+                                    });
                             })
                             .catch((err) => {
                                 throw err;
-                            })
+                            });
                     }
                 })
                 .catch((err) => {
                     throw err;
-                })
+                });
         });
     res.status(200).send('Parsing started');
 });

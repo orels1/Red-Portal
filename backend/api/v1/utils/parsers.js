@@ -23,13 +23,13 @@ let config = {
 function* getGithubRepo(url) {
     url = url.replace('github.com', 'api.github.com/repos') + '/contents';
     let options = {
-        headers: {
+        'headers': {
             'User-Agent': 'Red-Portal',
             'Accept': 'application/vnd.github.v3+json',
             'Authorization': config.githubToken,
         },
-        json: true,
-        uri: url,
+        'json': true,
+        'uri': url,
     };
 
     let githubRepo = yield rp(options);
@@ -55,13 +55,13 @@ function* getInfoJson(repo) {
     }
 
     let options = {
-        headers: {
+        'headers': {
             'User-Agent': 'Red-Portal',
             'Accept': 'application/vnd.github.v3+json',
             'Authorization': config.githubToken,
         },
-        json: true,
-        uri: infoJsonDescription.url,
+        'json': true,
+        'uri': infoJsonDescription.url,
     };
 
     let infoJsonObject = yield rp(options);
@@ -95,13 +95,13 @@ function* getCogs(githubRepo, repo) {
     let index = 0;
     for (let cog of cogsList) {
         let options = {
-            headers: {
+            'headers': {
                 'User-Agent': 'Red-Portal',
                 'Accept': 'application/vnd.github.v3+json',
                 'Authorization': config.githubToken,
             },
-            json: true,
-            uri: cog.url,
+            'json': true,
+            'uri': cog.url,
         };
 
         let cogDir = yield rp(options);
@@ -134,7 +134,7 @@ function* getCogs(githubRepo, repo) {
                     '_update': infoJsonContents.updateUrl,
                 },
             },
-            'tags': infoJsonContents.content.TAGS || []
+            'tags': infoJsonContents.content.TAGS || [],
         };
 
         index ++;
@@ -180,9 +180,9 @@ function* parseRepos(repos) {
             'links': extend(repo.links, {
                 'github': extend(repo.links.github, {
                     '_update': repoInfoJson.updateUrl,
-                })
+                }),
             }),
-            'tags': repoInfoJson.content.TAGS || []
+            'tags': repoInfoJson.content.TAGS || [],
         };
 
         result.parsed = true;
@@ -191,7 +191,6 @@ function* parseRepos(repos) {
     }
 
     return repos;
-
 }
 
 /**
@@ -213,13 +212,12 @@ function* parseCogs(repo) {
     let cogs;
 
     try {
-        cogs = yield* getCogs(githubRepo, repo)
-    } catch(e) {
+        cogs = yield* getCogs(githubRepo, repo);
+    } catch (e) {
         throw e;
     }
 
     return cogs;
-
 }
 
-export {getGithubRepo, getInfoJson, getCogs, parseRepos, parseCogs}
+export {getGithubRepo, getInfoJson, getCogs, parseRepos, parseCogs};

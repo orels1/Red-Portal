@@ -127,16 +127,16 @@ import co from 'co';
 router.get('/', (req, res) => {
     Repo.find({'parsed': true})
         .exec((err, entries) => {
-        if (err) {
-            throw err;
-        }
-        return res.status(200).send({
-            'error': false,
-            'results': {
-                'list': entries,
-            },
+            if (err) {
+                throw err;
+            }
+            return res.status(200).send({
+                'error': false,
+                'results': {
+                    'list': entries,
+                },
+            });
         });
-    });
 });
 
 /**
@@ -188,7 +188,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     // Check if we have that entry already
     Repo.findOne({
-        'url': req.body.url
+        'links.github.self': req.body.url,
     }, (err, entry) => {
         if (err) {
             throw err;
@@ -198,7 +198,7 @@ router.post('/', (req, res) => {
             return res.status(400).send({
                 'error': 'EntryExists',
                 'error_details': 'This repo already exists',
-                'results': {'id': entry._id},
+                'results': {'id': entry.links._self},
             });
         }
 
@@ -220,7 +220,7 @@ router.post('/', (req, res) => {
                     'self': req.body.url,
                 },
             },
-            'type': req.body.type
+            'type': req.body.type,
         }).save((err, entry) => {
             if (err) {
                 throw err;
@@ -294,7 +294,7 @@ router.get('/:author/:repoName', (req, res) => {
 router.put('/:author/:repoName/parse', (req, res) => {
     Repo.find({
         'author.username': req.params.author,
-        'name': req.params.repoName
+        'name': req.params.repoName,
     })
         .exec()
         .then((repos) => {
@@ -307,12 +307,12 @@ router.put('/:author/:repoName/parse', (req, res) => {
                             })
                             .catch((err) => {
                                 throw err;
-                            })
+                            });
                     }
                 })
                 .catch((err) => {
                     throw err;
-                })
+                });
         });
     res.status(200).send('Parsing started');
 });
@@ -355,7 +355,7 @@ router.put('/:id', (req, res) => {
             });
         }
         // update with the new values
-        entry = extend(entry, req.body);
+        extend(entry, req.body);
         return entry.save((err, entry) => {
             if (err) {
                 throw err;

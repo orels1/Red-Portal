@@ -134,12 +134,12 @@ router.get('/', (req, res) => {
                 'error': false,
                 'results': {
                     'list': cogs,
-                }
-            })
+                },
+            });
         })
         .catch((err) => {
             throw err;
-        })
+        });
 });
 
 /**
@@ -158,10 +158,9 @@ router.get('/', (req, res) => {
 router.get('/:author/:repoName', (req, res) => {
     Cog.find({
         'author.username': req.params.author,
-        'repo.name': req.params.repoName
+        'repo.name': req.params.repoName,
     }).exec()
         .then((cogs) => {
-
             if (!cogs) {
                 // if does not exist - return NotFound
                 return res.status(404).send({
@@ -178,7 +177,7 @@ router.get('/:author/:repoName', (req, res) => {
         })
         .catch((err) => {
             throw err;
-        })
+        });
 });
 
 /**
@@ -199,10 +198,9 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
     Cog.findOne({
         'name': req.params.cogName,
         'author.username': req.params.author,
-        'repo.name': req.params.repoName
+        'repo.name': req.params.repoName,
     }).exec()
         .then((cog) => {
-
             if (!cog) {
                 // if does not exist - return NotFound
                 return res.status(404).send({
@@ -213,12 +211,12 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
             }
 
             // check if voted for cog
-            Vote.findOne({
+            return Vote.findOne({
                 'repo': req.params.repoName,
-                'cog': req.params.cogName
+                'cog': req.params.cogName,
             }).exec()
                 .then((vote) => {
-                    cog.voted = vote && vote.IPs.indexOf(req.ip) != -1;
+                    cog.voted = vote && vote.IPs.indexOf(req.ip) !== -1;
 
                     return res.status(200).send({
                         'error': false,
@@ -231,7 +229,7 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
         })
         .catch((err) => {
             throw err;
-        })
+        });
 });
 
 /**
@@ -260,7 +258,7 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
 router.put('/:author/:repoName/parse', (req, res) => {
     Repo.findOne({
         'author.username': req.params.author,
-        'name': req.params.repoName
+        'name': req.params.repoName,
     })
         .exec()
         .then((repo) => {
@@ -271,7 +269,7 @@ router.put('/:author/:repoName/parse', (req, res) => {
                         Cog.findOne({
                             'name': cog.name,
                             'author.username': cog.author.username,
-                            'repo.name': cog.repo.name
+                            'repo.name': cog.repo.name,
                         })
                             .exec()
                             .then((dbCog) => {
@@ -283,20 +281,20 @@ router.put('/:author/:repoName/parse', (req, res) => {
 
                                 return cog.save()
                                     .then((cog) => {
-                                        return true;
+                                        return cog;
                                     })
                                     .catch((err) => {
                                         throw err;
-                                    })
+                                    });
                             })
                             .catch((err) => {
                                 throw err;
-                            })
+                            });
                     }
                 })
                 .catch((err) => {
                     throw err;
-                })
+                });
         });
     res.status(200).send('Parsing started');
 });
@@ -321,10 +319,9 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
     Cog.findOne({
         'name': req.params.cogName,
         'author.username': req.params.author,
-        'repo.name': req.params.repoName
+        'repo.name': req.params.repoName,
     }).exec()
         .then((cog) => {
-
             if (!cog) {
                 // if does not exist - return NotFound
                 return res.status(404).send({
@@ -337,18 +334,18 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
             return Vote.findOne({
                 'username': req.params.author,
                 'repo': req.params.repoName,
-                'cog': req.params.cogName
+                'cog': req.params.cogName,
             }).exec()
                 .then((vote) => {
                     if (!vote) {
                         vote = new Vote({
                             'username': req.params.author,
                             'repo': req.params.repoName,
-                            'cog': req.params.cogName
+                            'cog': req.params.cogName,
                         });
                     }
 
-                    if (vote.IPs.indexOf(req.ip) != -1 && req.query.choice === '1') {
+                    if (vote.IPs.indexOf(req.ip) !== -1 && req.query.choice === '1') {
                         return res.status(400).send({
                             'error': 'AlreadyVoted',
                             'error_details': 'You have already voted for this cog',
@@ -363,7 +360,7 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
                             vote.IPs.push(req.ip);
 
                         // only decrease votes if IP is in DB
-                        } else if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) != -1) {
+                        } else if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) !== -1) {
                             cog.votes -= 1;
                             let ipIndex = vote.IPs.indexOf(req.ip);
                             voted = false;
@@ -382,22 +379,20 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
                                     })
                                     .catch((err) => {
                                         throw err;
-                                        })
-                                })
+                                    });
+                            })
                             .catch((err) => {
                                 throw err;
-                            })
-
+                            });
                     }
                 })
                 .catch((err) => {
                     throw err;
                 });
-    })
+        })
         .catch((err) => {
             throw err;
-        })
-
+        });
 });
 
 export {router};
