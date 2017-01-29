@@ -34,8 +34,14 @@ More info on building and deployment process can be find [on the wiki](https://g
 
 - Docker
 - Gulp
-- Google Container Engine (<3)
+- Google Container Engine
 - Kubernetes
+
+### Tested with
+
+- Mocha
+- Chai
+- TravisCI
 
 ### Kept alive with
 
