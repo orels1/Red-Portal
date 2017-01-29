@@ -217,22 +217,30 @@ describe('Cogs', () => {
         before(() => {
             return Cog.remove({})
                 .then(() => {
-                    return Repo.findOne({
-                        'name': 'ORELS-Cogs',
-                    })
-                    .exec();
+                    return Repo.remove({});
                 })
-                .then((repo) => {
-                    if (!repo) {
-                        return chai.request(app)
-                            .post(`${apiUrl}/repos`)
-                            .set('Service-Token', process.env.serviceToken)
-                            .send({
-                                'url': 'https://github.com/orels1/ORELS-Cogs',
-                                'type': 'approved',
-                            });
-                    }
-
+                .then(() => {
+                    let repo = new Repo({
+                        'name': 'ORELS-Cogs',
+                        '_id': '587d7a9d13893158907d1729',
+                        'links': {
+                            '_self': '/api/v1/repos/orels1/ORELS-Cogs',
+                            'self': 'cogs/orels1/ORELS-Cogs/',
+                            'github': {
+                                'self': 'https://github.com/orels1/ORELS-Cogs',
+                            },
+                        },
+                        'type': 'unapproved',
+                        'parsed': false,
+                        'cogs': [],
+                        'author': {
+                            'url': 'https://github.com/orels1',
+                            'username': 'orels1',
+                        },
+                    });
+                    return repo.save();
+                })
+                .then(() => {
                     let cog = new Cog({
                         'links': {
                             'github': {
@@ -240,7 +248,7 @@ describe('Cogs', () => {
                                 'repo': 'https://github.com/orels1/ORELS-Cogs',
                                 'self': 'https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py',
                             },
-                            'repo': 'cogs/orels1/ORELS-Cogs/',
+                            'repo': '/cogs/orels1/ORELS-Cogs/',
                             'self': '/cogs/orels1/ORELS-Cogs/dota/',
                             '_update': '/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch',
                             '_repo': '/api/v1/repos/orels1/ORELS-Cogs',
@@ -260,9 +268,6 @@ describe('Cogs', () => {
                         'name': 'dota',
                     });
                     return cog.save();
-                })
-                .then(() => {
-                    return true;
                 })
                 .catch((err) => {
                     throw err;
