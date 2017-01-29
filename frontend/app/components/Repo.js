@@ -19,7 +19,7 @@ class Repo extends React.Component {
         RepoStore.listen(this.onChange);
         RepoActions.getCogs({
             'author': this.props.params.author,
-            'repoName': this.props.params.repoName
+            'repoName': this.props.params.repoName,
         });
     }
 
@@ -34,7 +34,7 @@ class Repo extends React.Component {
     }
 
     render() {
-        return(
+        return (
             <div className="inner-page">
                 <List
                     title={`Cogs from ${this.props.params.repoName}`}
@@ -44,7 +44,7 @@ class Repo extends React.Component {
                     router={this.props.router}
                 />
             </div>
-        )
+        );
     }
 }
 
