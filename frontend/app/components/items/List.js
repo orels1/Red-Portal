@@ -27,7 +27,7 @@ class List extends React.Component {
 
     render() {
         let list = this.props.list.map((item, index) => {
-            if ((this.props.filters && (this.props.filters.indexOf(item.type || item.repo.type) !== -1)) || (!this.props.filters && true)) {
+            if (this.props.filters && this.props.filters.indexOf(item.type || item.repo.type) !== -1 || !this.props.filters && true) {
                 return (
                     <div
                         key={this.props.keyName + index}
@@ -41,20 +41,20 @@ class List extends React.Component {
                                 </p>
                                 <p className="card-text">
                                     <small className="text-muted">{item.author.name}&nbsp;&nbsp;&nbsp;</small>
-                                    {((item.type && item.type === 'approved') || (item.repo && item.repo.type === 'approved')) &&
+                                    {(item.type && item.type === 'approved' || item.repo && item.repo.type === 'approved') &&
                                         <small className="text-success" title="approved"><i className="fa fa-check" aria-hidden="true"></i></small>
                                     }
-                                    {((item.type && item.type === 'beta') || (item.repo && item.repo.type === 'beta')) &&
+                                    {(item.type && item.type === 'beta' || item.repo && item.repo.type === 'beta') &&
                                         <small className="text-warning" title="beta">β</small>
                                     }
-                                    {((item.type && item.type === 'unapproved') || (item.repo && item.repo.type === 'unapproved')) &&
+                                    {(item.type && item.type === 'unapproved' || item.repo && item.repo.type === 'unapproved') &&
                                         <small className="text-danger" title="unapproved"><i className="fa fa-minus-circle" aria-hidden="true"></i></small>
                                     }
                                 </p>
                             </div>
                         </Link>
                     </div>
-                )
+                );
             }
         });
         return (

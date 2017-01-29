@@ -28,6 +28,7 @@ class CogsListStore {
     }
 
     onGetCogsSuccess(data) {
+        this.cogs = [];
         let approved = [],
             unapproved = [];
 
