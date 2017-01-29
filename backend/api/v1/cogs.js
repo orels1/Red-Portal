@@ -360,7 +360,6 @@ router.put('/:author/:repoName/parse', (req, res) => {
  * @apiUse EntryNotFound
  *
  */
-// TODO: Refactor
 router.get('/:author/:repoName/:cogName/vote', (req, res) => {
     let cog = null,
         voted = false;
