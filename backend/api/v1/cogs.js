@@ -39,6 +39,7 @@ import co from 'co';
  * @apiSuccess (200) {String} results.repo.type Cog's repo type
  * @apiSuccess (200) {String} results.repo.name Cog's repo name
  * @apiSuccess (200) {Boolean} results.voted Cog vote status for request's IP
+ * @apiSuccess (200) {Array} results.tags List of cog's tags
  *
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
@@ -71,6 +72,7 @@ import co from 'co';
  *              "name": "dota",
  *              "voted": false,
  *              "votes": 0,
+ *              "tags": ["gaming"]
  *              }
  *          }
  *      }
@@ -120,7 +122,8 @@ import co from 'co';
  *                        },
  *                        "name": "dota",
  *                        "voted": false,
- *                        "votes": 0
+ *                        "votes": 0,
+ *                        "tags": ["gaming"]
  *                   }
  *               ]
  *           }
@@ -152,8 +155,46 @@ router.get('/', (req, res) => {
  * @apiParam {String} repoName Name of the repo containing the cog
  *
  * @apiUse DBError
- * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {
+ *               "list": [
+ *                   {
+ *                       "links": {
+ *                           "github": {
+ *                               "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master",
+ *                               "repo": "https://github.com/orels1/ORELS-Cogs",
+ *                               "self": "https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py"
+ *                           },
+ *                           "repo": "cogs/orels1/ORELS-Cogs/",
+ *                           "self": "/cogs/orels1/ORELS-Cogs/dota/",
+ *                           "_update": "/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch",
+ *                           "_repo": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                           "_self": "/api/v1/cogs/orels1/ORELS-Cogs/dota"
+ *                        },
+ *                        "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
+ *                        "short": null,
+ *                        "updated_at": "Fri Jan 27 2017 00:10:15 GMT+0300",
+ *                        "author": {
+ *                            "url": "https://github.com/orels1",
+ *                            "name": "orels"
+ *                        },
+ *                        "repo": {
+ *                            "type": "unapproved",
+ *                            "name": "ORELS-Cogs"
+ *                        },
+ *                        "name": "dota",
+ *                        "voted": false,
+ *                        "votes": 0,
+ *                        "tags": ["gaming"]
+ *                   }
+ *               ]
+ *           }
+ *      }
  */
 router.get('/:author/:repoName', (req, res) => {
     Cog.find({
@@ -161,7 +202,7 @@ router.get('/:author/:repoName', (req, res) => {
         'repo.name': req.params.repoName,
     }).exec()
         .then((cogs) => {
-            if (!cogs) {
+            if (cogs.length === 0) {
                 // if does not exist - return NotFound
                 return res.status(404).send({
                     'error': 'EntryNotFound',
@@ -172,7 +213,9 @@ router.get('/:author/:repoName', (req, res) => {
 
             return res.status(200).send({
                 'error': false,
-                'results': cogs,
+                'results': {
+                    'list': cogs,
+                },
             });
         })
         .catch((err) => {
@@ -233,7 +276,7 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
 });
 
 /**
- * @api {put} /cogs/:author/:repoName/fetch Parse new cogs
+ * @api {put} /cogs/:author/:repoName/parse Parse new cogs
  * @apiVersion 0.2.0
  * @apiName parseCogs
  * @apiGroup cogs
@@ -296,7 +339,10 @@ router.put('/:author/:repoName/parse', (req, res) => {
                     throw err;
                 });
         });
-    res.status(200).send('Parsing started');
+    res.status(200).send({
+        'error': false,
+        'results': 'Parsing started',
+    });
 });
 
 /**
@@ -316,14 +362,75 @@ router.put('/:author/:repoName/parse', (req, res) => {
  */
 // TODO: Refactor
 router.get('/:author/:repoName/:cogName/vote', (req, res) => {
-    Cog.findOne({
+    let cog = null,
+        voted = false;
+    let p = Cog.findOne({
         'name': req.params.cogName,
         'author.username': req.params.author,
         'repo.name': req.params.repoName,
     }).exec()
-        .then((cog) => {
-            if (!cog) {
+        .then((result) => {
+            if (!result) {
                 // if does not exist - return NotFound
+                throw new Error('EntryNotFound');
+            }
+
+            cog = result;
+
+            return Vote.findOne({
+                'username': req.params.author,
+                'repo': req.params.repoName,
+                'cog': req.params.cogName,
+            }).exec();
+        })
+        .then((result) => {
+            let vote = null;
+
+            if (!result) {
+                vote = new Vote({
+                    'username': req.params.author,
+                    'repo': req.params.repoName,
+                    'cog': req.params.cogName,
+                    'IPs': [],
+                });
+            } else {
+                vote = result;
+            }
+
+            if (vote.IPs.indexOf(req.ip) !== -1 && req.query.choice === '1') {
+                throw new Error('AlreadyVoted');
+            }
+
+            voted = false;
+            // vote and save IP
+            if (req.query.choice === '1') {
+                cog.votes += 1;
+                voted = true;
+                vote.IPs.push(req.ip);
+
+                // only decrease votes if IP is in DB
+            }
+            if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) !== -1) {
+                cog.votes -= 1;
+                let ipIndex = vote.IPs.indexOf(req.ip);
+                voted = false;
+                vote.IPs.splice(ipIndex, 1);
+            }
+
+            return vote.save();
+        })
+        .then(() => {
+            return cog.save();
+        })
+        .then((cogSaved) => {
+            cogSaved.voted = voted;
+            return res.status(200).send({
+                'error': false,
+                'results': cogSaved,
+            });
+        })
+        .catch((err) => {
+            if (err.message === 'EntryNotFound') {
                 return res.status(404).send({
                     'error': 'EntryNotFound',
                     'error_details': 'There is no such cog, or it is being parsed currently',
@@ -331,66 +438,13 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
                 });
             }
 
-            return Vote.findOne({
-                'username': req.params.author,
-                'repo': req.params.repoName,
-                'cog': req.params.cogName,
-            }).exec()
-                .then((vote) => {
-                    if (!vote) {
-                        vote = new Vote({
-                            'username': req.params.author,
-                            'repo': req.params.repoName,
-                            'cog': req.params.cogName,
-                        });
-                    }
-
-                    if (vote.IPs.indexOf(req.ip) !== -1 && req.query.choice === '1') {
-                        return res.status(400).send({
-                            'error': 'AlreadyVoted',
-                            'error_details': 'You have already voted for this cog',
-                            'results': {},
-                        });
-                    } else {
-                        let voted = false;
-                        // vote and save IP
-                        if (req.query.choice === '1') {
-                            cog.votes += 1;
-                            voted = true;
-                            vote.IPs.push(req.ip);
-
-                        // only decrease votes if IP is in DB
-                        } else if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) !== -1) {
-                            cog.votes -= 1;
-                            let ipIndex = vote.IPs.indexOf(req.ip);
-                            voted = false;
-                            vote.IPs.splice(ipIndex, 1);
-                        }
-
-                        return vote.save()
-                            .then((vote) => {
-                                return cog.save()
-                                    .then((cogSaved) => {
-                                        cog.voted = voted;
-                                        return res.status(200).send({
-                                            'error': false,
-                                            'results': cogSaved,
-                                        });
-                                    })
-                                    .catch((err) => {
-                                        throw err;
-                                    });
-                            })
-                            .catch((err) => {
-                                throw err;
-                            });
-                    }
-                })
-                .catch((err) => {
-                    throw err;
+            if (err.message === 'AlreadyVoted') {
+                return res.status(400).send({
+                    'error': 'AlreadyVoted',
+                    'error_details': 'You have already voted for this cog',
+                    'results': {},
                 });
-        })
-        .catch((err) => {
+            }
             throw err;
         });
 });

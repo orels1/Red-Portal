@@ -18,7 +18,7 @@ const apiUrl = '/api/v1';
 
 describe('Repositories', () => {
     after(() => {
-        Repo.remove({})
+        return Repo.remove({})
             .then(() => {
                 return null;
             })
@@ -29,7 +29,7 @@ describe('Repositories', () => {
 
     describe('GET /repos', () => {
         before(() => {
-            Repo.remove({})
+            return Repo.remove({})
                 .then(() => {
                     return null;
                 })
@@ -39,7 +39,7 @@ describe('Repositories', () => {
         });
 
         it('should get all the repos', () => {
-            chai.request(app)
+            return chai.request(app)
                 .get(`${apiUrl}/repos`)
                 .then((res) => {
                     res.should.have.status(200);
@@ -49,73 +49,6 @@ describe('Repositories', () => {
                 })
                 .catch((err) => {
                     throw err;
-                });
-        });
-    });
-
-    describe('POST /repos', () => {
-        before(() => {
-            Repo.remove({})
-                .then(() => {
-                    return null;
-                })
-                .catch((err) => {
-                    throw err;
-                });
-        });
-
-        it('it should add new repo', () => {
-            chai.request(app)
-                .post(`${apiUrl}/repos`)
-                .set('Service-Token', process.env.serviceToken)
-                .send({
-                    'url': 'https://github.com/orels1/ORELS-Cogs',
-                    'type': 'approved',
-                })
-                .then((res) => {
-                    res.should.have.status(200);
-                    res.body.error.should.be.false;
-                    res.body.results.should.have.property('name');
-                    res.body.results.should.have.property('author');
-                    res.body.results.author.should.have.property('url');
-                    res.body.results.author.should.have.property('username');
-                    res.body.results.should.have.property('links');
-                    res.body.results.links.should.have.property('_self');
-                    res.body.results.links.should.have.property('_update');
-                    res.body.results.links.should.have.property('_cogs');
-                    res.body.results.links.should.have.property('self');
-                    res.body.results.links.should.have.property('github');
-                    res.body.results.links.github.should.have.property('self');
-                    res.body.results.cogs.should.be.an('array');
-                    res.body.results.cogs.should.have.lengthOf(0);
-                    res.body.results.should.have.property('parsed');
-                    res.body.results.parsed.should.be.false;
-                    res.body.results.should.have.property('type');
-                    res.body.results.should.have.property('tags');
-                    res.body.results.tags.should.be.an('array');
-                    res.body.results.tags.should.have.lengthOf(0);
-                })
-                .catch((err) => {
-                    throw err;
-                });
-        });
-
-        it('it should return link when posting duplicate', () => {
-            chai.request(app)
-                .post(`${apiUrl}/repos`)
-                .set('Service-Token', process.env.serviceToken)
-                .send({
-                    'url': 'https://github.com/orels1/ORELS-Cogs',
-                    'type': 'approved',
-                })
-                .then((res) => {
-                    throw new Error('Erorr expected');
-                })
-                .catch((err) => {
-                    err.should.have.status(400);
-                    err.response.body.error.should.equal('EntryExists');
-                    err.response.body.should.have.property('error_details');
-                    err.response.body.results.should.have.property('_self');
                 });
         });
     });
@@ -190,6 +123,73 @@ describe('Repositories', () => {
                 })
                 .catch((err) => {
                     throw err;
+                });
+        });
+    });
+
+    describe('POST /repos', () => {
+        before(() => {
+            Repo.remove({})
+                .then(() => {
+                    return null;
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        });
+
+        it('it should add new repo', () => {
+            return chai.request(app)
+                .post(`${apiUrl}/repos`)
+                .set('Service-Token', process.env.serviceToken)
+                .send({
+                    'url': 'https://github.com/orels1/ORELS-Cogs',
+                    'type': 'approved',
+                })
+                .then((res) => {
+                    res.should.have.status(200);
+                    res.body.error.should.be.false;
+                    res.body.results.should.have.property('name');
+                    res.body.results.should.have.property('author');
+                    res.body.results.author.should.have.property('url');
+                    res.body.results.author.should.have.property('username');
+                    res.body.results.should.have.property('links');
+                    res.body.results.links.should.have.property('_self');
+                    res.body.results.links.should.have.property('_update');
+                    res.body.results.links.should.have.property('_cogs');
+                    res.body.results.links.should.have.property('self');
+                    res.body.results.links.should.have.property('github');
+                    res.body.results.links.github.should.have.property('self');
+                    res.body.results.cogs.should.be.an('array');
+                    res.body.results.cogs.should.have.lengthOf(0);
+                    res.body.results.should.have.property('parsed');
+                    res.body.results.parsed.should.be.false;
+                    res.body.results.should.have.property('type');
+                    res.body.results.should.have.property('tags');
+                    res.body.results.tags.should.be.an('array');
+                    res.body.results.tags.should.have.lengthOf(0);
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        });
+
+        it('it should return link when posting duplicate', () => {
+            return chai.request(app)
+                .post(`${apiUrl}/repos`)
+                .set('Service-Token', process.env.serviceToken)
+                .send({
+                    'url': 'https://github.com/orels1/ORELS-Cogs',
+                    'type': 'approved',
+                })
+                .then((res) => {
+                    throw new Error('Erorr expected');
+                })
+                .catch((err) => {
+                    err.should.have.status(400);
+                    err.response.body.error.should.equal('EntryExists');
+                    err.response.body.should.have.property('error_details');
+                    err.response.body.results.should.have.property('_self');
                 });
         });
     });
@@ -289,6 +289,41 @@ describe('Repositories', () => {
         });
     });
 
+    describe('PUT /repos/:author/:repoName/parse', () => {
+        before(() => {
+            Repo.remove({})
+                .then(() => {
+                    return null;
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        });
+
+        it('it should start parsing repos', () => {
+            return chai.request(app)
+                .post(`${apiUrl}/repos`)
+                .set('Service-Token', process.env.serviceToken)
+                .send({
+                    'url': 'https://github.com/orels1/ORELS-Cogs',
+                    'type': 'approved',
+                })
+                .then((repo) => {
+                    return chai.request(app)
+                        .put(`${apiUrl}/repos/${repo.body.results.author.username}/${repo.body.results.name}/parse`)
+                        .set('Service-Token', process.env.serviceToken);
+                })
+                .then((res) => {
+                    res.should.have.status(200);
+                    res.body.error.should.be.false;
+                    res.body.results.should.equal('Parsing started');
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        });
+    });
+
     describe('DELETE /repos/:id', () => {
         before(() => {
             Repo.remove({})
@@ -335,7 +370,6 @@ describe('Repositories', () => {
             });
             return repo.save()
                 .then((saved) => {
-                    return chai.request(app)
                     return chai.request(app)
                         .delete(`${apiUrl}/repos/${saved._id}`)
                         .set('Service-Token', process.env.serviceToken);
