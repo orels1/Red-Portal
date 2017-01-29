@@ -231,11 +231,8 @@ describe('Cogs', () => {
                                 'url': 'https://github.com/orels1/ORELS-Cogs',
                                 'type': 'approved',
                             });
-                    } else {
-                        return new Promise();
                     }
-                })
-                .then(() => {
+
                     let cog = new Cog({
                         'links': {
                             'github': {
@@ -264,7 +261,7 @@ describe('Cogs', () => {
                     });
                     return cog.save();
                 })
-                .then((saved) => {
+                .then(() => {
                     return true;
                 })
                 .catch((err) => {

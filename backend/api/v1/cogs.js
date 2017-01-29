@@ -238,39 +238,42 @@ router.get('/:author/:repoName', (req, res) => {
  * @apiUse EntryNotFound
  */
 router.get('/:author/:repoName/:cogName', (req, res) => {
+    let cog = null;
     Cog.findOne({
         'name': req.params.cogName,
         'author.username': req.params.author,
         'repo.name': req.params.repoName,
     }).exec()
-        .then((cog) => {
-            if (!cog) {
+        .then((res) => {
+            if (!res) {
                 // if does not exist - return NotFound
+                throw new Error('EntryNotFound');
+            }
+
+            cog = res;
+
+            // check if voted for cog
+            return Vote.findOne({
+                'repo': req.params.repoName,
+                'cog': req.params.cogName,
+            }).exec();
+        })
+        .then((vote) => {
+            cog.voted = vote && vote.IPs.indexOf(req.ip) !== -1;
+
+            return res.status(200).send({
+                'error': false,
+                'results': cog,
+            });
+        })
+        .catch((err) => {
+            if (err.message === 'EntryNotFound') {
                 return res.status(404).send({
                     'error': 'EntryNotFound',
                     'error_details': 'There is no such cog, or it is being parsed currently',
                     'results': {},
                 });
             }
-
-            // check if voted for cog
-            return Vote.findOne({
-                'repo': req.params.repoName,
-                'cog': req.params.cogName,
-            }).exec()
-                .then((vote) => {
-                    cog.voted = vote && vote.IPs.indexOf(req.ip) !== -1;
-
-                    return res.status(200).send({
-                        'error': false,
-                        'results': cog,
-                    });
-                })
-                .catch((err) => {
-                    throw err;
-                });
-        })
-        .catch((err) => {
             throw err;
         });
 });
@@ -305,39 +308,36 @@ router.put('/:author/:repoName/parse', (req, res) => {
     })
         .exec()
         .then((repo) => {
-            co(parseCogs(repo))
-                .then((cogs) => {
-                    for (let cog of cogs) {
-                        // check if we have such cog
-                        Cog.findOne({
-                            'name': cog.name,
-                            'author.username': cog.author.username,
-                            'repo.name': cog.repo.name,
-                        })
-                            .exec()
-                            .then((dbCog) => {
-                                if (!dbCog) {
-                                    cog = new Cog(cog);
-                                } else {
-                                    cog = extend(dbCog, cog);
-                                }
-
-                                return cog.save()
-                                    .then((cog) => {
-                                        return cog;
-                                    })
-                                    .catch((err) => {
-                                        throw err;
-                                    });
-                            })
-                            .catch((err) => {
-                                throw err;
-                            });
-                    }
+            return co(parseCogs(repo));
+        })
+        .then((cogs) => {
+            for (let cog of cogs) {
+                // check if we have such cog
+                Cog.findOne({
+                    'name': cog.name,
+                    'author.username': cog.author.username,
+                    'repo.name': cog.repo.name,
                 })
-                .catch((err) => {
-                    throw err;
-                });
+                    .exec()
+                    .then((dbCog) => {
+                        if (!dbCog) {
+                            cog = new Cog(cog);
+                        } else {
+                            cog = extend(dbCog, cog);
+                        }
+
+                        return cog.save();
+                    })
+                    .then((cog) => {
+                        return cog;
+                    })
+                    .catch((err) => {
+                        throw err;
+                    });
+            }
+        })
+        .catch((err) => {
+            throw err;
         });
     res.status(200).send({
         'error': false,
