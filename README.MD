@@ -1,6 +1,6 @@
 ![s](http://i.imgur.com/fTkm9Kz.jpg)
 
-# Cogs.Red ![s](https://travis-ci.org/orels1/Red-Portal.svg?branch=master) ![s](https://img.shields.io/badge/support%20me%20on-patron-orange.svg)
+# Cogs.Red ![s](https://travis-ci.org/orels1/Red-Portal.svg?branch=master) ![s](https://img.shields.io/badge/support%20me%20on-patreon-orange.svg)
 >a.k.a. Red-Portal
 
 [Red-DiscordBot](https://github.com/Twentysix26/Red-DiscordBot) cogs registry
