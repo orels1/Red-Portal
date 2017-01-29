@@ -44,7 +44,7 @@ router.get('/cogs/:term', (req, res) => {
     })
         .exec()
         .then((cogs) => {
-            if (!cogs) {
+            if (cogs.length === 0) {
                 return res.status(404).send({
                     'error': 'EntryNotFound',
                     'error_details': 'No results for this search',

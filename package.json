@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test/*",
     "watch": "nodemon app.js",
     "gendocs": "apidoc -i backend/api -o docs/",
     "rundocs": "node docs.js",
@@ -34,7 +34,10 @@
   "homepage": "https://github.com/orels1/Red-Portal#readme",
   "devDependencies": {
     "apidoc": "^0.16.1",
-    "dockerode": "^2.3.1"
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "dockerode": "^2.3.1",
+    "mocha": "^3.2.0"
   },
   "dependencies": {
     "alt": "^0.18.6",
@@ -50,6 +53,7 @@
     "bluebird": "^3.4.7",
     "body-parser": "^1.15.2",
     "browserify": "^13.1.1",
+    "chai-http": "^3.0.0",
     "co": "^4.6.0",
     "cors": "^2.8.1",
     "express": "^4.14.0",

@@ -40,13 +40,8 @@ mongoose.connection.on('error', function() {
     console.log('Error: Could not connect to MongoDB. Did you forget to run `mongod`?');
 });
 
-var server = require('http').createServer(app);
-server.listen(app.get('port'), function() {
-    console.log('Red-Portal is available at http://localhost:' + app.get('port'));
-});
-
-// export server for the modules which needs it
-module.exports = server;
+app.listen(app.get('port'));
+console.log('Server is listening at port ' + app.get('port'));
 
 /*
 * Modules
@@ -144,7 +139,9 @@ app.use(function(req, res) {
 });
 
 // Error handler
-app.use(Raven.errorHandler());
+if (process.env.NODE_ENV === 'production') {
+    app.use(Raven.errorHandler());
+}
 
 // Optional fallthrough error handler
 app.use(function onError(err, req, res, next) {
@@ -161,3 +158,6 @@ app.use(function onError(err, req, res, next) {
         'results': {},
     });
 });
+
+// export server for the modules which needs it
+module.exports = app;

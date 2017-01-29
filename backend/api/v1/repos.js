@@ -198,7 +198,7 @@ router.post('/', (req, res) => {
             return res.status(400).send({
                 'error': 'EntryExists',
                 'error_details': 'This repo already exists',
-                'results': {'id': entry.links._self},
+                'results': {'_self': entry.links._self},
             });
         }
 
@@ -234,7 +234,7 @@ router.post('/', (req, res) => {
 });
 
 /**
- * @api {get} /repo/:author/:repoName Get repo
+ * @api {get} /repos/:author/:repoName Get repo
  * @apiVersion 0.2.0
  * @apiName getRepo
  * @apiGroup repos
@@ -255,7 +255,7 @@ router.get('/:author/:repoName', (req, res) => {
         }
         if (!entry) {
             // if does not exist - return NotFound
-            return res.status(400).send({
+            return res.status(404).send({
                 'error': 'EntryNotFound',
                 'error_details': 'There is no such repo, or it is being parsed currently',
                 'results': {},
@@ -314,7 +314,10 @@ router.put('/:author/:repoName/parse', (req, res) => {
                     throw err;
                 });
         });
-    res.status(200).send('Parsing started');
+    res.status(200).send({
+        'error': false,
+        'results': 'Parsing started',
+    });
 });
 
 /**
@@ -348,7 +351,7 @@ router.put('/:id', (req, res) => {
         }
         if (!entry) {
             // if does not exist - return NotFound
-            return res.status(400).send({
+            return res.status(404).send({
                 'error': 'EntryNotFound',
                 'error_details': 'There is no such repo',
                 'results': {},
@@ -398,7 +401,7 @@ router.delete('/:id', (req, res) => {
         }
         if (!entry) {
             // if does not exist - return NotFound
-            return res.status(400).send({
+            return res.status(404).send({
                 'error': 'EntryNotFound',
                 'error_details': 'There is no such repo',
                 'results': {},

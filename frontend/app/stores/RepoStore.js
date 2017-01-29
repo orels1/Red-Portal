@@ -17,7 +17,7 @@ class RepoStore {
     }
 
     onGetCogsSuccess(data) {
-        this.cogs = data.results;
+        this.cogs = data.results.list;
     }
 
     onGetCogsFail(jqXhr) {

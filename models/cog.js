@@ -5,7 +5,7 @@ let CogSchema = new mongoose.Schema({
     'author': {
         'name': String,
         'url': String,
-        'username': String
+        'username': String,
     },
     'repo': Object,
     'short': String,
@@ -25,7 +25,7 @@ let CogSchema = new mongoose.Schema({
     },
     'votes': {type: Number, default: 0},
     'voted': {type: Boolean, default: false}, // This is constructed for the individual user
-    'tags': {default: [], type: [String]}
+    'tags': {default: [], type: [String]},
 });
 
 module.exports = mongoose.model('Cog', CogSchema);

@@ -30,60 +30,54 @@ import co from 'co';
  *          "results": 'Parsing started',
  *      }
  */
+// TODO: replace loops with generators
 router.put('/batch/parse', (req, res) => {
     Repo.find({})
         .exec()
         .then((repos) => {
-            return co(parseRepos(repos))
-                .then((repos) => {
-                    for (let repo of repos) {
-                        repo.save()
-                            .then((repo) => {
-                                co(parseCogs(repo))
-                                    .then((cogs) => {
-                                        for (let cog of cogs) {
-                                            // check if we have such cog
-                                            Cog.findOne({
-                                                'name': cog.name,
-                                                'author.username': cog.author.username,
-                                                'repo.name': cog.repo.name,
-                                            })
-                                                .exec()
-                                                .then((dbCog) => {
-                                                    if (!dbCog) {
-                                                        cog = new Cog(cog);
-                                                    } else {
-                                                        cog = extend(dbCog, cog);
-                                                    }
-
-                                                    return cog.save()
-                                                        .then((cog) => {
-                                                            return true;
-                                                        })
-                                                        .catch((err) => {
-                                                            throw err;
-                                                        });
-                                                })
-                                                .catch((err) => {
-                                                    throw err;
-                                                });
-                                        }
-                                        return true;
-                                    })
-                                    .catch((err) => {
-                                        throw err;
-                                    });
+            return co(parseRepos(repos));
+        })
+        .then((repos) => {
+            for (let repo of repos) {
+                repo.save()
+                    .then((repo) => {
+                        return co(parseCogs(repo));
+                    })
+                    .then((cogs) => {
+                        for (let cog of cogs) {
+                            // check if we have such cog
+                            Cog.findOne({
+                                'name': cog.name,
+                                'author.username': cog.author.username,
+                                'repo.name': cog.repo.name,
                             })
-                            .catch((err) => {
-                                throw err;
-                            });
-                    }
-                })
-                .catch((err) => {
-                    throw err;
-                });
+                                .exec()
+                                .then((dbCog) => {
+                                    if (!dbCog) {
+                                        cog = new Cog(cog);
+                                    } else {
+                                        cog = extend(dbCog, cog);
+                                    }
+
+                                    return cog.save();
+                                })
+                                .catch((err) => {
+                                    throw err;
+                                });
+                        }
+                    })
+                    .catch((err) => {
+                        throw err;
+                    });
+            }
+        })
+        .catch((err) => {
+            throw err;
         });
-    res.status(200).send('Parsing started');
+    res.status(200).send({
+        'error': false,
+        'results': 'Parsing started',
+    });
 });
 
 

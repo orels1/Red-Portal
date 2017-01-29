@@ -29,7 +29,7 @@ import Cog from 'models/cog';
  */
 
 /**
- * @api {get} /count/ Count cogs in DB
+ * @api {get} /misc/count/ Count cogs in DB
  * @apiVersion 0.2.0
  * @apiName getTotalCount
  * @apiGroup misc
@@ -81,7 +81,7 @@ router.get('/', (req, res) => {
 });
 
 /**
- * @api {get} /count/cogs Count cogs in DB
+ * @api {get} /misc/count/cogs Count cogs in DB
  * @apiVersion 0.2.0
  * @apiName getCogsCount
  * @apiGroup misc
@@ -106,7 +106,7 @@ router.get('/cogs', (req, res) => {
 });
 
 /**
- * @api {get} /count/repos Count repos in DB
+ * @api {get} /misc/count/repos Count repos in DB
  * @apiVersion 0.2.0
  * @apiName getReposCount
  * @apiGroup misc
