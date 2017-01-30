@@ -63,6 +63,8 @@ var config = require('./backend/api/v1/config'),
 var count = require('./backend/api/v1/misc/count'),
     tags = require('./backend/api/v1/misc/tags');
 
+// Tasks
+var tasks = require('./backend/api/v1/tasks/tasks');
 
 /*
 * CORS for API

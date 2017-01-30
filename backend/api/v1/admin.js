@@ -32,6 +32,17 @@ import co from 'co';
  */
 // TODO: replace loops with generators
 router.put('/batch/parse', (req, res) => {
+    res.status(200).send({
+        'error': false,
+        'results': 'Parsing started',
+    });
+    repoParser();
+});
+
+/**
+ * Parses all repos and cogs in batch
+ */
+function repoParser() {
     Repo.find({})
         .exec()
         .then((repos) => {
@@ -74,11 +85,6 @@ router.put('/batch/parse', (req, res) => {
         .catch((err) => {
             throw err;
         });
-    res.status(200).send({
-        'error': false,
-        'results': 'Parsing started',
-    });
-});
+}
 
-
-export {router};
+export {router, repoParser};
