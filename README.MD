@@ -7,8 +7,6 @@
 
 Ever thought "it'd be cool if there was a place, where you can see a list of all the cogs and repos for Red"? Well, there is such a place now!
 
-### Project is currently WIP, expect a lot of updates
-
 ## API
 
 [Docs on the api are available here](https://orels1.github.io/Red-Portal/)
