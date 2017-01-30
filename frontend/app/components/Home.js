@@ -31,16 +31,16 @@ class Home extends React.Component {
         return (
             <div className="home">
                 <h1 className="display-1">RED</h1>
-                <div className="excerpt col-md-8 offset-md-2">
+                <div className="excerpt">
                     A fully customizable <b>Discord</b> bot<br/>
                     Created by <b>Twentysix</b>, made great by many
                 </div>
-                <div className="col-md-4 offset-md-4 download">
+                <div className="download">
                     <a href="https://github.com/Twentysix26/Red-DiscordBot" className="btn btn-default btn-square">
                         <i className="fa fa-github" aria-hidden="true"></i>&nbsp;Download now
                     </a>
                 </div>
-                <div className="stats col-md-8 offset-md-2">
+                <div className="stats">
                     <span>{this.state.cog_count}</span> cogs in <span>{this.state.repo_count}</span> repos and counting
                 </div>
             </div>

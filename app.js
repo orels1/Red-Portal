@@ -60,7 +60,8 @@ var config = require('./backend/api/v1/config'),
     admin = require('./backend/api/v1/admin');
 
 // Misc
-var count = require('./backend/api/v1/misc/count');
+var count = require('./backend/api/v1/misc/count'),
+    tags = require('./backend/api/v1/misc/tags');
 
 
 /*
@@ -107,6 +108,7 @@ app.use('/api/v1/admin', cors(), apiAccessControl, admin.router);
 
 // Misc
 app.use('/api/v1/misc/count', cors(), apiAccessControl, count.router);
+app.use('/api/v1/misc/tags', cors(), apiAccessControl, tags.router);
 
 /*
 * Frontend
