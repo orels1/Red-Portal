@@ -4,7 +4,9 @@ class HomeActions {
     constructor() {
         this.generateActions(
             'getStatsSuccess',
-            'getStatsFail'
+            'getStatsFail',
+            'getTagsSuccess',
+            'getTagsFail'
         );
     }
 
@@ -18,6 +20,20 @@ class HomeActions {
             })
             .fail((jqXhr) => {
                 this.getStatsFail(jqXhr);
+            });
+        return false;
+    }
+
+    getTags() {
+        $.ajax({
+            'url': '/api/v1/misc/tags/top',
+            'type': 'GET',
+        })
+            .done((data) => {
+                this.getTagsSuccess(data);
+            })
+            .fail((jqXhr) => {
+                this.getTagsFail(jqXhr);
             });
         return false;
     }

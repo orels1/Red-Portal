@@ -2,6 +2,8 @@ import React from 'react';
 import HomeActions from '../actions/HomeActions';
 import HomeStore from '../stores/HomeStore';
 
+import Tags from './items/Tags';
+
 class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -15,6 +17,7 @@ class Home extends React.Component {
         // Will fire once, after markup has been injected
         HomeStore.listen(this.onChange);
         HomeActions.getStats();
+        HomeActions.getTags();
     }
 
     componentWillUnmount() {
@@ -43,6 +46,7 @@ class Home extends React.Component {
                 <div className="stats">
                     <span>{this.state.cog_count}</span> cogs in <span>{this.state.repo_count}</span> repos and counting
                 </div>
+                <Tags list={this.state.tags} limit={5} />
             </div>
         );
     }
