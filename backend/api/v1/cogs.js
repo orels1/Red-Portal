@@ -324,6 +324,7 @@ router.put('/:author/:repoName/parse', (req, res) => {
                             cog = new Cog(cog);
                         } else {
                             cog = extend(dbCog, cog);
+                            cog.updated_at = new Date();
                         }
 
                         return cog.save();
