@@ -23,7 +23,7 @@ class About extends React.Component {
 
     render() {
         return (
-            <div className="about col-md-10 offset-md-1">
+            <div className="about col-md-10 offset-md-1 inner-page">
                 <h1 className="display-2">About red</h1>
                 <div className="excerpt text-justify">
                     Red is an open source Discord bot powered by <a href="https://github.com/Rapptz/discord.py/" target="_blank"><b>discord.py</b></a>

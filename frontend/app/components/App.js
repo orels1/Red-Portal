@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import Navbar from './Navbar';
+import Footer from './Footer';
 
 class App extends React.Component {
     render() {
@@ -13,6 +14,7 @@ class App extends React.Component {
                 <div className="container" id="main">
                     {this.props.children}
                 </div>
+                <Footer />
             </div>
         );
     }

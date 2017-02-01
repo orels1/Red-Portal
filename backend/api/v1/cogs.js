@@ -7,11 +7,15 @@ let router = express.Router();
 import {eachLimit} from 'async';
 import {findWhere, where, extend, filter} from 'underscore';
 import Repo from 'models/repo';
+import Cog from 'models/cog';
+import Vote from 'models/vote';
+import {parseCogs} from './utils/parsers';
+import co from 'co';
 
 /**
  * @apiDefine CogRequestSuccess
  *
- * @apiVersion 0.1.0
+ * @apiVersion 0.2.0
  *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
@@ -34,6 +38,8 @@ import Repo from 'models/repo';
  * @apiSuccess (200) {Object} results.repo Contains info about cog's repo
  * @apiSuccess (200) {String} results.repo.type Cog's repo type
  * @apiSuccess (200) {String} results.repo.name Cog's repo name
+ * @apiSuccess (200) {Boolean} results.voted Cog vote status for request's IP
+ * @apiSuccess (200) {Array} results.tags List of cog's tags
  *
  * @apiSuccessExample {json} Success-Response:
  *      HTTP/1.1 200 OK
@@ -46,14 +52,15 @@ import Repo from 'models/repo';
  *                      "repo": "https://github.com/orels1/ORELS-Cogs",
  *                      "self": "https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py"
  *                  },
- *                  "repo": "cogs/repo/ORELS-Cogs/",
- *                  "self": "/cogs/cog/ORELS-Cogs/dota/",
- *                  "_update": "/api/v1/cogs/cog/ORELS-Cogs/dota/fetch",
- *                  "_repo": "/api/v1/repo/ORELS-Cogs",
- *                  "_self": "/api/v1/cogs/cog/ORELS-Cogs/dota"
+ *                  "repo": "cogs/orels1/ORELS-Cogs/",
+ *                  "self": "/cogs/orels1/ORELS-Cogs/dota/",
+ *                  "_update": "/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch",
+ *                  "_repo": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                  "_self": "/api/v1/cogs/orels1/ORELS-Cogs/dota"
  *              },
  *              "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
  *              "short": null,
+ *              "updated_at": "Fri Jan 27 2017 00:10:15 GMT+0300",
  *              "author": {
  *                  "url": "https://github.com/orels1",
  *                  "name": "orels"
@@ -62,7 +69,10 @@ import Repo from 'models/repo';
  *                  "type": "unapproved",
  *                  "name": "ORELS-Cogs"
  *              },
- *              "name": "dota"
+ *              "name": "dota",
+ *              "voted": false,
+ *              "votes": 0,
+ *              "tags": ["gaming"]
  *              }
  *          }
  *      }
@@ -70,7 +80,7 @@ import Repo from 'models/repo';
 
 /**
  * @api {get} /cogs/ List all cogs
- * @apiVersion 0.1.0
+ * @apiVersion 0.2.0
  * @apiName getCogList
  * @apiGroup cogs
  *
@@ -93,14 +103,15 @@ import Repo from 'models/repo';
  *                               "repo": "https://github.com/orels1/ORELS-Cogs",
  *                               "self": "https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py"
  *                           },
- *                           "repo": "cogs/repo/ORELS-Cogs/",
- *                           "self": "/cogs/cog/ORELS-Cogs/dota/",
- *                           "_update": "/api/v1/cogs/cog/ORELS-Cogs/dota/fetch",
- *                           "_repo": "/api/v1/repo/ORELS-Cogs",
- *                           "_self": "/api/v1/cogs/cog/ORELS-Cogs/dota"
+ *                           "repo": "cogs/orels1/ORELS-Cogs/",
+ *                           "self": "/cogs/orels1/ORELS-Cogs/dota/",
+ *                           "_update": "/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch",
+ *                           "_repo": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                           "_self": "/api/v1/cogs/orels1/ORELS-Cogs/dota"
  *                        },
  *                        "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
  *                        "short": null,
+ *                        "updated_at": "Fri Jan 27 2017 00:10:15 GMT+0300",
  *                        "author": {
  *                            "url": "https://github.com/orels1",
  *                            "name": "orels"
@@ -109,99 +120,116 @@ import Repo from 'models/repo';
  *                            "type": "unapproved",
  *                            "name": "ORELS-Cogs"
  *                        },
- *                        "name": "dota"
+ *                        "name": "dota",
+ *                        "voted": false,
+ *                        "votes": 0,
+ *                        "tags": ["gaming"]
  *                   }
  *               ]
  *           }
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.aggregate([
-        {$match: {
-            'cogs' : {$exists: true, $not: {$size: 0}}
-        }},
-        {$unwind: "$cogs"},
-        {$group: {_id: null, cgs: {$push: "$cogs"}}},
-        {$project: {_id: 0, cogs: "$cgs"}}
-    ]).exec((err, repos) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not list entries'
+    Cog.find({})
+        .exec()
+        .then((cogs) => {
+            res.status(200).send({
+                'error': false,
+                'results': {
+                    'list': cogs,
+                },
             });
-        }
-        let cogs = [];
-        let i = 1;
-        for (let repo of repos) {
-            cogs = cogs.concat(repo.cogs);
-        }
-
-        res.status(200).send({
-            'error': false,
-            'results': {
-                'list': cogs,
-            }
         })
-
-    });
+        .catch((err) => {
+            throw err;
+        });
 });
 
 /**
- * @api {get} /cogs/repo/:repoName Get cogs from repo
- * @apiVersion 0.1.0
+ * @api {get} /cogs/:author/:repoName Get cogs from repo
+ * @apiVersion 0.2.0
  * @apiName getCogFromRepo
  * @apiGroup cogs
  *
+ * @apiParam {String} author Cog author github username
  * @apiParam {String} repoName Name of the repo containing the cog
  *
  * @apiUse DBError
- * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {
+ *               "list": [
+ *                   {
+ *                       "links": {
+ *                           "github": {
+ *                               "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master",
+ *                               "repo": "https://github.com/orels1/ORELS-Cogs",
+ *                               "self": "https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py"
+ *                           },
+ *                           "repo": "cogs/orels1/ORELS-Cogs/",
+ *                           "self": "/cogs/orels1/ORELS-Cogs/dota/",
+ *                           "_update": "/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch",
+ *                           "_repo": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                           "_self": "/api/v1/cogs/orels1/ORELS-Cogs/dota"
+ *                        },
+ *                        "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
+ *                        "short": null,
+ *                        "updated_at": "Fri Jan 27 2017 00:10:15 GMT+0300",
+ *                        "author": {
+ *                            "url": "https://github.com/orels1",
+ *                            "name": "orels"
+ *                        },
+ *                        "repo": {
+ *                            "type": "unapproved",
+ *                            "name": "ORELS-Cogs"
+ *                        },
+ *                        "name": "dota",
+ *                        "voted": false,
+ *                        "votes": 0,
+ *                        "tags": ["gaming"]
+ *                   }
+ *               ]
+ *           }
+ *      }
  */
-router.get('/repo/:repoName', (req, res) => {
-    Repo.aggregate([
-        {$match: {
-            'name': req.params.repoName,
-            'cogs' : {$exists: true, $not: {$size: 0}}
-        }},
-        {$unwind: "$cogs"},
-        {$group: {_id: null, cgs: {$push: "$cogs"}}},
-        {$project: {_id: 0, cogs: "$cgs"}}
-    ]).exec((err, cogs) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
+router.get('/:author/:repoName', (req, res) => {
+    Cog.find({
+        'author.username': req.params.author,
+        'repo.name': req.params.repoName,
+    }).exec()
+        .then((cogs) => {
+            if (cogs.length === 0) {
+                // if does not exist - return NotFound
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'results': {},
+                });
+            }
+
+            return res.status(200).send({
+                'error': false,
+                'results': {
+                    'list': cogs,
+                },
             });
-        }
-
-        cogs = cogs[0].cogs;
-
-        if (!cogs) {
-            // if does not exist - return NotFound
-            return res.status(404).send({
-                'error': 'EntryNotFound',
-                'error_details': 'There is no such cog, or it is being parsed currently',
-                'results': {},
-            });
-        }
-
-        return res.status(200).send({
-            'error': false,
-            'results': cogs,
+        })
+        .catch((err) => {
+            throw err;
         });
-    });
 });
 
 /**
- * @api {get} /cogs/cog/:repoName/:cogName Get cog
- * @apiVersion 0.1.0
+ * @api {get} /cogs/:author/:repoName/:cogName Get cog
+ * @apiVersion 0.2.0
  * @apiName getCog
  * @apiGroup cogs
  *
+ * @apiParam {String} author Cog author github username
  * @apiParam {String} repoName Name of the repo containing the cog
  * @apiParam {String} cogName Name of the cog to get
  *
@@ -209,101 +237,216 @@ router.get('/repo/:repoName', (req, res) => {
  * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
  */
-router.get('/cog/:repoName/:cogName', (req, res) => {
-    Repo.aggregate([
-        {$match: {
-            'name': req.params.repoName,
-            'cogs' : {$exists: true, $not: {$size: 0}}
-        }},
-        {$unwind: "$cogs"},
-        {$group: {_id: null, cgs: {$push: "$cogs"}}},
-        {$project: {_id: 0, cogs: "$cgs"}}
-    ]).exec((err, cogs) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
+router.get('/:author/:repoName/:cogName', (req, res) => {
+    let cog = null;
+    Cog.findOne({
+        'name': req.params.cogName,
+        'author.username': req.params.author,
+        'repo.name': req.params.repoName,
+    }).exec()
+        .then((res) => {
+            if (!res) {
+                // if does not exist - return NotFound
+                throw new Error('EntryNotFound');
+            }
+
+            cog = res;
+
+            // check if voted for cog
+            return Vote.findOne({
+                'repo': req.params.repoName,
+                'cog': req.params.cogName,
+            }).exec();
+        })
+        .then((vote) => {
+            cog.voted = vote && vote.IPs.indexOf(req.ip) !== -1;
+
+            return res.status(200).send({
+                'error': false,
+                'results': cog,
             });
-        }
-
-        cogs = cogs[0].cogs;
-
-        let result = findWhere(cogs, {'name': req.params.cogName});
-
-        if (!result) {
-            // if does not exist - return NotFound
-            return res.status(404).send({
-                'error': 'EntryNotFound',
-                'error_details': 'There is no such cog, or it is being parsed currently',
-                'results': {},
-            });
-        }
-
-        return res.status(200).send({
-            'error': false,
-            'results': result,
+        })
+        .catch((err) => {
+            if (err.message === 'EntryNotFound') {
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'results': {},
+                });
+            }
+            throw err;
         });
+});
+
+/**
+ * @api {put} /cogs/:author/:repoName/parse Parse new cogs
+ * @apiVersion 0.2.0
+ * @apiName parseCogs
+ * @apiGroup cogs
+ *
+ * @apiHeader {string} Service-Token Admin-oriented service token
+ *
+ * @apiParam {String} author Cog author github username
+ * @apiParam {String} repoName Name of the repo containing the cog
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": 'Parsing started',
+ *      }
+ */
+router.put('/:author/:repoName/parse', (req, res) => {
+    Repo.findOne({
+        'author.username': req.params.author,
+        'name': req.params.repoName,
+    })
+        .exec()
+        .then((repo) => {
+            return co(parseCogs(repo));
+        })
+        .then((cogs) => {
+            for (let cog of cogs) {
+                // check if we have such cog
+                Cog.findOne({
+                    'name': cog.name,
+                    'author.username': cog.author.username,
+                    'repo.name': cog.repo.name,
+                })
+                    .exec()
+                    .then((dbCog) => {
+                        if (!dbCog) {
+                            cog = new Cog(cog);
+                        } else {
+                            cog = extend(dbCog, cog);
+                            cog.updated_at = new Date();
+                        }
+
+                        return cog.save();
+                    })
+                    .then((cog) => {
+                        return cog;
+                    })
+                    .catch((err) => {
+                        throw err;
+                    });
+            }
+        })
+        .catch((err) => {
+            throw err;
+        });
+    res.status(200).send({
+        'error': false,
+        'results': 'Parsing started',
     });
 });
 
 /**
- * @api {get} /cogs/search/:term Search for a cog
- * @apiVersion 0.1.0
- * @apiName searchCog
+ * @api {get} /cogs/:author/:repoName/:cogName/vote Vote for cog with ?choice=[0|1]
+ * @apiVersion 0.2.0
+ * @apiName voteCog
  * @apiGroup cogs
  *
- * @apiDescription Supports offset and limit query params, by default set to offset=0 and limit=20
- *
- * @apiParam {String} term Term to search for
+ * @apiParam {String} author Cog author github username
+ * @apiParam {String} repoName Name of the repo containing the cog
+ * @apiParam {String} cogName Name of the cog to get
  *
  * @apiUse DBError
  * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
+ *
  */
-router.get('/search/:term', (req, res) => {
-    Repo.aggregate([
-        {$match: {
-            'cogs' : {$exists: true, $not: {$size: 0}}
-        }},
-        {$unwind: "$cogs"},
-        {$group: {_id: null, cgs: {$push: "$cogs"}}},
-        {$project: {_id: 0, cogs: "$cgs"}},
-    ]).exec((err, cogs) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not list entries',
-                'results': {},
+router.get('/:author/:repoName/:cogName/vote', (req, res) => {
+    let cog = null,
+        voted = false;
+    let p = Cog.findOne({
+        'name': req.params.cogName,
+        'author.username': req.params.author,
+        'repo.name': req.params.repoName,
+    }).exec()
+        .then((result) => {
+            if (!result) {
+                // if does not exist - return NotFound
+                throw new Error('EntryNotFound');
+            }
+
+            cog = result;
+
+            return Vote.findOne({
+                'username': req.params.author,
+                'repo': req.params.repoName,
+                'cog': req.params.cogName,
+            }).exec();
+        })
+        .then((result) => {
+            let vote = null;
+
+            if (!result) {
+                vote = new Vote({
+                    'username': req.params.author,
+                    'repo': req.params.repoName,
+                    'cog': req.params.cogName,
+                    'IPs': [],
+                });
+            } else {
+                vote = result;
+            }
+
+            if (vote.IPs.indexOf(req.ip) !== -1 && req.query.choice === '1') {
+                throw new Error('AlreadyVoted');
+            }
+
+            voted = false;
+            // vote and save IP
+            if (req.query.choice === '1') {
+                cog.votes += 1;
+                voted = true;
+                vote.IPs.push(req.ip);
+
+                // only decrease votes if IP is in DB
+            }
+            if (req.query.choice === '0' && vote.IPs.indexOf(req.ip) !== -1) {
+                cog.votes -= 1;
+                let ipIndex = vote.IPs.indexOf(req.ip);
+                voted = false;
+                vote.IPs.splice(ipIndex, 1);
+            }
+
+            return vote.save();
+        })
+        .then(() => {
+            return cog.save();
+        })
+        .then((cogSaved) => {
+            cogSaved.voted = voted;
+            return res.status(200).send({
+                'error': false,
+                'results': cogSaved,
             });
-        }
+        })
+        .catch((err) => {
+            if (err.message === 'EntryNotFound') {
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'results': {},
+                });
+            }
 
-        // when got list of cogs - match with our term
-        let search = filter(cogs[0].cogs, (cog) => {
-            let re = new RegExp(req.params.term, 'i');
-            return re.test(cog.id) || re.test(cog.description) || re.test(cog.short);
+            if (err.message === 'AlreadyVoted') {
+                return res.status(400).send({
+                    'error': 'AlreadyVoted',
+                    'error_details': 'You have already voted for this cog',
+                    'results': {},
+                });
+            }
+            throw err;
         });
-
-        if (!search || search.length === 0) {
-            return res.status(404).send({
-                'error': 'EntryNotFound',
-                'error_details': 'No results for this search',
-                'results': {},
-            })
-        }
-        let offset = parseInt(req.query.offset || 0),
-            limit = parseInt(req.query.limit || 20) + offset;
-
-        return res.status(200).send({
-            'error': false,
-            'results': {
-                'list': search.slice(offset, limit),
-            },
-        });
-
-    });
 });
 
 export {router};

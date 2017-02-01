@@ -1,9 +1,12 @@
+html
+  min-height: 100%
+
 body
   font-family: 'Montserrat', sans-serif
   color: #fff
   background: url('/img/bg.jpg') center top no-repeat, #000000
   background-size: 1920px
-  min-height: 80vh
+  min-height: 100%
 
   &:after
     content: ''
@@ -18,9 +21,14 @@ body
 #app
   position: relative
   z-index: 10
+  min-height: 100%
+
+  & > :first-child
+    min-height: 100%
 
 #main
-  margin-top: 80px
+  min-height: 100vh
+  margin-top: -64px
 
 // Navbar
 .navbar
@@ -79,25 +87,42 @@ body
 // Home
 .home
   height: 80vh
-  width: 100vw
-  display: table-cell
-  vertical-align: middle
+  padding-top: 13vh
+  display: flex
+  flex-direction: column
+  justify-content: center
   text-align: center
+  box-sizing: content-box
 
   .display-1
     font-weight: 700
     color: #fd2121
+    margin-top: 60px
 
   .excerpt
     color: #fff
     font-size: 24px
     padding: 40px 100px
     background: rgba(0,0,0,0.8)
+    max-width: 600px
+    margin: 0 auto
 
 
     b
       font-weight: 500
       color: #fd2121
+
+// Stats
+.stats
+  margin-top: 20px
+  padding: 20px
+  font-size: 22px
+  text-transform: uppercase
+
+  span
+    display: inline-block
+    background: rgba(0,0,0,0.8)
+    padding: 5px 10px
 
 // Headers
 h1.section-header
@@ -142,7 +167,7 @@ h1.section-header
     .card-text
 
       &.short
-        min-height: 50px
+        min-height: 72px
 
 // Cog
 .cog
@@ -154,7 +179,6 @@ h1.section-header
     font-size: 16px
     margin-top: 10px
     text-transform: uppercase
-
 
 
 .cog-info
@@ -174,6 +198,32 @@ h1.section-header
     line-height: 27px
     letter-spacing: -1px
     color: rgba(255,255,255,0.9)
+
+// Tags Block
+
+.tags-block
+
+  .cog-info
+    margin-top: 0
+    margin-right: 0
+    
+.tags
+  max-width: 800px
+  margin: 0 auto
+  display: flex
+  justify-content: center
+  
+  .cog-info
+    float: none
+
+// Votes
+.vote
+  color: #fff
+  transition: color 300ms ease
+  cursor: pointer
+
+  &:hover
+    color: #fd2121
 
 // Download
 .download
@@ -210,3 +260,20 @@ h1.section-header
 
 .display-linebreak
   white-space: pre-line
+
+.inner-page
+  margin-top: 150px
+
+.cogLink
+  text-decoration: none !important
+
+// Footer
+.footer
+  width: 100%
+  padding: 20px 0
+  background: rgba(0,0,0,0.5)
+  text-align: center
+
+  .footer-text
+    color: #ffffff
+    text-transform: uppercase

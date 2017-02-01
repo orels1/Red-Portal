@@ -20,7 +20,18 @@ class CogsListStore {
     }
 
     onGetReposSuccess(data) {
-        // shuffling
+        this.repos = data.results.list;
+    }
+
+    onGetReposFail(jqXhr) {
+        console.error(jqXhr.reponseText);
+    }
+
+    onGetCogsSuccess(data) {
+        this.cogs = [];
+        let approved = [],
+            unapproved = [];
+
         function shuffle(array) {
             var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -40,33 +51,25 @@ class CogsListStore {
             return array;
         }
 
-        this.repos = data.results.list;
-        this.cogs = [];
-
-        let approved = [],
-            beta = [],
-            unapproved = [];
-
-        for (let repo of data.results.list) {
-            switch (repo.type) {
+        for (let cog of data.results.list) {
+            switch (cog.repo.type) {
                 case 'approved':
-                    approved = approved.concat(repo.cogs);
+                    approved.push(cog);
                     break;
                 case 'beta':
-                    beta = beta.concat(repo.cogs);
+                    approved.push(cog);
                     break;
                 case 'unapproved':
-                    unapproved = unapproved.concat(repo.cogs);
+                    unapproved.push(cog);
                     break;
                 default:
-                    unapproved = unapproved.concat(repo.cogs);
+                    unapproved.push(cog);
             }
         }
-
-        this.cogs = this.cogs.concat(shuffle(approved), shuffle(beta), shuffle(unapproved));
+        this.cogs = this.cogs.concat(shuffle(approved), shuffle(unapproved));
     }
 
-    onGetReposFail(jqXhr) {
+    onGetCogsFail(jqXhr) {
         console.error(jqXhr.reponseText);
     }
 
@@ -78,11 +81,11 @@ class CogsListStore {
         this.showCogs = 10;
     }
 
-    findSuccess(data) {
-        this.searchResults = data.results.list || [];
+    onFindSuccess(data) {
+        this.searchResults = data.results && data.results.list || [];
     }
 
-    findFail(jqXhr) {
+    onFindFail(jqXhr) {
         console.error(jqXhr.responseText);
     }
 

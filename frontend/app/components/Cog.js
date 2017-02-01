@@ -17,6 +17,7 @@ class Cog extends React.Component {
         // Will fire once, after markup has been injected
         CogStore.listen(this.onChange);
         CogActions.getCog({
+            'author': this.props.params.author,
             'repoName': this.props.params.repoName,
             'cogName': this.props.params.cogName
         });
@@ -32,9 +33,36 @@ class Cog extends React.Component {
         this.setState(state);
     }
 
+    handleVote() {
+        if (this.state.cog.voted) {
+            CogActions.voteCog({
+                'author': this.props.params.author,
+                'repoName': this.props.params.repoName,
+                'cogName': this.props.params.cogName,
+                'choice': 0
+            });
+        } else {
+            CogActions.voteCog({
+                'author': this.props.params.author,
+                'repoName': this.props.params.repoName,
+                'cogName': this.props.params.cogName,
+                'choice': 1
+            });
+        }
+    }
+
     render() {
+        let tags = this.state.cog.tags && this.state.cog.tags.map((item, index) => {
+                return(
+                    <p key={`${item}-1`} className="cog-info">
+                        <Link to={`/cogs/?search=${encodeURIComponent(item)}`}>
+                            {item}
+                        </Link>
+                    </p>
+                )
+            });
         return(
-            <div className="cog">
+            <div className="cog inner-page">
                 <DocumentMeta
                     title={`Cogs.Red | Cog: ${this.props.params.cogName}`}
                     meta={{
@@ -66,6 +94,11 @@ class Cog extends React.Component {
                         <span className="text-danger">{this.state.cog.repo.type}</span>
                     </p>
                 }
+                <p className="cog-info vote" onClick={this.handleVote.bind(this)}>
+                    <i className={`fa ${this.state.cog.voted && 'fa-star' || 'fa-star-o'}`} aria-hidden="true"></i>
+                    &nbsp;
+                    {this.state.cog.votes || 0}
+                </p>
                 <p className="cog-info">
                     By&nbsp;
                     <a href={this.state.cog.author && this.state.cog.author.url} target="_blank">
@@ -83,6 +116,13 @@ class Cog extends React.Component {
                         source
                     </a>
                 </p>
+                <div className="clearfix"></div>
+                <div className="tags-block">
+                    <p className="cog-info">
+                        Tags
+                    </p>
+                    {tags}
+                </div>
                 <div className="clearfix"></div>
 
                 {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&
