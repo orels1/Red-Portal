@@ -9,14 +9,15 @@ var path = require('path'),
     logger = require('morgan'),
     bodyParser = require('body-parser'),
     express = require('express'),
-    cors = require('cors'),
-    session = require('express-session');
+    cors = require('cors');
 
 var app = express();
 
 // Sentry
 var Raven = require('raven');
-Raven.config(process.env.DSN).install();
+if (process.env.NODE_ENV === 'production') {
+    Raven.config(process.env.DSN).install();
+}
 
 /*
 * App Middleware
@@ -73,9 +74,7 @@ var tasks = require('./backend/api/v1/tasks/tasks');
 /*
  * Passport
  * */
-app.use(session({ secret: 'red is bae', resave: false, saveUninitialized: false }));
 app.use(auth.passport.initialize());
-app.use(auth.passport.session());
 
 /*
 * CORS for API
@@ -94,12 +93,12 @@ var corsOpts = {
 /*
 * API access control*/
 
-function apiAccessControl(restricted, cogs, req, res, next) {
+function apiAccessControl(restricted, cors, req, res, next) {
     if (
         (req.method !== 'GET' || restricted)
         &&
         (req.method !== 'POST' && !cors)
-    ){
+    ) {
         if (req.get('Service-Token') === process.env.serviceToken) {
             next();
         } else {
@@ -117,36 +116,36 @@ function apiAccessControl(restricted, cogs, req, res, next) {
 * */
 
 // Main
-app.use('/api/v1/config', cors(), 
-    (req, res, next) => {apiAccessControl(true, false req, res, next)},
+app.use('/api/v1/config', cors(),
+    function(req, res, next) {apiAccessControl(true, false, req, res, next);},
     config.router);
 app.use('/api/v1/repos', cors(),
-    (req, res, next) => {apiAccessControl(false, false req, res, next)},
+    function(req, res, next) {apiAccessControl(false, true, req, res, next);},
     repos.router);
 app.use('/api/v1/cogs', cors(),
-    (req, res, next) => {apiAccessControl(false, false req, res, next)},
+    function(req, res, next) {apiAccessControl(false, true, req, res, next);},
     cogs.router);
 app.use('/api/v1/search', cors(),
-    (req, res, next) => {apiAccessControl(false, false req, res, next)},
+    function(req, res, next) {apiAccessControl(false, true, req, res, next);},
     search.router);
 app.use('/api/v1/admin', cors(),
-    (req, res, next) => {apiAccessControl(false, false req, res, next)},
+    function(req, res, next) {apiAccessControl(false, false, req, res, next);},
     admin.router);
 app.use('/api/v1/auth', cors(),
-    admin.router);
+    auth.router);
 app.use('/api/v1/hooks', cors(),
-    (req, res, next) => {apiAccessControl(true, true req, res, next)},
-    admin.router);
+    function(req, res, next) {apiAccessControl(true, true, req, res, next);},
+    hooks.router);
 app.use('/api/v1/users', cors(),
-    (req, res, next) => {apiAccessControl(true, false req, res, next)},
-    admin.router);
+    function(req, res, next) {apiAccessControl(false, true, req, res, next);},
+    users.router);
 
 // Misc
 app.use('/api/v1/misc/count', cors(),
-    (req, res, next) => {apiAccessControl(false, false req, res, next)},
+    function(req, res, next) {apiAccessControl(false, true, req, res, next);},
     count.router);
 app.use('/api/v1/misc/tags', cors(),
-    (req, res, next) => {apiAccessControl(false, false req, res, next)},
+    function(req, res, next) {apiAccessControl(false, true, req, res, next);},
     tags.router);
 
 /*

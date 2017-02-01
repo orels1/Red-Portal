@@ -8,6 +8,7 @@ import {extend} from 'underscore';
 import {parseRepos} from './utils/parsers';
 import Repo from 'models/repo';
 import co from 'co';
+import {checkOwnership} from './users';
 
 
 /**
@@ -185,7 +186,7 @@ router.get('/', (req, res) => {
  *          }
  *      }
  */
-router.post('/', (req, res) => {
+router.post('/', checkOwnership, (req, res) => {
     // Check if we have that entry already
     Repo.findOne({
         'links.github.self': req.body.url,

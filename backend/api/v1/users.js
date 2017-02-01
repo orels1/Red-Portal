@@ -7,6 +7,9 @@ import express from 'express';
 let router = express.Router();
 import User from 'models/user';
 import {getUserRepos} from 'backend/api/v1/github';
+import {findWhere, extend} from 'underscore';
+import {decode} from 'jsonwebtoken';
+import {authorize} from './auth';
 
 /**
  * @apiDefine UserRequestSuccess
@@ -87,21 +90,17 @@ import {getUserRepos} from 'backend/api/v1/github';
  */
 router.get('/', (req, res) => {
     User.find({})
-        .exec((err, entries) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).send({
-                    'error': 'DBError',
-                    'error_details': 'Could not list entries',
-                    'results': {},
-                });
-            }
+        .exec()
+        .then((entries) => {
             return res.status(200).send({
                 'error': false,
                 'results': {
                     'list': entries,
                 },
             });
+        })
+        .catch((err) => {
+            throw err;
         });
 });
 
@@ -119,31 +118,93 @@ router.get('/', (req, res) => {
  * @apiUse UserRequestSuccess
  * @apiUse EntryNotFound
  */
-router.get('/:username', (req, res) => {
-    User.findOne({
-        'username': req.params.username,
-    }, (err, entry) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
-        }
-        if (!entry) {
-            // if does not exist - return NotFound
-            return res.status(400).send({
-                'error': 'EntryNotFound',
-                'error_details': 'There is no such user',
-                'results': {},
-            });
-        }
+router.get('/:username', authorize, (req, res) => {
+    // If requested by user himself
+    if (req.user && req.user.username === req.params.username) {
         return res.status(200).send({
             'error': false,
-            'results': entry,
+            'results': req.user,
         });
-    });
+    }
+    // if elevated access
+    return User.findOne({
+        'username': req.params.username,
+    })
+        .exec()
+        .then((user) => {
+            if (!user) {
+                throw new Error('EntryNotFound');
+            }
+            return res.status(200).send({
+                'error': false,
+                'results': user,
+            });
+        })
+        .catch((err) => {
+            if (err.message === 'EntryNotFound') {
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such user',
+                    'results': {},
+                });
+            }
+            throw err;
+        });
+});
+
+/**
+ * @api {put} /users/:id Update user by ID
+ * @apiVersion 0.2.0
+ * @apiName updateUser
+ * @apiGroup users
+ *
+ * @apiHeader {String} Authorization User's JWT access token
+ * @apiHeader {String} Service-Token Admin-oriented service token
+ *
+ * @apiParam {String} id User's id in DB
+ *
+ * @apiUse DBError
+ * @apiUse EntryNotFound
+ * @apiUse UserRequestSuccess
+ */
+router.put('/:id', authorize, (req, res) => {
+    // If requested by user himself
+    if (req.user && req.user._id.toString() === req.params.id) {
+
+        // only admins can change roles
+        if (req.body.roles && !req.body.roles.include('admin')) {
+            delete req.body.roles;
+        }
+
+        extend(req.user, req.body);
+
+        return req.user.save()
+            .then((user) => {
+                return res.status(200).send({
+                    'error': false,
+                    'results': user,
+                });
+            })
+            .catch((err) => {
+                throw err;
+            });
+    }
+    // if elevated access
+    return User.findById(req.params.id)
+        .exec()
+        .then((user) => {
+            extend(user, req.body);
+            return user.save();
+        })
+        .then((user) => {
+            return res.status(200).send({
+                'error': false,
+                'results': user,
+            });
+        })
+        .catch((err) => {
+            throw err;
+        });
 });
 
 /**
@@ -162,40 +223,88 @@ router.get('/:username', (req, res) => {
 router.get('/:username/repos', (req, res) => {
     User.findOne({
         'username': req.params.username,
-    }, (err, entry) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send({
-                'error': 'DBError',
-                'error_details': 'Could not check for entry',
-                'results': {},
-            });
-        }
-        if (!entry) {
-            // if does not exist - return NotFound
-            return res.status(400).send({
-                'error': 'EntryNotFound',
-                'error_details': 'There is no such user',
-                'results': {},
-            });
-        }
+    })
+        .exec()
+        .then((entry) => {
+            if (err) {
+                throw err;
+            }
+            if (!entry) {
+                // if does not exist - return NotFound
+                throw new Error('EntryNotFound');
+            }
 
-        // get repos from github;
-        getUserRepos(entry, (err, repos) => {
-            if (err) console.log(err);
+            // get repos from github;
+            return getUserRepos(entry);
+        })
+        .then((repos) => {
             return res.status(200).send({
                 'error': false,
                 'results': {
-                    'list': repos
-                }
-            })
+                    'list': repos,
+                },
+            });
+        })
+        .catch((err) => {
+            if (err.message === 'EntryNotFound') {
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such user',
+                    'results': {},
+                });
+            }
+            throw err;
         });
-
-
-    });
 });
 
-// There is no POST operation, since users can only be created in the auth module
+
+/**
+ * Middleware
+ * Checks if user owns a repo
+ * @param req
+ * @param res
+ * @param next
+ */
+function checkOwnership(req, res, next) {
+    let token = req.get('Authorization');
+    User.findOne({
+        'tokens.jwt': token,
+    })
+        .exec()
+        .then((user) => {
+            if (!user && req.get('Service-Token') !== process.env.serviceToken && !user.roles.include('admin')) {
+                // override if Service-Token is provided
+                throw new Error('Unauthorized');
+            }
+
+            // check if repo exists
+            return getUserRepos(user);
+        })
+        .then((repos) => {
+            if (findWhere(repos, {'html_url': req.body.url})) {
+                next();
+            } else {
+                throw new Error('EntryNotFound');
+            }
+        })
+        .catch((err) => {
+            if (err.message === 'Unauthorized') {
+                return res.status(401).send({
+                    'error': 'Unauthorized',
+                    'error_details': 'JWT token invalid',
+                    'results': {},
+                });
+            }
+            if (err.message === 'EntryNotFound') {
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There is no such repo for this user',
+                    'results': {},
+                });
+            }
+            throw err;
+        });
+}
 
 
-export {router};
+export {router, checkOwnership};

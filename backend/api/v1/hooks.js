@@ -97,12 +97,7 @@ router.get('/', (req, res) => {
     Hook.find({'parsed': true})
         .exec((err, entries) => {
             if (err) {
-                console.log(err);
-                return res.status(500).send({
-                    'error': 'DBError',
-                    'error_details': 'Could not list entries',
-                    'results': {},
-                });
+                throw err;
             }
             return res.status(200).send({
                 'error': false,
@@ -123,15 +118,15 @@ function createHook(name, type, repo, cb) {
         'name': name || `${repo.name}-hook`,
         'type': type || 'repo-update',
         'links': {
-            '_self': `/api/v1/hooks/${repo._id}`
+            '_self': `/api/v1/hooks/${repo._id}`,
         },
         'repo': {
             'name': repo.name,
             '_id': repo._id,
             'links': {
-                '_self': repo.links._self
-            }
-        }
+                '_self': repo.links._self,
+            },
+        },
     });
 
     return hook.save((err, hook) => {
