@@ -277,11 +277,14 @@ function checkOwnership(req, res, next) {
                 throw new Error('Unauthorized');
             }
 
+            if (req.get('Service-Token') === process.env.serviceToken) {
+                return null;
+            }
             // check if repo exists
             return getUserRepos(user);
         })
         .then((repos) => {
-            if (findWhere(repos, {'html_url': req.body.url})) {
+            if (findWhere(repos, {'html_url': req.body.url}) || req.get('Service-Token') === process.env.serviceToken) {
                 next();
             } else {
                 throw new Error('EntryNotFound');

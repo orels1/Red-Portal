@@ -54,6 +54,14 @@ class Panel extends React.Component {
         PanelActions.parseRepo({'url': item.links._update, 'id': item._id});
     }
 
+    handleParseCogs(item) {
+        PanelActions.parseCogs({'url': `${item.links._cogs}/parse`, 'id': item._id});
+    }
+
+    handleMoveRepo(item, type) {
+        PanelActions.moveRepo({'url': `/api/v1/repos/${item._id}`, 'type': type, 'id': item._id});
+    }
+
     render() {
         let reposList = this.state.repos.map((item, index) => {
             return (
@@ -61,20 +69,43 @@ class Panel extends React.Component {
                     <div className="d-flex w-100 justify-content-between">
                         {item.name}
                         <div>
-                            <span className="admin-links-item" onClick={this.handleRepoParse.bind(null, item)}>
-                                parse
+                            <span className="admin-links-item" style={{'textDecoration': 'none'}}>
+                                move to:
                             </span>
-                            <span
-                                className={`badge badge-pill ${item.parsed && 'badge-success' || 'badge-danger'}`}
-                                style={{'marginRight': '15px'}}
-                            >{item.parsed && 'parsed' || 'not parsed'}</span>
+                            <span className="admin-links-item" onClick={this.handleMoveRepo.bind(null, item, 'approved')}>
+                                approved
+                            </span>
+                            <span className="admin-links-item" onClick={this.handleMoveRepo.bind(null, item, 'beta')}>
+                                beta
+                            </span>
+                            <span className="admin-links-item" onClick={this.handleMoveRepo.bind(null, item, 'unapproved')}>
+                                unapproved
+                            </span>
+                            |&nbsp;&nbsp;&nbsp;
+                            <span className="admin-links-item" onClick={this.handleRepoParse.bind(null, item)}>
+                                parse repo
+                            </span>
+                            <span className="admin-links-item" onClick={this.handleParseCogs.bind(null, item)}>
+                                parse cogs
+                            </span>
                             <span className={`badge badge-pill ${item.type === 'approved' && 'badge-success' || item.type === 'beta' && 'badge-warning' || item.type === 'unapproved' && 'badge-danger'}`}>{item.type}</span>
                         </div>
                     </div>
-                    <small className="mb-1">
-                        By&nbsp;
-                        <a href={item.author.url} target="_blank">{item.author.username}</a>
-                    </small>
+                    <div className="d-flex w-100 justify-content-between mb-1" style={{'marginTop': '7px'}}>
+                        <small>
+                            By&nbsp;
+                            <a href={item.author.url} target="_blank">{item.author.username}</a>
+                        </small>
+                        {item.status &&
+                            <small>
+                                Status:&nbsp;&nbsp;
+                                <span
+                                    className={`badge badge-pill ${item.status.state && 'badge-success' || 'badge-danger'}`}>
+                                    {item.status && item.status.message}
+                                </span>
+                            </small>
+                        }
+                    </div>
                 </li>
             );
         });
@@ -141,7 +172,7 @@ class Panel extends React.Component {
                                 </div>
                             }
                         </form>
-                        <h4 style={{'marginTop': '20px'}}>Repos list</h4>
+                        <h4 style={{'marginTop': '20px'}}>Repos list (re-parse both repo and cogs after type change)</h4>
                         <div className="list-group repos-admin-list">
                             {reposList}
                         </div>

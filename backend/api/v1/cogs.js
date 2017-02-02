@@ -11,6 +11,7 @@ import Cog from 'models/cog';
 import Vote from 'models/vote';
 import {parseCogs} from './utils/parsers';
 import co from 'co';
+import {authorize} from './auth';
 
 /**
  * @apiDefine CogRequestSuccess
@@ -301,7 +302,14 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
  *          "results": 'Parsing started',
  *      }
  */
-router.put('/:author/:repoName/parse', (req, res) => {
+router.put('/:author/:repoName/parse', authorize, (req, res) => {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
+        return res.status(401).send({
+            'error': 'Unauthorized',
+            'error_details': 'Authorization header not provided',
+            'results': {},
+        });
+    }
     Repo.findOne({
         'author.username': req.params.author,
         'name': req.params.repoName,
@@ -340,7 +348,7 @@ router.put('/:author/:repoName/parse', (req, res) => {
         .catch((err) => {
             throw err;
         });
-    res.status(200).send({
+    return res.status(200).send({
         'error': false,
         'results': 'Parsing started',
     });

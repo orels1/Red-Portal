@@ -13,7 +13,11 @@ class HomeActions {
             'getReposSuccess',
             'getReposFail',
             'parseRepoSuccess',
-            'parseRepoFail,'
+            'parseRepoFail',
+            'parseCogsSuccess',
+            'parseCogsFail',
+            'moveRepoSuccess',
+            'moveRepoFail',
         );
     }
 
@@ -30,7 +34,6 @@ class HomeActions {
                 this.addRepoSuccess(data);
             })
             .fail((jqXhr) => {
-                console.log(this.addRepoFail);
                 this.addRepoFail(jqXhr);
             });
     }
@@ -59,7 +62,38 @@ class HomeActions {
             })
             .fail((jqXhr) => {
                 this.parseRepoFail(jqXhr);
+            });
+    }
+
+    parseCogs(payload) {
+        $.ajax({
+            'url': payload.url,
+            'type': 'PUT',
+        })
+            .done(() => {
+                this.parseCogsSuccess(payload);
             })
+            .fail((jqXhr) => {
+                this.parseCogsFail(jqXhr);
+            });
+    }
+
+    moveRepo(payload) {
+        $.ajax({
+            'url': payload.url,
+            'type': 'PUT',
+            'headers': {
+                'Content-Type': 'application/json',
+            },
+            'data': JSON.stringify({'type': payload.type}),
+        })
+            .done((data) => {
+                payload.data = data;
+                this.moveRepoSuccess(payload);
+            })
+            .fail((jqXhr) => {
+                this.moveRepoFail(jqXhr);
+            });
     }
 }
 

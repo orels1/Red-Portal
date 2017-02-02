@@ -9,6 +9,7 @@ import {parseRepos} from './utils/parsers';
 import Repo from 'models/repo';
 import co from 'co';
 import {checkOwnership} from './users';
+import {authorize} from './auth';
 
 
 /**
@@ -293,7 +294,7 @@ router.get('/:author/:repoName', (req, res) => {
  *      }
  */
 router.put('/:author/:repoName/parse', authorize, (req, res) => {
-    if (!req.user.roles.includes('admin') || !req.user.roles.includes('staff')) {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
@@ -352,9 +353,16 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
  * @apiUse RepoRequestSuccess
  * @apiUse EntryNotFound
  */
-router.put('/:id', (req, res) => {
+router.put('/:id', authorize, (req, res) => {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
+        return res.status(401).send({
+            'error': 'Unauthorized',
+            'error_details': 'Authorization header not provided',
+            'results': {},
+        });
+    }
     // Check if we have that entry already
-    Repo.findById(req.params.id, (err, entry) => {
+    return Repo.findById(req.params.id, (err, entry) => {
         if (err) {
             throw err;
         }
@@ -403,8 +411,15 @@ router.put('/:id', (req, res) => {
  *          "results": {}
  *      }
  */
-router.delete('/:id', (req, res) => {
-    Repo.findByIdAndRemove(req.params.id, (err, entry) => {
+router.delete('/:id', authorize, (req, res) => {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
+        return res.status(401).send({
+            'error': 'Unauthorized',
+            'error_details': 'Authorization header not provided',
+            'results': {},
+        });
+    }
+    return Repo.findByIdAndRemove(req.params.id, (err, entry) => {
         if (err) {
             throw err;
         }

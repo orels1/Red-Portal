@@ -9,6 +9,7 @@ import Cog from 'models/cog';
 import {extend} from 'underscore';
 import {parseCogs, parseRepos} from './utils/parsers';
 import co from 'co';
+import {authorize} from './auth';
 
 /**
  * @api {put} /admin/batch/parse Parse all repos in batch
@@ -31,12 +32,19 @@ import co from 'co';
  *      }
  */
 // TODO: replace loops with generators
-router.put('/batch/parse', (req, res) => {
+router.put('/batch/parse', authorize, (req, res) => {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
+        return res.status(401).send({
+            'error': 'Unauthorized',
+            'error_details': 'Authorization header not provided',
+            'results': {},
+        });
+    }
     res.status(200).send({
         'error': false,
         'results': 'Parsing started',
     });
-    repoParser();
+    return repoParser();
 });
 
 /**

@@ -51,11 +51,37 @@ class PanelStore {
     }
 
     onParseRepoSuccess(payload) {
-        findWhere(this.repos, {'_id': payload.id}).parsed = true;
+        findWhere(this.repos, {'_id': payload.id}).status = {
+            'state': true,
+            'message': 'Parsing started',
+        };
     }
 
     onParseRepoFail(jqXhr) {
         conrole.error(jqXhr.responseText);
+    }
+
+    onParseCogsSuccess(payload) {
+        findWhere(this.repos, {'_id': payload.id}).status = {
+            'state': true,
+            'message': 'Parsing started',
+        };
+    }
+
+    onParseCogsFail(jqXhr) {
+        console.error(jqXhr.responseText);
+    }
+
+    onMoveRepoSuccess(payload) {
+        findWhere(this.repos, {'_id': payload.id}).status = {
+            'state': true,
+            'message': 'Repo updated',
+        };
+        findWhere(this.repos, {'_id': payload.id}).type = payload.data.results.type;
+    }
+
+    onMoveRepoFail(jqXhr) {
+        console.error(jqXhr.responseText);
     }
 }
 
