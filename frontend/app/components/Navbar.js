@@ -48,6 +48,13 @@ class Navbar extends React.Component {
         if (window.localStorage.getItem('token')) {
             NavbarActions.loadToken(window.localStorage.getItem('token'));
         }
+
+        // setup ajax headers to send token by default
+        $.ajaxSetup({
+            'beforeSend': (xhr) => {
+                xhr.setRequestHeader('Authorization', window.localStorage.getItem('token'));
+            },
+        });
     }
 
     componentWillUnmount() {
@@ -73,7 +80,6 @@ class Navbar extends React.Component {
 
     checkAccess() {
         let token = this.state.token && decode(this.state.token) ||  null;
-        console.log(token, token && token.roles && (token.roles.includes('admin') || token.roles.includes('staff')));
         return token && token.roles && (token.roles.includes('admin') || token.roles.includes('staff'));
     }
 
@@ -127,7 +133,7 @@ class Navbar extends React.Component {
                                     Community
                                 </a>
                             </li>
-                            {this.checkAccess() && 
+                            {this.checkAccess() &&
                                 <li className="nav-item">
                                     <Link to="/panel/" activeClassName="active" className="nav-link">
                                         Panel

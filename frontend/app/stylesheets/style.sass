@@ -1,3 +1,5 @@
+@import '../../../node_modules/react-select/scss/default.scss'
+
 html
   min-height: 100%
 
@@ -265,7 +267,83 @@ h1.section-header
     b
       font-weight: 500
       color: #fd2121
-
+      
+// Panel
+.panel
+  margin-top: 138px
+  display: flex
+  flex-direction: column
+  justify-content: flex-start
+  
+  section
+    margin-top: 50px
+    display: flex
+    flex-direction: column
+    
+    .section-inner-wrapper
+      margin-top: 30px
+      display: flex
+      flex-direction: column
+      width: 100%
+      min-height: 400px
+      background: rgba(18, 18, 18, 0.8)
+      padding: 40px
+      
+      h4
+        font-size: 16px
+        color: rgba(255,255,255, 0.8)
+        padding-bottom: 10px
+        
+      form
+        
+        input.form-control, .Select.form-control
+          font-size: 14px
+          background: none
+          border: 1px solid rgba(255,255,255,0.6)
+          color: rgba(255,255,255,0.8)
+          border-radius: 0
+          
+          .Select-control
+            background: #000000
+            border: none
+            
+            .Select-value span
+              color: rgba(255,255,255,0.8)
+              
+          .Select-menu-outer
+            background: #000000
+            border: 1px solid rgba(255,255,255,0.6)
+            border-radius: 0
+            
+            .Select-option
+              background: #000000
+              color: rgba(255,255,255,0.8)
+              transition: color 300ms ease
+              
+              &.is-focused
+                color: #fd2121
+                
+              &.is-selected
+                color: #fd2121
+                
+        .btn
+          
+          &.btn-outline-primary
+            border-radius: 0
+            border: 1px solid #fff
+            background: #fff
+            color: #000
+            transition: all 300ms ease
+            
+            &:hover
+              border: 1px solid #fd2121
+              background: transparent
+              color: #fd2121
+              
+        span.status
+          font-size: 12px
+                
+          
 // Extra stylings
 .code
   font-family: 'Source Code Pro', monospace
@@ -279,6 +357,9 @@ h1.section-header
 
 .cogLink
   text-decoration: none !important
+  
+.Select.form-control
+  padding: 0
 
 // Footer
 .footer

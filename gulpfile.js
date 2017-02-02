@@ -54,6 +54,7 @@ var dependencies = [
     'react-router',
     'underscore',
     'jsonwebtoken',
+    'react-select',
 ];
 
 /**

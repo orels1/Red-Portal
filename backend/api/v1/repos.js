@@ -48,7 +48,7 @@ import {checkOwnership} from './users';
  *              "short": "Data scraping cogs with a bit of extra",
  *              "links": {
  *                  "_self": "/api/v1/repos/orels1/ORELS-Cogs",
- *                  "_update": "/api/v1/repos/orels1/ORELS-Cogs/fetch",
+ *                  "_update": "/api/v1/repos/orels1/ORELS-Cogs/parse",
  *                  "_cogs": "/api/v1/cogs/orels1/ORELS-Cogs
  *                  "self": "/cogs/orels1/ORELS-Cogs/",
  *                  "github": {
@@ -99,7 +99,7 @@ import {checkOwnership} from './users';
  *                       "short": "Data scraping cogs with a bit of extra",
  *                       "links": {
  *                           "_self": "/api/v1/repos/orels1/ORELS-Cogs",
- *                           "_update": "/api/v1/repos/orels1/ORELS-Cogs/fetch",
+ *                           "_update": "/api/v1/repos/orels1/ORELS-Cogs/parse",
  *                           "_cogs": "/api/v1/cogs/orels1/ORELS-Cogs
  *                           "self": "/cogs/orels1/ORELS-Cogs/",
  *                           "github": {
@@ -214,7 +214,7 @@ router.post('/', checkOwnership, (req, res) => {
             },
             'links': {
                 '_self': `/api/v1/repos/${username}/${name}`,
-                '_update': `/api/v1/repos/${username}/${name}/fetch`,
+                '_update': `/api/v1/repos/${username}/${name}/parse`,
                 '_cogs': `/api/v1/cogs/${username}/${name}`,
                 'self': `/cogs/${username}/${name}/`,
                 'github': {
