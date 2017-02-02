@@ -3,6 +3,7 @@
  */
 import alt from '../alt';
 import PanelActions from '../actions/PanelActions';
+import {findWhere} from 'underscore';
 
 class PanelStore {
     constructor() {
@@ -39,6 +40,22 @@ class PanelStore {
             'text': jqXhr.responseJSON.error_details,
             'class': 'text-danger',
         };
+    }
+
+    onGetReposSuccess(data) {
+        this.repos = data.results.list;
+    }
+
+    onGetReposFail(jqXhr) {
+        console.error(jqXhr.reponseText);
+    }
+
+    onParseRepoSuccess(payload) {
+        findWhere(this.repos, {'_id': payload.id}).parsed = true;
+    }
+
+    onParseRepoFail(jqXhr) {
+        conrole.error(jqXhr.responseText);
     }
 }
 

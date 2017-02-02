@@ -85,34 +85,17 @@ class Navbar extends React.Component {
 
     render() {
         return (
-            <nav className='navbar navbar-light navbar-fixed-top bg-faded'>
+            <nav className='navbar navbar-toggleable-md navbar-light fixed-top bg-faded'>
                 <div className="container">
-                    <button className="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbar">
-                        &#9776;
+                    <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar">
+                        <span className="navbar-toggler-icon"></span>
                     </button>
-                    <div className='collapse navbar-toggleable-xs' id='navbar'>
+                    <div className='collapse navbar-collapse' id='navbar'>
                         <Link to='/' activeClassName="active" className='navbar-brand'>
                             <i className="fa fa-code" aria-hidden="true"></i>&nbsp;
                             Red Discord Bot
                         </Link>
-                        <ul className="nav navbar-nav float-xs-right">
-                            <li className="nav-item github">
-                                <a href="/api/v1/auth/github" className="nav-link">
-                                    <i className="fa fa-github" aria-hidden="true"></i>
-                                </a>
-                            </li>
-                        </ul>
-                        <form className="form-inline float-xs-right navbar-search" onSubmit={this.handleSubmit.bind(this)}>
-                            <input
-                                className="form-control"
-                                type="text"
-                                placeholder="Search cogs..."
-                                autoFocus="autoFocus"
-                                value={this.state.searchQuery}
-                                onChange={this.handleUpdateSearchQuery.bind(this)}
-                            />
-                        </form>
-                        <ul className="nav navbar-nav float-xs-right">
+                        <ul className="nav navbar-nav ml-auto">
                             <li className="nav-item">
                                 <Link to='/cogs/' activeClassName="active" className="nav-link">
                                     Cogs
@@ -140,6 +123,23 @@ class Navbar extends React.Component {
                                     </Link>
                                 </li>
                             }
+                        </ul>
+                        <form className="form-inline ml-auto navbar-search" onSubmit={this.handleSubmit.bind(this)}>
+                            <input
+                                className="form-control"
+                                type="text"
+                                placeholder="Search cogs..."
+                                autoFocus="autoFocus"
+                                value={this.state.searchQuery}
+                                onChange={this.handleUpdateSearchQuery.bind(this)}
+                            />
+                        </form>
+                        <ul className="nav navbar-nav ml-auto">
+                            <li className="nav-item github">
+                                <a href="/api/v1/auth/github" className="nav-link">
+                                    <i className="fa fa-github" aria-hidden="true"></i>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

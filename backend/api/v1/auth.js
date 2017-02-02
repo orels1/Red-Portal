@@ -128,7 +128,7 @@ function authorize(req, res, next) {
     })
         .exec()
         .then((user) => {
-            if (!user  && req.get('Service-Token') !== process.env.serviceToken && !user.roles.include('admin')) {
+            if (!user  && req.get('Service-Token') !== process.env.serviceToken) {
                 // override if Service-Token is provided
                 throw new Error('Unauthorized');
             }

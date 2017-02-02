@@ -10,6 +10,10 @@ class HomeActions {
             'repoTypeChange',
             'addRepoSuccess',
             'addRepoFail',
+            'getReposSuccess',
+            'getReposFail',
+            'parseRepoSuccess',
+            'parseRepoFail,'
         );
     }
 
@@ -29,6 +33,33 @@ class HomeActions {
                 console.log(this.addRepoFail);
                 this.addRepoFail(jqXhr);
             });
+    }
+
+    getRepos() {
+        $.ajax({
+            'url': '/api/v1/repos?unparsed=1',
+            'type': 'GET',
+        })
+            .done((data) => {
+                this.getReposSuccess(data);
+            })
+            .fail((jqXhr) => {
+                this.getReposFail(jqXhr);
+            });
+        return false;
+    }
+
+    parseRepo(payload) {
+        $.ajax({
+            'url': payload.url,
+            'type': 'PUT',
+        })
+            .done(() => {
+                this.parseRepoSuccess(payload);
+            })
+            .fail((jqXhr) => {
+                this.parseRepoFail(jqXhr);
+            })
     }
 }
 

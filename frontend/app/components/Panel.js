@@ -18,6 +18,7 @@ class Panel extends React.Component {
     componentDidMount() {
         // Will fire once, after markup has been injected
         PanelStore.listen(this.onChange);
+        PanelActions.getRepos();
     }
 
     componentWillUnmount() {
@@ -49,13 +50,40 @@ class Panel extends React.Component {
         });
     }
 
+    handleRepoParse(item) {
+        PanelActions.parseRepo({'url': item.links._update, 'id': item._id});
+    }
+
     render() {
+        let reposList = this.state.repos.map((item, index) => {
+            return (
+                <li key={`repo-${index}`} className="list-group-item flex-column align-items-start">
+                    <div className="d-flex w-100 justify-content-between">
+                        {item.name}
+                        <div>
+                            <span className="admin-links-item" onClick={this.handleRepoParse.bind(null, item)}>
+                                parse
+                            </span>
+                            <span
+                                className={`badge badge-pill ${item.parsed && 'badge-success' || 'badge-danger'}`}
+                                style={{'marginRight': '15px'}}
+                            >{item.parsed && 'parsed' || 'not parsed'}</span>
+                            <span className={`badge badge-pill ${item.type === 'approved' && 'badge-success' || item.type === 'beta' && 'badge-warning' || item.type === 'unapproved' && 'badge-danger'}`}>{item.type}</span>
+                        </div>
+                    </div>
+                    <small className="mb-1">
+                        By&nbsp;
+                        <a href={item.author.url} target="_blank">{item.author.username}</a>
+                    </small>
+                </li>
+            );
+        });
         return (
             <div className="panel">
                 <section>
                     <h1 className="section-header">Control Panel</h1>
                     <div className="section-inner-wrapper">
-                        <h4>Add cog to regitstry</h4>
+                        <h4>Add repo to regitstry</h4>
                         <form
                             onSubmit={this.hanldeSubmit.bind(this)}
                             className="form-inline"
@@ -72,7 +100,7 @@ class Panel extends React.Component {
                                     onChange={this.handleRepoUrlChange.bind(this)}
                                     className="form-control"
                                     placeholder="Repo URL"
-                                    style={{'minWidth': '350px'}}
+                                    style={{'minWidth': '350px', 'height': '38px'}}
                                     />
                             </div>
                             <div
@@ -113,6 +141,10 @@ class Panel extends React.Component {
                                 </div>
                             }
                         </form>
+                        <h4 style={{'marginTop': '20px'}}>Repos list</h4>
+                        <div className="list-group repos-admin-list">
+                            {reposList}
+                        </div>
                     </div>
                 </section>
             </div>

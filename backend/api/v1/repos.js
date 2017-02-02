@@ -126,7 +126,7 @@ import {checkOwnership} from './users';
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.find({'parsed': true})
+    Repo.find(req.query.unparsed === '1' && {} || {'parsed': true})
         .exec((err, entries) => {
             if (err) {
                 throw err;
@@ -292,7 +292,15 @@ router.get('/:author/:repoName', (req, res) => {
  *          "results": 'Parsing started',
  *      }
  */
-router.put('/:author/:repoName/parse', (req, res) => {
+router.put('/:author/:repoName/parse', authorize, (req, res) => {
+    if (!req.user.roles.includes('admin') || !req.user.roles.includes('staff')) {
+        return res.status(401).send({
+            'error': 'Unauthorized',
+            'error_details': 'Authorization header not provided',
+            'results': {},
+        });
+    }
+
     Repo.find({
         'author.username': req.params.author,
         'name': req.params.repoName,
@@ -315,7 +323,7 @@ router.put('/:author/:repoName/parse', (req, res) => {
                     throw err;
                 });
         });
-    res.status(200).send({
+    return res.status(200).send({
         'error': false,
         'results': 'Parsing started',
     });
