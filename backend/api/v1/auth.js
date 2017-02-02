@@ -48,7 +48,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GithubStrategy({
     'clientID': GITHUB_CLIENT_ID,
     'clientSecret': GITHUB_CLIENT_SECRET,
-    'callbackURL': 'http://localhost:3000/api/v1/auth/github/callback',
+    'callbackURL': process.env.NODE_ENV === 'production' && 'https://cogs.red/api/v1/auth/github/callback' || 'http://localhost:3000/api/v1/auth/github/callback',
 },
 function(accessToken, refreshToken, profile, done) {
     User.findOne({
