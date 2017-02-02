@@ -58,26 +58,14 @@ function(accessToken, refreshToken, profile, done) {
         .then((user) => {
             if (!user) {
                 let user = new User(profile);
-
-                // generate JWT
-                let jwToken = jwt.sign({
-                    'usr': user.id,
-                }, process.env.JWT_SECRET, {'expiresIn': '100d'});
-
-                user.tokens = {
-                    'access_token': accessToken,
-                    'jwt': jwTken,
-                };
-
-                return user.save();
+            } else {
+                user = extend(user, profile);
             }
-
-            // get only the first match
-            user = extend(user, profile);
 
             // generate JWT
             let jwToken = jwt.sign({
                 'usr': user.id,
+                'roles': user.roles || ['member'],
             }, process.env.JWT_SECRET, {'expiresIn': '100d'});
 
             user.tokens = {

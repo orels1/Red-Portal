@@ -8,6 +8,7 @@ class NavbarActions {
     constructor() {
         this.generateActions(
             'updateSearchQuery',
+            'loadToken',
         );
     }
 }

@@ -5,6 +5,7 @@ import React from 'react';
 import {Link} from 'react-router';
 import NavbarStore from '../stores/NavbarStore';
 import NavbarActions from '../actions/NavbarActions';
+import {decode} from 'jsonwebtoken';
 
 class Navbar extends React.Component {
     constructor(props) {
@@ -29,11 +30,23 @@ class Navbar extends React.Component {
             NavbarActions.updateSearchQuery({
                 'event': {
                     'target': {
-                        'value': search
-                    }
+                        'value': search,
+                    },
                 },
-                'router': this.props.router
+                'router': this.props.router,
             });
+        }
+
+        // save token to local storage
+        // function source -> https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
+        let token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+        if (token) {
+            window.localStorage.setItem('token', token);
+        }
+
+        // load token into state
+        if (window.localStorage.getItem('token')) {
+            NavbarActions.loadToken(window.localStorage.getItem('token'));
         }
     }
 
@@ -58,6 +71,12 @@ class Navbar extends React.Component {
         event.preventDefault();
     }
 
+    checkAccess() {
+        let token = this.state.token && decode(this.state.token) ||  null;
+        console.log(token, token && token.roles && (token.roles.includes('admin') || token.roles.includes('staff')));
+        return token && token.roles && (token.roles.includes('admin') || token.roles.includes('staff'));
+    }
+
     render() {
         return (
             <nav className='navbar navbar-light navbar-fixed-top bg-faded'>
@@ -70,6 +89,13 @@ class Navbar extends React.Component {
                             <i className="fa fa-code" aria-hidden="true"></i>&nbsp;
                             Red Discord Bot
                         </Link>
+                        <ul className="nav navbar-nav float-xs-right">
+                            <li className="nav-item github">
+                                <a href="/api/v1/auth/github" className="nav-link">
+                                    <i className="fa fa-github" aria-hidden="true"></i>
+                                </a>
+                            </li>
+                        </ul>
                         <form className="form-inline float-xs-right navbar-search" onSubmit={this.handleSubmit.bind(this)}>
                             <input
                                 className="form-control"
@@ -101,6 +127,13 @@ class Navbar extends React.Component {
                                     Community
                                 </a>
                             </li>
+                            {this.checkAccess() && 
+                                <li className="nav-item">
+                                    <Link to="/panel/" activeClassName="active" className="nav-link">
+                                        Panel
+                                    </Link>
+                                </li>
+                            }
                         </ul>
                     </div>
                 </div>

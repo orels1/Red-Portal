@@ -172,7 +172,7 @@ router.put('/:id', authorize, (req, res) => {
     if (req.user && req.user._id.toString() === req.params.id) {
 
         // only admins can change roles
-        if (req.body.roles && !req.body.roles.include('admin')) {
+        if (req.body.roles && !req.user.roles.include('admin')) {
             delete req.body.roles;
         }
 
