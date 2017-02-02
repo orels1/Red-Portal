@@ -64,7 +64,7 @@ function(accessToken, refreshToken, profile, done) {
 
             // generate JWT
             let jwToken = jwt.sign({
-                'usr': user.id,
+                'usr': profile.id,
                 'roles': user.roles || ['member'],
             }, process.env.JWT_SECRET, {'expiresIn': '100d'});
 
