@@ -57,7 +57,7 @@ function(accessToken, refreshToken, profile, done) {
         .exec()
         .then((user) => {
             if (!user) {
-                let user = new User(profile);
+                user = new User(profile);
             } else {
                 user = extend(user, profile);
             }
@@ -65,7 +65,7 @@ function(accessToken, refreshToken, profile, done) {
             // generate JWT
             let jwToken = jwt.sign({
                 'usr': profile.id,
-                'roles': user.roles || ['member'],
+                'roles': user && user.roles || ['member'],
             }, process.env.JWT_SECRET, {'expiresIn': '100d'});
 
             user.tokens = {
