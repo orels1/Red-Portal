@@ -116,7 +116,7 @@ router.get('/logout', (req, res) => {
 
 function authorize(req, res, next) {
     let token = req.get('Authorization');
-    console.log('token', token, headers, req.headers);
+    console.log('token', token, 'headers', req.headers);
     if (!token && req.get('Service-Token') !== process.env.serviceToken) {
         return res.status(401).send({
             'error': 'Unauthorized',
