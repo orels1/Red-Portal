@@ -354,6 +354,7 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
  * @apiUse EntryNotFound
  */
 router.put('/:id', authorize, (req, res) => {
+    console.log('got user', req.user && !req.user.roles.includes('admin'));
     if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
         return res.status(401).send({
             'error': 'Unauthorized',
