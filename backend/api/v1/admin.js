@@ -33,7 +33,7 @@ import {authorize} from './auth';
  */
 // TODO: replace loops with generators
 router.put('/batch/parse', authorize, (req, res) => {
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',

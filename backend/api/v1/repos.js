@@ -294,7 +294,7 @@ router.get('/:author/:repoName', (req, res) => {
  *      }
  */
 router.put('/:author/:repoName/parse', authorize, (req, res) => {
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
@@ -354,8 +354,7 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
  * @apiUse EntryNotFound
  */
 router.put('/:id', authorize, (req, res) => {
-    console.log('got user', req.user && !req.user.roles.includes('admin'));
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
@@ -413,7 +412,7 @@ router.put('/:id', authorize, (req, res) => {
  *      }
  */
 router.delete('/:id', authorize, (req, res) => {
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || req.get('Service-Token') !== process.env.serviceToken) {
+    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
