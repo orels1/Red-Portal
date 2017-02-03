@@ -125,7 +125,7 @@ function* getCogs(githubRepo, repo) {
             'links': {
                 '_self': `/api/v1/cogs/${repo.author.username}/${repo.name}/${cog.name}`,
                 '_repo': repo.links._self,
-                '_update': `/api/v1/cogs/${repo.author.username}/${repo.name}/${cog.name}/fetch`,
+                '_update': `/api/v1/cogs/${repo.author.username}/${repo.name}/${cog.name}/parse`,
                 'self': `/cogs/${repo.author.username}/${repo.name}/${cog.name}/`,
                 'repo': repo.links.self,
                 'github': {
@@ -178,6 +178,7 @@ function* parseRepos(repos) {
             'short': repoInfoJson.content.SHORT || undefined,
             'description': repoInfoJson.content.DESCRIPTION || undefined,
             'links': extend(repo.links, {
+                '_update': `/api/v1/repos/${repo.author.username}/${repo.name}/parse`,
                 'github': extend(repo.links.github, {
                     '_update': repoInfoJson.updateUrl,
                 }),
