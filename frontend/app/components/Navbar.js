@@ -90,9 +90,9 @@ class Navbar extends React.Component {
 
     render() {
         return (
-            <nav className='navbar navbar-toggleable-md navbar-light bg-transparent'>
+            <nav className='navbar navbar-toggleable-lg navbar-light bg-transparent'>
                 <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
+                    <i className="fa fa-bars" style={{'fontSize': '24px'}}></i>
                 </button>
                 <div className='collapse navbar-collapse justify-content-between' id='navbar'>
                     <div className="mr-auto">
@@ -146,7 +146,7 @@ class Navbar extends React.Component {
                             <input
                                 className="form-control"
                                 type="text"
-                                placeholder="cmd+shift+p"
+                                placeholder="cmd/ctrl+shift+p"
                                 value={this.state.searchQuery}
                                 onChange={this.handleUpdateSearchQuery.bind(this)}
                             />

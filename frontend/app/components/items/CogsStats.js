@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import {Link} from 'react-router';
-import {random} from 'underscore';
+import {shuffle} from 'underscore';
 
 class CogsStats extends React.Component {
     constructor(props) {
@@ -27,7 +27,7 @@ class CogsStats extends React.Component {
     }
 
     render() {
-        let randomRepo = this.props.repos.map((item, index) => {
+        let randomRepo = shuffle(this.props.repos).map((item, index) => {
             return (
                 <Link key={`random_repo-${index}`} className="suppress-links" to={item.links.self}>
                     <div className="repo-block">
@@ -94,7 +94,7 @@ class CogsStats extends React.Component {
                     <div className="header-2">
                         Random repo
                     </div>
-                    {randomRepo.length > 1 && randomRepo.slice(random(0, randomRepo.length - 1), 1)}
+                    {randomRepo[0]}
                 </div>
                 <div className="stats-block">
                     <div className="header-2">
