@@ -97,8 +97,8 @@ class CogsList extends React.Component {
                         router={this.props.router}
                     />
                     {this.state.cogs.length >= this.state.showCogs &&
-                    <button className="btn btn-default btn-square" onClick={this.handleShowMoreCogs.bind(this)}>
-                        Show more...
+                    <button className="btn show-more" onClick={this.handleShowMoreCogs.bind(this)}>
+                        Show more
                     </button>
                     }
 

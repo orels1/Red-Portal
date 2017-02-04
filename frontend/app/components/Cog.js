@@ -103,6 +103,15 @@ class Cog extends React.Component {
                         <div className="icon icon-tags"></div>
                         <div className="muted">{tags}</div>
                     </div>
+                    <div className="ml-auto align-self-end">
+                        <a
+                            href={this.state.cog.links && this.state.cog.links.github.self || '#'}
+                            className="suppress-links"
+                            style={{'fontSize': '24px'}}
+                        >
+                            <i className="fa fa-github white"></i>
+                        </a>
+                    </div>
                 </div>
                 <div className="padding">
                     {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&

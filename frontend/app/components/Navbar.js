@@ -134,6 +134,11 @@ class Navbar extends React.Component {
                                     get our cog
                                 </Link>
                             </li>
+                            <li className="nav-item">
+                                <a href="/api/v1/auth/github"  className="nav-link cogs">
+                                    <i className="fa fa-github"></i>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div className="ml-auto">

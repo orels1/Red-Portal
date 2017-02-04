@@ -94,7 +94,7 @@ class CogsStats extends React.Component {
                     <div className="header-2">
                         Random repo
                     </div>
-                    {randomRepo.length > 1 && randomRepo.slice(0, random(1, randomRepo.length - 1))}
+                    {randomRepo.length > 1 && randomRepo.slice(random(0, randomRepo.length - 1), 1)}
                 </div>
                 <div className="stats-block">
                     <div className="header-2">
