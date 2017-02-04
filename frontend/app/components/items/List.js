@@ -31,26 +31,25 @@ class List extends React.Component {
                 return (
                     <div
                         key={this.props.keyName + index}
-                        className="card"
+                        className="item"
                     >
-                        <Link className="cogLink" to={item.links.self}>
-                            <div className="card-block">
-                                <h4 className="card-title">{item.name}</h4>
-                                <p className="card-text short text-muted">
-                                    {item.short || item.description.substr(0, 70) + '...'}
-                                </p>
-                                <p className="card-text">
-                                    <small className="text-muted">{item.author.name}&nbsp;&nbsp;&nbsp;</small>
-                                    {(item.type && item.type === 'approved' || item.repo && item.repo.type === 'approved') &&
-                                        <small className="text-success" title="approved"><i className="fa fa-check" aria-hidden="true"></i></small>
+                        <Link className="suppress-links" to={item.links.self}>
+                            <div className="item-inner d-flex flex-column">
+                                <div className="header-4">{item.name}</div>
+                                <div className="item-text">
+                                    {item.short && item.short.length <= 80 && item.short}
+                                    {item.short && item.short.length > 80 && item.short.substr(0, 80) + '...'}
+                                    {!item.short && item.description && item.description.length <= 80 && item.description}
+                                    {!item.short && item.description && item.description.length > 80 && item.description.substr(0, 80) + '...'}
+                                </div>
+                                <div className="d-flex">
+                                    <div className="item-author">{item.author.username}</div>
+                                    {!this.props.notypes &&
+                                        <div className={`type-badge badge-${item.type || item.repo.type}`}>
+                                            {item.type || item.repo.type}
+                                        </div>
                                     }
-                                    {(item.type && item.type === 'beta' || item.repo && item.repo.type === 'beta') &&
-                                        <small className="text-warning" title="beta">β</small>
-                                    }
-                                    {(item.type && item.type === 'unapproved' || item.repo && item.repo.type === 'unapproved') &&
-                                        <small className="text-danger" title="unapproved"><i className="fa fa-minus-circle" aria-hidden="true"></i></small>
-                                    }
-                                </p>
+                                </div>
                             </div>
                         </Link>
                     </div>
@@ -58,9 +57,9 @@ class List extends React.Component {
             }
         });
         return (
-            <div className="repos-list">
-                <h1 className="section-header">{this.props.title}</h1>
-                <div className="card-columns">
+            <div className="list">
+                {this.props.title  && <div className="header-2">{this.props.title}</div>}
+                <div className="items d-flex justify-content-between flex-wrap">
                     {this.props.limit && list.slice(0, this.props.limit) || list}
                 </div>
             </div>

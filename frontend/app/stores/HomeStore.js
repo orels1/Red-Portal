@@ -6,7 +6,6 @@ class HomeStore {
         this.bindActions(HomeActions);
         this.cog_count = 0;
         this.repo_count = 0;
-        this.tags = [];
     }
 
     onGetStatsSuccess(data) {
@@ -17,15 +16,6 @@ class HomeStore {
     onGetStatsFail(jqXhr) {
         console.error(jqXhr);
     }
-
-    onGetTagsSuccess(data) {
-        this.tags = !data.error && data.results && data.results.list;
-    }
-
-    onGetTagsFail(jqXhr) {
-        console.error(jqXhr);
-    }
-
 }
 
 export default alt.createStore(HomeStore);

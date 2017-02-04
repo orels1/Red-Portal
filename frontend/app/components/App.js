@@ -9,10 +9,12 @@ import Footer from './Footer';
 class App extends React.Component {
     render() {
         return (
-            <div>
-                <Navbar router={this.props.router} />
-                <div className="container" id="main">
-                    {this.props.children}
+            <div className="app">
+                <div className="container main">
+                    <Navbar router={this.props.router} />
+                    <div className="contents">
+                        {this.props.children}
+                    </div>
                 </div>
                 <Footer />
             </div>

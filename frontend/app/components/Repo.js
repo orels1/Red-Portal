@@ -21,6 +21,10 @@ class Repo extends React.Component {
             'author': this.props.params.author,
             'repoName': this.props.params.repoName,
         });
+        RepoActions.getRepo({
+            'author': this.props.params.author,
+            'repoName': this.props.params.repoName,
+        });
     }
 
     componentWillUnmount() {
@@ -34,15 +38,47 @@ class Repo extends React.Component {
     }
 
     render() {
+        let tags = this.state.repo.tags && this.state.repo.tags.map((item, index) => {
+            return (
+                <Link key={`tag-${index}`} to={`/cogs/?search=${encodeURIComponent(item)}`} className="suppress-links">
+                    {item}
+                    {index !== this.state.repo.tags.length - 1 && ', '}
+                </Link>
+            );
+        });
         return (
-            <div className="inner-page">
-                <List
-                    title={`Cogs from ${this.props.params.repoName}`}
-                    list={this.state.cogs}
-                    keyName="cog"
-                    type="cogs"
-                    router={this.props.router}
-                />
+            <div className="repo">
+                <div className="info-header padding d-flex">
+                    <div className="header-1">
+                        {this.props.params.repoName}
+                    </div>
+                    <div className="header-4 align-self-end">
+                        By&nbsp;
+                        <Link to={this.state.repo.author && this.state.repo.author.url || '#'} className="suppress-links">
+                            <b>{this.props.params.author}</b>
+                        </Link>
+                    </div>
+                    <div className="repo-info-item d-flex align-self-end">
+                        <div className="icon icon-stars"></div>
+                        <div className="muted">0</div>
+                    </div>
+                    <div className={`align-self-end type-badge badge-${this.state.repo.type}`}>
+                        {this.state.repo.type}
+                    </div>
+                    <div className="repo-info-item d-flex align-self-end">
+                        <div className="icon icon-tags"></div>
+                        <div className="muted">{tags}</div>
+                    </div>
+                </div>
+                <div className="padding">
+                    <List
+                        list={this.state.cogs}
+                        keyName="cog"
+                        type="cogs"
+                        router={this.props.router}
+                        notypes={true}
+                    />
+                </div>
             </div>
         );
     }

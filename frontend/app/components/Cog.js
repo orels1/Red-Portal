@@ -39,118 +39,99 @@ class Cog extends React.Component {
                 'author': this.props.params.author,
                 'repoName': this.props.params.repoName,
                 'cogName': this.props.params.cogName,
-                'choice': 0
+                'choice': 0,
             });
         } else {
             CogActions.voteCog({
                 'author': this.props.params.author,
                 'repoName': this.props.params.repoName,
                 'cogName': this.props.params.cogName,
-                'choice': 1
+                'choice': 1,
             });
         }
     }
 
     render() {
         let tags = this.state.cog.tags && this.state.cog.tags.map((item, index) => {
-                return(
-                    <p key={`${item}-1`} className="cog-info">
-                        <Link to={`/cogs/?search=${encodeURIComponent(item)}`}>
-                            {item}
-                        </Link>
-                    </p>
-                )
-            });
-        return(
-            <div className="cog inner-page">
+            return (
+                <Link key={`tag-${index}`} to={`/cogs/?search=${encodeURIComponent(item)}`} className="suppress-links">
+                    {item}
+                    {index !== this.state.cog.tags.length - 1 && ', '}
+                </Link>
+            );
+        });
+        return (
+            <div className="cog">
                 <DocumentMeta
-                    title={`Cogs.Red | Cog: ${this.props.params.cogName}`}
-                    meta={{
-                    'property': {
-                        'og:title': `Cog: ${this.props.params.cogName}`,
-                        'twitter:title': `Cog: ${this.props.params.cogName}`,
-                    }
-                }} />
-                <h1 className="display-3">
-                    {this.state.cog.name ||
-                        <span>
-                            <i className="fa fa-cog fa-spin" aria-hidden="true"></i>&nbsp;
-                            Loading
-                        </span>
-                    }
-                </h1>
-                {this.state.cog.repo && this.state.cog.repo.type === 'approved' &&
-                    <p className="cog-info">
-                        <span className="text-success">{this.state.cog.repo.type}</span>
-                    </p>
-                }
-                {this.state.cog.repo && this.state.cog.repo.type === 'beta' &&
-                    <p className="cog-info">
-                        <span className="text-warning">{this.state.cog.repo.type}</span>
-                    </p>
-                }
-                {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&
-                    <p className="cog-info">
-                        <span className="text-danger">{this.state.cog.repo.type}</span>
-                    </p>
-                }
-                <p className="cog-info vote" onClick={this.handleVote.bind(this)}>
-                    <i className={`fa ${this.state.cog.voted && 'fa-star' || 'fa-star-o'}`} aria-hidden="true"></i>
-                    &nbsp;
-                    {this.state.cog.votes || 0}
-                </p>
-                <p className="cog-info">
-                    By&nbsp;
-                    <a href={this.state.cog.author && this.state.cog.author.url} target="_blank">
-                        {this.state.cog.author && this.state.cog.author.name}
-                    </a>
-                </p>
-                <p className="cog-info">
-                    Repo&nbsp;
-                    <Link to={this.state.cog.links && this.state.cog.links.repo}>
-                        {this.state.cog.repo && this.state.cog.repo.name}
-                    </Link>
-                </p>
-                <p className="cog-info">
-                    <a href={this.state.cog.links && this.state.cog.links.github.self} target="_blank">
-                        source
-                    </a>
-                </p>
-                <div className="clearfix"></div>
-                <div className="tags-block">
-                    <p className="cog-info">
-                        Tags
-                    </p>
-                    {tags}
-                </div>
-                <div className="clearfix"></div>
-
-                {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&
-                    <div>
-                        <h2 className="display-4">Disclaimer</h2>
-                        <p className="cog-info description">
-                            This is a cog from an unapproved repo, it was not checked by members of either Red-DiscordBot or Cogs-Support staff and it can contain anything.
-                            <br/>
-                            <b className="text-danger">USE AT YOUR OWN RISK!</b>
-                        </p>
+                    title={`${this.props.params.cogName} by ${this.props.params.author} on Cogs.Red`}
+                    meta=
+                        {
+                            {
+                                'title': `${this.props.params.cogName} by ${this.props.params.author} on Cogs.Red`,
+                                'property': {
+                                    'og:title': `${this.props.params.cogName} by ${this.props.params.author} on Cogs.Red`,
+                                    'twitter:title': `${this.props.params.cogName} by ${this.props.params.author} on Cogs.Red`,
+                                },
+                            }
+                        }
+                />
+                <div className="info-header padding d-flex">
+                    <div className="header-1">
+                        {this.props.params.cogName}
                     </div>
-                }
-
-                <h2 className="display-4">Description</h2>
-                <p className="cog-info description display-linebreak">
-                    {(this.state.cog.description || this.state.cog.short || '')}
-                </p>
-
-                <h2 className="display-4">Installation</h2>
-                <small>Replace [p] with your bot's prefix and use these commands</small>
-                <p className="cog-info description code">
-                    [p]cog repo add {`${this.state.cog.repo && this.state.cog.repo.name} ${this.state.cog.links && this.state.cog.links.github.repo}`}
-                </p>
-                <p className="cog-info description code">
-                    [p]cog install {`${this.state.cog.repo && this.state.cog.repo.name} ${this.state.cog.name}`}
-                </p>
+                    <div className="header-4 align-self-end">
+                        From&nbsp;
+                        <Link to={this.state.cog.links && this.state.cog.links.repo || '#'} className="suppress-links">
+                            <b>{this.props.params.repoName}</b>
+                        </Link>
+                        &nbsp;by&nbsp;
+                        <Link to={this.state.cog.author && this.state.cog.author.url || '#'} className="suppress-links">
+                            <b>{this.props.params.author}</b>
+                        </Link>
+                    </div>
+                    <div
+                        className="repo-info-item d-flex align-self-end vote"
+                        onClick={this.handleVote.bind(this)}
+                    >
+                        <div className="icon icon-stars"></div>
+                        <div className="muted">{this.state.cog.votes}</div>
+                    </div>
+                    <div className={`align-self-end type-badge badge-${this.state.cog.repo && this.state.cog.repo.type}`}>
+                        {this.state.cog.repo && this.state.cog.repo.type}
+                    </div>
+                    <div className="repo-info-item d-flex align-self-end">
+                        <div className="icon icon-tags"></div>
+                        <div className="muted">{tags}</div>
+                    </div>
+                </div>
+                <div className="padding">
+                    {this.state.cog.repo && this.state.cog.repo.type === 'unapproved' &&
+                        <div className="info-block red">
+                            This is a cog from an unapproved repo, it was not checked by members of either Red-DiscordBot or
+                            Cogs-Support staff and it can contain anything.
+                            <br />
+                            <b>USE AT YOUR OWN RISK!</b>
+                        </div>
+                    }
+                    <div className="header-4">
+                        Description
+                    </div>
+                    <div className="item-description display-linebreak">
+                        {this.state.cog.description || this.state.cog.short}
+                    </div>
+                    <div className="header-4">
+                        Install
+                    </div>
+                    <small className="text-muted">Replace [p] with your bot's prefix and use these commands</small>
+                    <div className="code">
+                        {`[p]cog repo add ${this.props.params.repoName} ${this.state.cog.links && this.state.cog.links.github.repo}`}
+                    </div>
+                    <div className="code">
+                        {`[p]cog install ${this.props.params.repoName} ${this.props.params.cogName}`}
+                    </div>
+                </div>
             </div>
-        )
+        );
     }
 }
 

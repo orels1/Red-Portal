@@ -10,6 +10,7 @@ class RepoStore {
         //     'getRepos': RepoActions.GET_REPOS,
         // });
         this.cogs = [];
+        this.repo = {};
     }
 
     getRepos() {
@@ -21,6 +22,14 @@ class RepoStore {
     }
 
     onGetCogsFail(jqXhr) {
+        console.error(jqXhr.reponseText);
+    }
+
+    onGetRepoSuccess(data) {
+        this.repo = data.results;
+    }
+
+    onGetRepoFail(jqXhr) {
         console.error(jqXhr.reponseText);
     }
 }

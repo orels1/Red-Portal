@@ -4,6 +4,7 @@ import CogsListStore from '../stores/CogsListStore';
 import {Link} from 'react-router';
 
 import List from './items/List';
+import CogsStats from './items/CogsStats';
 
 class CogsList extends React.Component {
     constructor(props) {
@@ -28,6 +29,7 @@ class CogsList extends React.Component {
         CogsListStore.listen(this.onChange);
         CogsListActions.getRepos();
         CogsListActions.getCogs();
+        CogsListActions.getTags();
 
         let search = this.qs('search', this.props);
         if (search && search.length !== 0) {
@@ -61,53 +63,55 @@ class CogsList extends React.Component {
     }
 
     render() {
-        return(
-            <div className="inner-page">
-                <h1 className="section-header" style={{paddingTop: '50px'}}>Add cogs.red to your bot</h1>
-                <p className="cog-info description">
-                    There is an option to interact with cogs.red without leaving discord!
-                    <br />
-                    Install <Link to="/cogs/orels1/Red-Portal-Cogs/redportal/">redportal cog</Link> to search through all the cogs listed one the website.
-                </p>
-                <h1 className="section-header" style={{paddingTop: '50px'}}>Disclaimer</h1>
-                <p className="cog-info description">
-                    These repositories are community made. We have no say over what goes into them. The author of Red and the contributors are not responsible for any damage caused by 3rd party cogs.
-                </p>
-
-                {this.state.searchResults.length !== 0 &&
-                    <List
-                        title="Search results"
-                        keyName="search"
-                        list={this.state.searchResults}
-                        type="search"
+        return (
+            <div className="cogs">
+                <div className="stats-header padding">
+                    <CogsStats
+                        cogs={this.state.cogs}
+                        repos={this.state.repos}
+                        tags={this.state.tags}
                         router={this.props.router}
                     />
-                }
+                </div>
+                <div className="padding">
+                    <div className="info-block">
+                        These repositories are community made. We have no say over what goes into them. The author of Red and the contributors are not responsible for any damage caused by 3rd party cogs.
+                    </div>
+                    {this.state.searchResults.length !== 0 &&
+                        <List
+                            title="Search results"
+                            keyName="search"
+                            list={this.state.searchResults}
+                            type="search"
+                            router={this.props.router}
+                        />
+                    }
 
-                <List
-                    title="Cogs"
-                    list={this.state.cogs}
-                    filers={['approved', 'beta']}
-                    keyName="cog"
-                    type="cogs"
-                    limit={this.state.showCogs}
-                    router={this.props.router}
-                />
-                {this.state.cogs.length >= this.state.showCogs &&
-                <button className="btn btn-default btn-square" onClick={this.handleShowMoreCogs.bind(this)}>
-                    Show more...
-                </button>
-                }
+                    <List
+                        title="Cogs"
+                        list={this.state.cogs}
+                        filers={['approved', 'beta']}
+                        keyName="cog"
+                        type="cogs"
+                        limit={this.state.showCogs}
+                        router={this.props.router}
+                    />
+                    {this.state.cogs.length >= this.state.showCogs &&
+                    <button className="btn btn-default btn-square" onClick={this.handleShowMoreCogs.bind(this)}>
+                        Show more...
+                    </button>
+                    }
 
-                <List
-                    title="Repos"
-                    list={this.state.repos}
-                    keyName="repo"
-                    type="repos"
-                    router={this.props.router}
-                />
+                    <List
+                        title="Repos"
+                        list={this.state.repos}
+                        keyName="repo"
+                        type="repos"
+                        router={this.props.router}
+                    />
+                </div>
             </div>
-        )
+        );
     }
 }
 

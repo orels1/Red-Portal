@@ -13,6 +13,7 @@ class CogsListStore {
         this.cogs = [];
         this.showCogs = 10;
         this.searchResults = [];
+        this.tags = [];
     }
 
     getRepos() {
@@ -91,6 +92,14 @@ class CogsListStore {
 
     onResetSearchResults() {
         this.searchResults = [];
+    }
+
+    onGetTagsSuccess(data) {
+        this.tags = !data.error && data.results && data.results.list;
+    }
+
+    onGetTagsFail(jqXhr) {
+        console.error(jqXhr);
     }
 }
 

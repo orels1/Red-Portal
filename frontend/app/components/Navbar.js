@@ -55,6 +55,11 @@ class Navbar extends React.Component {
                 xhr.setRequestHeader('Authorization', window.localStorage.getItem('token'));
             },
         });
+
+        Mousetrap.bind(['command+shift+p', 'ctrl+shift+p'], (e) => {
+            $('.navbar-search .form-control').focus();
+            return false;
+        });
     }
 
     componentWillUnmount() {
@@ -85,19 +90,20 @@ class Navbar extends React.Component {
 
     render() {
         return (
-            <nav className='navbar navbar-toggleable-md navbar-light fixed-top bg-faded'>
-                <div className="container">
-                    <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar">
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-                    <div className='collapse navbar-collapse' id='navbar'>
-                        <Link to='/' activeClassName="active" className='navbar-brand'>
-                            <i className="fa fa-code" aria-hidden="true"></i>&nbsp;
-                            Red Discord Bot
-                        </Link>
-                        <ul className="nav navbar-nav ml-auto">
+            <nav className='navbar navbar-toggleable-md navbar-light bg-transparent'>
+                <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+                <div className='collapse navbar-collapse justify-content-between' id='navbar'>
+                    <div className="mr-auto">
+                        <ul className="nav navbar-nav">
                             <li className="nav-item">
-                                <Link to='/cogs/' activeClassName="active" className="nav-link">
+                                <Link to='/' activeClassName="active" className="nav-link">
+                                    Red-DiscordBot
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to='/cogs/' activeClassName="active" className="nav-link cogs">
                                     Cogs
                                 </Link>
                             </li>
@@ -123,28 +129,28 @@ class Navbar extends React.Component {
                                     </Link>
                                 </li>
                             }
+                            <li className="nav-item">
+                                <Link to="/cogs/orels1/Red-Portal-Cogs/redportal/" activeClassName="active" className="nav-link cogs active">
+                                    get our cog
+                                </Link>
+                            </li>
                         </ul>
+                    </div>
+                    <div className="ml-auto">
                         <form className="form-inline ml-auto navbar-search" onSubmit={this.handleSubmit.bind(this)}>
                             <input
                                 className="form-control"
                                 type="text"
-                                placeholder="Search cogs..."
-                                autoFocus="autoFocus"
+                                placeholder="cmd+shift+p"
                                 value={this.state.searchQuery}
                                 onChange={this.handleUpdateSearchQuery.bind(this)}
                             />
+                            <i className="fa fa-search"></i>
                         </form>
-                        <ul className="nav navbar-nav ml-auto">
-                            <li className="nav-item github">
-                                <a href="/api/v1/auth/github" className="nav-link">
-                                    <i className="fa fa-github" aria-hidden="true"></i>
-                                </a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </nav>
-        );
+    );
     }
 }
 

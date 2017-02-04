@@ -5,6 +5,8 @@ class RepoActions {
         this.generateActions(
             'getCogsSuccess',
             'getCogsFail',
+            'getRepoSuccess',
+            'getRepoFail'
         );
     }
 
@@ -18,6 +20,20 @@ class RepoActions {
             })
             .fail((jqXhr) => {
                 this.getCogsFail(jqXhr);
+            });
+        return false;
+    }
+
+    getRepo(payload) {
+        $.ajax({
+            'url': `/api/v1/repos/${payload.author}/${payload.repoName}`,
+            'type': 'GET',
+        })
+            .done((data) => {
+                this.getRepoSuccess(data);
+            })
+            .fail((jqXhr) => {
+                this.getRepoFail(jqXhr);
             });
         return false;
     }

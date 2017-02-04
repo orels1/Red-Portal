@@ -68,27 +68,32 @@ class Panel extends React.Component {
                 <li key={`repo-${index}`} className="list-group-item flex-column align-items-start">
                     <div className="d-flex w-100 justify-content-between">
                         {item.name}
-                        <div>
-                            <span className="admin-links-item" style={{'textDecoration': 'none'}}>
-                                move to:
+                        <div className="d-flex">
+                            <span>
+                                move to:&nbsp;&nbsp;
                             </span>
-                            <span className="admin-links-item" onClick={this.handleMoveRepo.bind(null, item, 'approved')}>
+                            &nbsp;
+                            <button className="btn btn-outline-success btn-sm" onClick={this.handleMoveRepo.bind(null, item, 'approved')}>
                                 approved
-                            </span>
-                            <span className="admin-links-item" onClick={this.handleMoveRepo.bind(null, item, 'beta')}>
+                            </button>
+                            &nbsp;
+                            <span className="btn btn-outline-warning btn-sm" onClick={this.handleMoveRepo.bind(null, item, 'beta')}>
                                 beta
                             </span>
-                            <span className="admin-links-item" onClick={this.handleMoveRepo.bind(null, item, 'unapproved')}>
+                            &nbsp;
+                            <span className="btn btn-outline-danger btn-sm" onClick={this.handleMoveRepo.bind(null, item, 'unapproved')}>
                                 unapproved
                             </span>
-                            |&nbsp;&nbsp;&nbsp;
-                            <span className="admin-links-item" onClick={this.handleRepoParse.bind(null, item)}>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <span className="btn btn-outline-primary btn-sm" onClick={this.handleRepoParse.bind(null, item)}>
                                 parse repo
                             </span>
-                            <span className="admin-links-item" onClick={this.handleParseCogs.bind(null, item)}>
+                            &nbsp;
+                            <span className="btn btn-outline-primary btn-sm" onClick={this.handleParseCogs.bind(null, item)}>
                                 parse cogs
                             </span>
-                            <span className={`badge badge-pill ${item.type === 'approved' && 'badge-success' || item.type === 'beta' && 'badge-warning' || item.type === 'unapproved' && 'badge-danger'}`}>{item.type}</span>
+                            &nbsp;
+                            <div className={`align-self-center type-badge badge-${item.type}`}>{item.type}</div>
                         </div>
                     </div>
                     <div className="d-flex w-100 justify-content-between mb-1" style={{'marginTop': '7px'}}>
@@ -110,74 +115,72 @@ class Panel extends React.Component {
             );
         });
         return (
-            <div className="panel">
-                <section>
-                    <h1 className="section-header">Control Panel</h1>
-                    <div className="section-inner-wrapper">
-                        <h4>Add repo to regitstry</h4>
-                        <form
-                            onSubmit={this.hanldeSubmit.bind(this)}
-                            className="form-inline"
+            <div className="panel padding">
+                <h1 className="section-header">Control Panel</h1>
+                <div className="section-inner-wrapper">
+                    <h4>Add repo to regitstry</h4>
+                    <form
+                        onSubmit={this.hanldeSubmit.bind(this)}
+                        className="form-inline"
+                    >
+                        <div
+                            className="form-group"
+                            style={{
+                                'marginRight': '15px',
+                            }}
                         >
-                            <div
-                                className="form-group"
-                                style={{
-                                    'marginRight': '15px',
-                                }}
-                            >
-                                <input
-                                    id="repoUrl"
-                                    value={this.state.repoUrl}
-                                    onChange={this.handleRepoUrlChange.bind(this)}
-                                    className="form-control"
-                                    placeholder="Repo URL"
-                                    style={{'minWidth': '350px', 'height': '38px'}}
-                                    />
-                            </div>
-                            <div
-                                className="form-group"
-                                style={{
-                                    'marginRight': '15px',
-                                }}
-                            >
-                                <Select
-                                    id="repoType"
-                                    value={this.state.repoType}
-                                    options={this.state.repoTypeOptions}
-                                    onChange={this.handleRepoTypeChange.bind(this)}
-                                    className="form-control"
-                                    placeholder="Repo type"
-                                    clearable={false}
-                                    style={{'minWidth': '150px'}}
+                            <input
+                                id="repoUrl"
+                                value={this.state.repoUrl}
+                                onChange={this.handleRepoUrlChange.bind(this)}
+                                className="form-control"
+                                placeholder="Repo URL"
+                                style={{'minWidth': '350px', 'height': '38px'}}
                                 />
-                            </div>
-                            <div
-                                className="form-group"
-                                style={{
-                                    'marginRight': '15px',
-                                }}
-                            >
-                                <button
-                                    className="btn btn-outline-primary"
-                                    onClick={this.handleRepoAdd.bind(this)}
-                                >
-                                    Add
-                                </button>
-                            </div>
-                            {this.state.addStatus &&
-                                <div className="form-group">
-                                    <span className={`status ${this.state.addStatus.class}`}>
-                                        {this.state.addStatus.text}
-                                    </span>
-                                </div>
-                            }
-                        </form>
-                        <h4 style={{'marginTop': '20px'}}>Repos list (re-parse both repo and cogs after type change)</h4>
-                        <div className="list-group repos-admin-list">
-                            {reposList}
                         </div>
+                        <div
+                            className="form-group"
+                            style={{
+                                'marginRight': '15px',
+                            }}
+                        >
+                            <Select
+                                id="repoType"
+                                value={this.state.repoType}
+                                options={this.state.repoTypeOptions}
+                                onChange={this.handleRepoTypeChange.bind(this)}
+                                className="form-control"
+                                placeholder="Repo type"
+                                clearable={false}
+                                style={{'minWidth': '150px'}}
+                            />
+                        </div>
+                        <div
+                            className="form-group"
+                            style={{
+                                'marginRight': '15px',
+                            }}
+                        >
+                            <button
+                                className="btn btn-outline-primary"
+                                onClick={this.handleRepoAdd.bind(this)}
+                            >
+                                Add
+                            </button>
+                        </div>
+                        {this.state.addStatus &&
+                            <div className="form-group">
+                                <span className={`status ${this.state.addStatus.class}`}>
+                                    {this.state.addStatus.text}
+                                </span>
+                            </div>
+                        }
+                    </form>
+                    <h4 style={{'marginTop': '20px'}}>Repos list (re-parse both repo and cogs after type change)</h4>
+                    <div className="list-group repos-admin-list">
+                        {reposList}
                     </div>
-                </section>
+                </div>
             </div>
         );
     }
