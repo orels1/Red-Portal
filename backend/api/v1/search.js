@@ -30,7 +30,6 @@ function escapeRegExp(str) {
  * @apiParam {String} term Term to search for
  *
  * @apiUse DBError
- * @apiUse CogRequestSuccess
  * @apiUse EntryNotFound
  */
 router.get('/cogs/:term', (req, res) => {
@@ -58,6 +57,78 @@ router.get('/cogs/:term', (req, res) => {
                 'error': false,
                 'results': {
                     'list': cogs.slice(offset, limit),
+                },
+            });
+        })
+        .catch((err) => {
+            throw err;
+        });
+});
+
+/**
+ * @api {get} /search/random/cog Get random cog
+ * @apiVersion 0.2.0
+ * @apiName getRandomCog
+ * @apiGroup search
+ *
+ * @apiDescription The `limit` query params is supported (`1` by default)
+ *
+ * @apiUse DBError
+ * @apiUse EntryNotFound
+ */
+router.get('/random/cog', (req, res) => {
+    Cog.aggregate([
+        {'$sample': {'size': parseInt(req.query.limit || 1, 10)}},
+    ])
+        .exec()
+        .then((cogs) => {
+            if (cogs.length === 0) {
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There are no cogs to get random from',
+                    'results': '',
+                });
+            }
+            return res.status(200).send({
+                'error': false,
+                'results': {
+                    'list': cogs,
+                },
+            });
+        })
+        .catch((err) => {
+            throw err;
+        });
+});
+
+/**
+ * @api {get} /search/random/repo Get random repo
+ * @apiVersion 0.2.0
+ * @apiName getRandomRepo
+ * @apiGroup search
+ *
+ * @apiDescription The `limit` query params is supported (`1` by default)
+ *
+ * @apiUse DBError
+ * @apiUse EntryNotFound
+ */
+router.get('/random/repo', (req, res) => {
+    Repo.aggregate([
+        {'$sample': {'size': parseInt(req.query.limit || 1, 10)}},
+    ])
+        .exec()
+        .then((repos) => {
+            if (repos.length === 0) {
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There are no repos to get random from',
+                    'results': '',
+                });
+            }
+            return res.status(200).send({
+                'error': false,
+                'results': {
+                    'list': repos,
                 },
             });
         })

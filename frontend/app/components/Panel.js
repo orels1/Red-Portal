@@ -149,7 +149,6 @@ class Panel extends React.Component {
                                 value={this.state.repoType}
                                 options={this.state.repoTypeOptions}
                                 onChange={this.handleRepoTypeChange.bind(this)}
-                                className="form-control"
                                 placeholder="Repo type"
                                 clearable={false}
                                 style={{'minWidth': '150px'}}

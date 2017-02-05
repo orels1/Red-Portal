@@ -19,13 +19,23 @@ class Cog extends React.Component {
         CogActions.getCog({
             'author': this.props.params.author,
             'repoName': this.props.params.repoName,
-            'cogName': this.props.params.cogName
+            'cogName': this.props.params.cogName,
         });
     }
 
     componentWillUnmount() {
         // Will fire once before markup has been removed
         CogStore.unlisten(this.onChange);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.params !== this.props.params) {
+            CogActions.getCog({
+                'author': nextProps.params.author,
+                'repoName': nextProps.params.repoName,
+                'cogName': nextProps.params.cogName,
+            });
+        }
     }
 
     onChange(state) {
