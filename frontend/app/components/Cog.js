@@ -4,6 +4,8 @@ import CogStore from '../stores/CogStore';
 import DocumentMeta from 'react-document-meta';
 import {Link} from 'react-router';
 
+import Relevant from './items/Relevant';
+
 class Cog extends React.Component {
     constructor(props) {
         super(props);
@@ -148,6 +150,9 @@ class Cog extends React.Component {
                     <div className="code">
                         {`[p]cog install ${this.props.params.repoName} ${this.props.params.cogName}`}
                     </div>
+                </div>
+                <div style={{'padding': '0 40px 0 40px'}}>
+                    <Relevant tags={this.state.cog.tags} />
                 </div>
             </div>
         );
