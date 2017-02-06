@@ -67,7 +67,7 @@ class Repo extends React.Component {
                     </div>
                     <div className="repo-info-item d-flex align-self-end">
                         <div className="icon icon-tags"></div>
-                        <div className="muted">{tags}</div>
+                        <div className="muted">{tags.join('').length < 30 && tags || tags.slice(0, 3)}</div>
                     </div>
                 </div>
                 <div className="padding">
