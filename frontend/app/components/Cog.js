@@ -151,7 +151,7 @@ class Cog extends React.Component {
                         {`[p]cog install ${this.props.params.repoName} ${this.props.params.cogName}`}
                     </div>
                 </div>
-                {this.state.cog.tags && this.state.cog.tags.length > 0 &&
+                {false && this.state.cog.tags && this.state.cog.tags.length > 0 &&
                     <div style={{'padding': '0 40px 0 40px'}}>
                         <Relevant tags={this.state.cog.tags}/>
                     </div>
