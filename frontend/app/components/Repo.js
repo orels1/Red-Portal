@@ -54,9 +54,9 @@ class Repo extends React.Component {
                     </div>
                     <div className="header-4 align-self-end">
                         By&nbsp;
-                        <Link to={this.state.repo.author && this.state.repo.author.url || '#'} className="suppress-links">
+                        <a href={this.state.repo.author && this.state.repo.author.url || '#'} className="suppress-links">
                             <b>{this.props.params.author}</b>
-                        </Link>
+                        </a>
                     </div>
                     <div className="repo-info-item d-flex align-self-end">
                         <div className="icon icon-stars"></div>

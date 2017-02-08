@@ -97,9 +97,9 @@ class Cog extends React.Component {
                             <b>{this.props.params.repoName}</b>
                         </Link>
                         &nbsp;by&nbsp;
-                        <Link to={this.state.cog.author && this.state.cog.author.url || '#'} className="suppress-links">
+                        <a href={this.state.cog.author && this.state.cog.author.url || '#'} className="suppress-links">
                             <b>{this.props.params.author}</b>
-                        </Link>
+                        </a>
                     </div>
                     <div
                         className="repo-info-item d-flex align-self-end vote"
