@@ -2,8 +2,6 @@ import React from 'react';
 import HomeActions from '../actions/HomeActions';
 import HomeStore from '../stores/HomeStore';
 
-import Tags from './items/Tags';
-
 class Home extends React.Component {
     constructor(props) {
         super(props);

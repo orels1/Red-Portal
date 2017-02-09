@@ -5,6 +5,7 @@ import DocumentMeta from 'react-document-meta';
 import {Link} from 'react-router';
 
 import Relevant from './items/Relevant';
+import Tags from './items/Tags';
 
 class Cog extends React.Component {
     constructor(props) {
@@ -64,14 +65,6 @@ class Cog extends React.Component {
     }
 
     render() {
-        let tags = this.state.cog.tags && this.state.cog.tags.map((item, index) => {
-            return (
-                <Link key={`tag-${index}`} to={`/cogs/?search=${encodeURIComponent(item)}`} className="suppress-links">
-                    {item}
-                    {index !== this.state.cog.tags.length - 1 && ', '}
-                </Link>
-            );
-        });
         return (
             <div className="cog">
                 <DocumentMeta
@@ -111,10 +104,11 @@ class Cog extends React.Component {
                     <div className={`align-self-end type-badge badge-${this.state.cog.repo && this.state.cog.repo.type}`}>
                         {this.state.cog.repo && this.state.cog.repo.type}
                     </div>
-                    <div className="repo-info-item d-flex align-self-end">
-                        <div className="icon icon-tags"></div>
-                        <div className="muted">{tags && tags.join('').length < 30 && tags || tags && tags.slice(0, 3)}</div>
-                    </div>
+                    {this.state.cog.tags &&
+                        <Tags list={this.state.cog.tags}
+                              inline={true}
+                        />
+                    }
                     <div className="ml-auto align-self-end">
                         <a
                             href={this.state.cog.links && this.state.cog.links.github.self || '#'}

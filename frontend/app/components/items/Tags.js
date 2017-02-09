@@ -26,18 +26,45 @@ class Tags extends React.Component {
     }
 
     render() {
-        let list = this.props.list.map((item, index) => {
-            return (
-                <div className="cog-info" key={`tag-${index}`}>
-                    <Link to={`/cogs/?search=${encodeURIComponent(item.name)}`}>
-                        {item.name}
+        let tags = this.props.list.map((item, index) => {
+            if (this.props.inline) {
+                return (
+                    <Link key={`tag-${index}`} to={`/cogs/?search=${encodeURIComponent(item)}`} className="suppress-links">
+                        {item}
+                        {index !== this.props.list.length - 1 && ', '}
                     </Link>
-                </div>
+                );
+            }
+
+            return (
+                <Link key={`tag-${index}`} className="suppress-links" activeClassName="active" to={`/cogs/?search=${encodeURIComponent(item.name)}`}>
+                    <div className="tag d-flex justify-content-between">
+                        <span>{item.name}</span>
+                        <span>{item.count} cogs</span>
+                    </div>
+                </Link>
             );
         });
+
+        if (this.props.inline) {
+            return (
+                <div className="repo-info-item d-flex align-self-end">
+                    <div className="icon icon-tags"></div>
+                    <div className="muted">{tags && tags.join('').length < 30 && tags || tags && tags.slice(0, 3)}</div>
+                </div>
+            );
+        }
+
         return (
-            <div className="tags">
-                {list.slice(0, this.props.limit)}
+            <div className="stats-block">
+                {this.props.title &&
+                    <div className="header-2">
+                        {this.props.title}
+                    </div>
+                }
+                <div className="top-tags d-flex flex-column justify-content-between">
+                    {tags && tags.slice(0, this.props.limit)}
+                </div>
             </div>
         );
     }

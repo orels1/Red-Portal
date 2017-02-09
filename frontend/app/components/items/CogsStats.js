@@ -5,6 +5,8 @@ import React from 'react';
 import {Link} from 'react-router';
 import {shuffle} from 'underscore';
 
+import Tags from './Tags';
+
 class CogsStats extends React.Component {
     constructor(props) {
         super(props);
@@ -59,17 +61,6 @@ class CogsStats extends React.Component {
             );
         });
 
-        let topTags = this.props.tags.map((item, index) => {
-            return (
-                <Link key={`tag-${index}`} className="suppress-links" activeClassName="active" to={`/cogs/?search=${encodeURIComponent(item.name)}`}>
-                    <div className="tag d-flex justify-content-between">
-                        <span>{item.name}</span>
-                        <span>{item.count} cogs</span>
-                    </div>
-                </Link>
-            );
-        });
-
         return (
             <div className="cogs-stats d-flex justify-content-between align-items-sm-center align-items-md-stretch flex-sm-column flex-md-row flex-wrap">
                 <div className="d-flex flex-column justify-content-between">
@@ -96,14 +87,12 @@ class CogsStats extends React.Component {
                     </div>
                     {randomRepo[0]}
                 </div>
-                <div className="stats-block">
-                    <div className="header-2">
-                        Top tags
-                    </div>
-                    <div className="top-tags d-flex flex-column justify-content-between">
-                        {topTags.slice(0, 5)}
-                    </div>
-                </div>
+                <Tags
+                    list={this.props.tags}
+                    inline={false}
+                    limit={5}
+                    title="Top Tags"
+                />
             </div>
         );
     }

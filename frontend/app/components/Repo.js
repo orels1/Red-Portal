@@ -4,6 +4,7 @@ import RepoStore from '../stores/RepoStore';
 import {Link} from 'react-router';
 
 import List from './items/List';
+import Tags from './items/Tags';
 
 class Repo extends React.Component {
     constructor(props) {
@@ -38,14 +39,6 @@ class Repo extends React.Component {
     }
 
     render() {
-        let tags = this.state.repo.tags && this.state.repo.tags.map((item, index) => {
-            return (
-                <Link key={`tag-${index}`} to={`/cogs/?search=${encodeURIComponent(item)}`} className="suppress-links">
-                    {item}
-                    {index !== this.state.repo.tags.length - 1 && ', '}
-                </Link>
-            );
-        });
         return (
             <div className="repo">
                 <div className="info-header padding d-flex">
@@ -65,10 +58,7 @@ class Repo extends React.Component {
                     <div className={`align-self-end type-badge badge-${this.state.repo.type}`}>
                         {this.state.repo.type}
                     </div>
-                    <div className="repo-info-item d-flex align-self-end">
-                        <div className="icon icon-tags"></div>
-                        <div className="muted">{tags && tags.join('').length < 30 && tags || tags && tags.slice(0, 3)}</div>
-                    </div>
+                    {this.state.repo.tags && <Tags list={this.state.repo.tags} inline={true} />}
                 </div>
                 <div className="padding">
                     <List
