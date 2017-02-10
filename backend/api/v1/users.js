@@ -170,7 +170,6 @@ router.get('/:username', authorize, (req, res) => {
 router.put('/:id', authorize, (req, res) => {
     // If requested by user himself
     if (req.user && req.user._id.toString() === req.params.id) {
-
         // only admins can change roles
         if (req.body.roles && !req.user.roles.include('admin')) {
             delete req.body.roles;
@@ -272,19 +271,21 @@ function checkOwnership(req, res, next) {
     })
         .exec()
         .then((user) => {
+            // Save globally to use later
+            req.user = user;
             if (!user && req.get('Service-Token') !== process.env.serviceToken) {
                 // override if Service-Token is provided
                 throw new Error('Unauthorized');
             }
 
-            if (req.get('Service-Token') === process.env.serviceToken) {
+            if (req.get('Service-Token') === process.env.serviceToken || user.roles.includes('staff') || user.roles.includes('admin')) {
                 return null;
             }
             // check if repo exists
             return getUserRepos(user);
         })
         .then((repos) => {
-            if (findWhere(repos, {'html_url': req.body.url}) || req.get('Service-Token') === process.env.serviceToken) {
+            if (findWhere(repos, {'html_url': req.body.url}) || req.get('Service-Token') === process.env.serviceToken || req.user.roles.includes('staff') || req.user.roles.includes('admin')) {
                 next();
             } else {
                 throw new Error('EntryNotFound');
