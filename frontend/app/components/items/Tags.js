@@ -37,8 +37,8 @@ class Tags extends React.Component {
             }
 
             return (
-                <Link key={`tag-${index}`} className="suppress-links" activeClassName="active" to={`/cogs/?search=${encodeURIComponent(item.name)}`}>
-                    <div className="tag d-flex justify-content-between">
+                <Link key={`tag-${index}`}className="suppress-links" activeClassName="active" to={`/cogs/?search=${encodeURIComponent(item.name)}`}>
+                    <div className="tag d-flex justify-content-between" style={this.props.horizontal && {'minWidth': '200px', 'marginBottom': '20px'}}>
                         <span>{item.name}</span>
                         <span>{item.count} cogs</span>
                     </div>
@@ -62,8 +62,19 @@ class Tags extends React.Component {
                         {this.props.title}
                     </div>
                 }
-                <div className="top-tags d-flex flex-column justify-content-between">
-                    {tags && tags.slice(0, this.props.limit)}
+                <div
+                    className={`top-tags d-flex justify-content-between ${this.props.horizontal && 'flex-row flex-wrap' || 'flex-column'}`}
+                    style={this.props.horizontal && {'width': '100%', 'margin': '0', 'height': 'auto'}}
+                >
+                    {tags && tags.slice(0, this.props.limit - 1)}
+
+                    {!this.props.horizontal &&
+                        <Link className="suppress-links" activeClassName="active" to={'/cogs/tags/'}>
+                            <div className="tag d-flex justify-content-between">
+                                <span>Show all tags</span>
+                            </div>
+                        </Link>
+                    }
                 </div>
             </div>
         );
