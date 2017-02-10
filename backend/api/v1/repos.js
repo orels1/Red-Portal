@@ -128,7 +128,7 @@ import {authorize} from './auth';
  */
 router.get('/', (req, res) => {
     Repo.find(req.query.unparsed === '1' && {} || {'parsed': true})
-        .sort({'type': -1})
+        .sort({'type': 1})
         .exec((err, entries) => {
             if (err) {
                 throw err;
