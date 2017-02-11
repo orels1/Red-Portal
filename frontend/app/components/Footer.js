@@ -17,7 +17,7 @@ class Footer extends React.Component {
         return (
             <div className="footer">
                 <a className="footer-text" href="https://patreon.com/orels1" target="_blank">
-                    cogs.red made with ❤️️ by orels1
+                    support cogs.red – made with ❤ by orels1
                 </a>
             </div>
         );
