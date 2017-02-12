@@ -3,7 +3,9 @@ var gulp = require('gulp'),
     gulpif = require('gulp-if'),
     plumber = require('gulp-plumber'),
     concat = require('gulp-concat'),
-    gutil = require('gulp-util');
+    gutil = require('gulp-util'),
+    bust = require('gulp-buster'),
+    runSequence = require('run-sequence');
 
 // styling dependencies
 var sass = require('gulp-sass'),
@@ -112,14 +114,22 @@ gulp.task('browserify-watch', ['browserify-vendor'], function() {
                 gutil.log(gutil.colors.green('Finished rebuilding in', (Date.now() - start + 'ms.')));
             })
             .pipe(source('bundle.js'))
-            .pipe(gulp.dest('public/js'))
+            .pipe(gulp.dest('public/js'));
     }
+});
+
+gulp.task('cache-bust', function() {
+    return gulp.src(['public/js/*.js', 'public/css/*.css'])
+        .pipe(bust())
+        .pipe(gulp.dest('.'));
 });
 
 // configure default tasks
 gulp.task('default', ['styles', 'browserify-watch', 'styles-watch']);
-gulp.task('build', ['styles', 'browserify'], function() {
-    gulp.src('public/js/bundle.js');
+gulp.task('build', function(cb) {
+    runSequence(['styles', 'browserify'],
+                'cache-bust',
+                cb);
 });
 
 // simple service function
@@ -132,31 +142,9 @@ function execCommand(command, args, cb) {
         process.stderr.write(data);
     });
     ctx.on('close', function(code) {
-        if(cb){cb(code === 0 ? null : code);}
-    })
+        if(cb) {cb(code === 0 ? null : code);}
+    });
 }
-
-var options = {
-    'method': 'POST',
-    'uri': process.env.gulpDiscordHook,
-    'headers': {
-        'Content-Type': 'application/json'
-    },
-    'body': {
-        'username': 'Gulp',
-        'avatar_url': 'http://i.imgur.com/58BHyM5.jpg',
-        'embeds': [
-            {
-                'title': 'Red-Portal docker build started',
-                'color': 4839423,
-                'footer': {
-                    'text': ''
-                }
-            }
-        ]
-    },
-    'json': true
-};
 
 // Docker build
 var docker = new Docker(),
@@ -180,46 +168,9 @@ gulp.task('kubernetes-proxy', function(cb) {
 });
 
 gulp.task('deploy', ['build'], function(cb) {
-    // send to webhook
-    var t1 = Date.now(),
-        t0 = moment();
-    options.body.embeds[0].footer.text = t0.format('[At] HH:mm:ss');
-    request(options, function(err, resp) {
-        if (err) console.log(err);
-    });
-
     execCommand('docker', ['build', '-t', imageName, '.'], function() {
-        // send to webhook
-        var t2 = Date.now();
-        options.body.embeds[0].title = 'Red-Portal docker build finished';
-        options.body.embeds[0].color = 9240393;
-        options.body.embeds[0].footer.text = 'After ' + moment.duration(t2-t1).humanize();
-        request(options, function(err, resp) {
-            if (err) console.log(err);
-        });
-
-        // send to webhook
-        t1 = Date.now();
-        t0 = moment();
-        options.body.embeds[0].title = 'Red-Portal deploy started';
-        options.body.embeds[0].color = 4839423;
-        options.body.embeds[0].footer.text = t0.format('[At] HH:mm:ss');
-        request(options, function(err, resp) {
-            if (err) console.log(err);
-        });
         execCommand('docker', ['push', imageName], function() {
             execCommand('kubectl', ['rolling-update', containerName, '--image=' + imageName, '--image-pull-policy=Always'], function(){
-                // send to webhook
-                var t2 = Date.now();
-                options.body.embeds[0].title = 'Red-Portal deployed';
-                options.body.embeds[0].url = 'https://cogs.red';
-                options.body.embeds[0].description = 'Changes are live now';
-                options.body.embeds[0].color = 9240393;
-                options.body.embeds[0].footer.text = 'After ' + moment.duration(t2-t1).humanize();
-                request(options, function(err, resp) {
-                    if (err) console.log(err);
-                });
-
                 cb();
             });
         });

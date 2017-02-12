@@ -159,6 +159,14 @@ var swig  = require('swig'),
     DocumentMeta = require('react-document-meta');
 
 /*
+* Busting
+* */
+var busters = require('./busters.json');
+function asset(path) {
+    return path.substr(7) + (busters[path] ? '?' + busters[path] : '');
+}
+
+/*
 * React Middleware
 * */
 app.use(function(req, res) {
@@ -170,7 +178,15 @@ app.use(function(req, res) {
         } else if (renderProps) {
             var html = ReactDOM.renderToString(React.createElement(Router.RouterContext, renderProps));
             var head = DocumentMeta.renderAsHTML();
-            var page = swig.renderFile('frontend/views/index.html', { 'html': html, 'head': head });
+            var page = swig.renderFile('frontend/views/index.html',
+                {
+                    'html': html,
+                    'head': head,
+                    'styles': '/' + asset('public/css/style.css'),
+                    'vendor_bundle': '/' + asset('public/js/vendor.bundle.js'),
+                    'bundle': '/' + asset('public/js/bundle.js'),
+                }
+            );
             res.status(200).send(page);
         } else {
             res.status(404).send('Page Not Found');

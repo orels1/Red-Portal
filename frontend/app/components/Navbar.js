@@ -18,9 +18,9 @@ class Navbar extends React.Component {
         if (!props) {
             return false;
         }
-        key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
-        let match = props.location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
-        return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+        key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, '\\$&'); // escape RegEx meta chars
+        let match = props.location.search.match(new RegExp('[?&]' + key + '=([^&]+)(&|$)'));
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     }
 
     componentDidMount() {
