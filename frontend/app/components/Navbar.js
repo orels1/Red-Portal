@@ -118,7 +118,7 @@ class Navbar extends React.Component {
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a href="https://discord.me/Red-DiscordBot" target="_blank" className="nav-link">
+                                <a href="https://discord.gg/red" target="_blank" className="nav-link">
                                     Community
                                 </a>
                             </li>
