@@ -5,6 +5,7 @@ import React from 'react';
 import PanelActions from '../actions/PanelActions';
 import PanelStore from '../stores/PanelStore';
 import Select from 'react-select';
+import moment from 'moment';
 
 class Panel extends React.Component {
     constructor(props) {
@@ -19,6 +20,11 @@ class Panel extends React.Component {
         // Will fire once, after markup has been injected
         PanelStore.listen(this.onChange);
         PanelActions.getRepos();
+        PanelActions.getLastUpdate();
+
+        if (window.localStorage.getItem('token')) {
+            PanelActions.loadToken(window.localStorage.getItem('token'));
+        }
     }
 
     componentWillUnmount() {
@@ -60,6 +66,10 @@ class Panel extends React.Component {
 
     handleMoveRepo(item, type) {
         PanelActions.moveRepo({'url': `/api/v1/repos/${item._id}`, 'type': type, 'id': item._id});
+    }
+
+    handleParseEverything() {
+        PanelActions.parseEverything();
     }
 
     render() {
@@ -115,9 +125,44 @@ class Panel extends React.Component {
             );
         });
         return (
-            <div className="panel padding">
-                <h1 className="section-header">Control Panel</h1>
-                <div className="section-inner-wrapper">
+            <div className="panel">
+                <div className="info-header padding d-flex justify-content-between">
+                    <div className="mr-auto d-flex">
+                        <div className="stats-block small">
+                            <div className="header-5">
+                                Last updated
+                            </div>
+                            <div className="stats-count">
+                                {moment(this.state.last_updated).fromNow()}
+                            </div>
+                        </div>
+                        <div className="stats-block small">
+                            <div className="header-5">
+                                Repos
+                            </div>
+                            <div className="stats-count">
+                                {this.state.repos.length}
+                            </div>
+                        </div>
+                        <div className="stats-block">
+                            <div className="btn-square" onClick={this.handleParseEverything.bind(null)}>
+                                {this.state.parse_text}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="ml-auto d-flex">
+                        <div className="stats-block small">
+                            <div className="header-5">
+                                Access level
+                            </div>
+                            <div className="stats-count">
+                                <div className="badge type-badge badge-blue">{this.state.roles[1]}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="padding">
+                    <div className="section-inner-wrapper">
                     <h4>Add repo to regitstry</h4>
                     <form
                         onSubmit={this.hanldeSubmit.bind(this)}
@@ -179,6 +224,7 @@ class Panel extends React.Component {
                     <div className="list-group repos-admin-list">
                         {reposList}
                     </div>
+                </div>
                 </div>
             </div>
         );

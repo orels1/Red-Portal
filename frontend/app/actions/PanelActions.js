@@ -18,6 +18,11 @@ class HomeActions {
             'parseCogsFail',
             'moveRepoSuccess',
             'moveRepoFail',
+            'loadToken',
+            'getLastUpdateSuccess',
+            'getLastUpdateFail',
+            'parseEverythingSuccess',
+            'parseEverythingFail',
         );
     }
 
@@ -93,6 +98,32 @@ class HomeActions {
             })
             .fail((jqXhr) => {
                 this.moveRepoFail(jqXhr);
+            });
+    }
+
+    getLastUpdate() {
+        $.ajax({
+            'url': '/api/v1/config/last_updated',
+            'type': 'GET',
+        })
+            .done((data) => {
+                this.getLastUpdateSuccess(data);
+            })
+            .fail((jqXhr) => {
+                this.getLastUpdateFail(jqXhr);
+            });
+    }
+
+    parseEverything() {
+        $.ajax({
+            'url': '/api/v1/admin/batch/parse',
+            'type': 'PUT',
+        })
+            .done((data) => {
+                this.parseEverythingSuccess(data);
+            })
+            .fail((jqXhr) => {
+                this.parseEverythingFail(jqXhr);
             });
     }
 }

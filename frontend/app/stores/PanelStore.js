@@ -4,6 +4,8 @@
 import alt from '../alt';
 import PanelActions from '../actions/PanelActions';
 import {findWhere} from 'underscore';
+import {decode} from 'jsonwebtoken';
+
 
 class PanelStore {
     constructor() {
@@ -17,6 +19,11 @@ class PanelStore {
         ];
         this.repos = [];
         this.addStatus = null;
+        this.token = '';
+        this.roles = [];
+        this.user = '';
+        this.last_updated = new Date();
+        this.parse_text = 'Re-parse everything';
     }
 
     onRepoUrlChange(value) {
@@ -81,6 +88,29 @@ class PanelStore {
     }
 
     onMoveRepoFail(jqXhr) {
+        console.error(jqXhr.responseText);
+    }
+
+    onLoadToken(token) {
+        let decoded = decode(token);
+        this.token = token;
+        this.roles = decoded.roles;
+        this.user = decoded.user;
+    }
+
+    onGetLastUpdateSuccess(data) {
+        this.last_updated = data.results.value;
+    }
+
+    onGetLastUpdateFail(jqXhr) {
+        console.error(jqXhr.responseText);
+    }
+
+    onParseEverythingSuccess(data) {
+        this.parse_text = 'Parsing started';
+    }
+
+    onParseEverythingFail(jqXhr) {
         console.error(jqXhr.responseText);
     }
 }

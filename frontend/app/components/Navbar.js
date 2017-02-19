@@ -124,7 +124,7 @@ class Navbar extends React.Component {
                             </li>
                             {this.checkAccess() &&
                                 <li className="nav-item">
-                                    <Link to="/panel/" activeClassName="active" className="nav-link">
+                                    <Link to="/panel/" activeClassName="active" className="cogs nav-link">
                                         Panel
                                     </Link>
                                 </li>

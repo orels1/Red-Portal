@@ -99,7 +99,7 @@ function apiAccessControl(restricted, cors, req, res, next) {
         &&
         (req.method !== 'POST' && !cors)
     ) {
-        if (req.get('Service-Token') === process.env.serviceToken) {
+        if (req.get('Service-Token') === process.env.serviceToken || req.user && (req.user.roles.includes('admin') || req.user.roles.includes('staff'))) {
             next();
         } else {
             res.status(401).send({
@@ -116,7 +116,7 @@ function apiAccessControl(restricted, cors, req, res, next) {
 * */
 
 // Main
-app.use('/api/v1/config', cors(),
+app.use('/api/v1/config', cors(), auth.authorize,
     function(req, res, next) {apiAccessControl(true, false, req, res, next);},
     config.router);
 app.use('/api/v1/repos', cors(),
@@ -128,7 +128,7 @@ app.use('/api/v1/cogs', cors(),
 app.use('/api/v1/search', cors(),
     function(req, res, next) {apiAccessControl(false, true, req, res, next);},
     search.router);
-app.use('/api/v1/admin', cors(),
+app.use('/api/v1/admin', cors(), auth.authorize,
     function(req, res, next) {apiAccessControl(false, false, req, res, next);},
     admin.router);
 app.use('/api/v1/auth', cors(),

@@ -5,6 +5,7 @@
 import express from 'express';
 let router = express.Router();
 import Repo from 'models/repo';
+import Config from 'models/config';
 import Cog from 'models/cog';
 import {extend} from 'underscore';
 import {parseCogs, parseRepos} from './utils/parsers';
@@ -32,8 +33,8 @@ import {authorize} from './auth';
  *      }
  */
 // TODO: replace loops with generators
-router.put('/batch/parse', authorize, (req, res) => {
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
+router.put('/batch/parse', (req, res) => {
+    if (!req.user) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
@@ -89,6 +90,16 @@ function repoParser() {
                         throw err;
                     });
             }
+        })
+        .then(() => {
+            return Config.findOne({'name': 'last_updated'}).exec();
+        })
+        .then((entry) => {
+            if (!entry) {
+                return new Config({'name': 'last_updated', 'value': new Date()}).save();
+            }
+            entry.value = new Date();
+            return entry.save();
         })
         .catch((err) => {
             throw err;
