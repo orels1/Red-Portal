@@ -1,0 +1,14 @@
+{
+  "name": "red-portal",
+  "description": "A cog-listing project for Red-DiscordBot",
+  "main": "app.js",
+  "authors": [
+    "orels1"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "node"
+  ],
+  "homepage": "https://github.com/orels1/Red-Portal",
+  "private": true
+}
