@@ -9,7 +9,7 @@ Ever thought "it'd be cool if there was a place, where you can see a list of all
 
 ## API
 
-[Docs on the api are available here](https://orels1.github.io/Red-Portal/)
+[API docs are here](https://orels1.github.io/Red-Portal/)
 
 ## Wiki
 
