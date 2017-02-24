@@ -23,6 +23,9 @@ class HomeActions {
             'getLastUpdateFail',
             'parseEverythingSuccess',
             'parseEverythingFail',
+            'changeStatus',
+            'getCogsSuccess',
+            'getCogsFail',
         );
     }
 
@@ -68,6 +71,7 @@ class HomeActions {
             .fail((jqXhr) => {
                 this.parseRepoFail(jqXhr);
             });
+        return false;
     }
 
     parseCogs(payload) {
@@ -81,6 +85,7 @@ class HomeActions {
             .fail((jqXhr) => {
                 this.parseCogsFail(jqXhr);
             });
+        return false;
     }
 
     moveRepo(payload) {
@@ -99,6 +104,7 @@ class HomeActions {
             .fail((jqXhr) => {
                 this.moveRepoFail(jqXhr);
             });
+        return false;
     }
 
     getLastUpdate() {
@@ -112,6 +118,7 @@ class HomeActions {
             .fail((jqXhr) => {
                 this.getLastUpdateFail(jqXhr);
             });
+        return false;
     }
 
     parseEverything() {
@@ -125,6 +132,22 @@ class HomeActions {
             .fail((jqXhr) => {
                 this.parseEverythingFail(jqXhr);
             });
+        return false;
+    }
+
+    getCogs(payload) {
+        $.ajax({
+            'url': `/api/v1/cogs/${payload.author.username}/${payload.name}`,
+            'type': 'GET',
+        })
+            .done((data) => {
+                payload.data = data;
+                this.getCogsSuccess(payload);
+            })
+            .fail((jqXhr) => {
+                this.getCogsFail(jqXhr);
+            });
+        return false;
     }
 }
 

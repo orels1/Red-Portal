@@ -50,10 +50,14 @@ class Panel extends React.Component {
     }
 
     handleRepoAdd() {
-        PanelActions.addRepo({
-            'url': this.state.repoUrl,
-            'type': this.state.repoType.value,
-        });
+        if (this.state.repoUrl.length > 20) {
+            PanelActions.addRepo({
+                'url': this.state.repoUrl,
+                'type': this.state.repoType.value,
+            });
+        } else {
+            PanelActions.changeStatus('Invalid URL');
+        }
     }
 
     handleRepoParse(item) {
@@ -72,56 +76,29 @@ class Panel extends React.Component {
         PanelActions.parseEverything();
     }
 
+    handleRepoClick(item) {
+        PanelActions.getCogs(item);
+    }
+
     render() {
         let reposList = this.state.repos.map((item, index) => {
             return (
-                <li key={`repo-${index}`} className="list-group-item flex-column align-items-start">
+                <div
+                    key={`repo-${index}`}
+                    onClick={this.handleRepoClick.bind(null, item)}
+                    className={`list-group-item flex-column align-items-start ${this.state.selectedRepo && this.state.selectedRepo._id === item._id && 'active'}`}
+                >
                     <div className="d-flex w-100 justify-content-between">
-                        {item.name}
-                        <div className="d-flex">
-                            <span>
-                                move to:&nbsp;&nbsp;
-                            </span>
-                            &nbsp;
-                            <button className="btn btn-outline-success btn-sm" onClick={this.handleMoveRepo.bind(null, item, 'approved')}>
-                                approved
-                            </button>
-                            &nbsp;
-                            <span className="btn btn-outline-warning btn-sm" onClick={this.handleMoveRepo.bind(null, item, 'beta')}>
-                                beta
-                            </span>
-                            &nbsp;
-                            <span className="btn btn-outline-danger btn-sm" onClick={this.handleMoveRepo.bind(null, item, 'unapproved')}>
-                                unapproved
-                            </span>
-                            &nbsp;&nbsp;&nbsp;&nbsp;
-                            <span className="btn btn-outline-primary btn-sm" onClick={this.handleRepoParse.bind(null, item)}>
-                                parse repo
-                            </span>
-                            &nbsp;
-                            <span className="btn btn-outline-primary btn-sm" onClick={this.handleParseCogs.bind(null, item)}>
-                                parse cogs
-                            </span>
-                            &nbsp;
-                            <div className={`align-self-center type-badge badge-${item.type}`}>{item.type}</div>
-                        </div>
-                    </div>
-                    <div className="d-flex w-100 justify-content-between mb-1" style={{'marginTop': '7px'}}>
-                        <small>
-                            By&nbsp;
-                            <a href={item.author.url} target="_blank">{item.author.username}</a>
-                        </small>
-                        {item.status &&
+                        <div className="repo-admin-name">{item.name}</div>
+                        <div className="repo-admin-author">
                             <small>
-                                Status:&nbsp;&nbsp;
-                                <span
-                                    className={`badge badge-pill ${item.status.state && 'badge-success' || 'badge-danger'}`}>
-                                    {item.status && item.status.message}
-                                </span>
+                                By&nbsp;
+                                <a href={item.author.url} target="_blank">{item.author.username}</a>
                             </small>
-                        }
+                        </div>
+                        <div className={`align-self-center ml-auto type-badge badge-${item.type}`}>{item.type}</div>
                     </div>
-                </li>
+                </div>
             );
         });
         return (
@@ -161,70 +138,88 @@ class Panel extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="padding">
-                    <div className="section-inner-wrapper">
-                    <h4>Add repo to regitstry</h4>
-                    <form
-                        onSubmit={this.hanldeSubmit.bind(this)}
-                        className="form-inline"
-                    >
-                        <div
-                            className="form-group"
-                            style={{
-                                'marginRight': '15px',
-                            }}
+                <div className="padding d-flex flex-wrap flex-xl-nowrap justify-content-between">
+                    <div className="d-flex flex-column">
+                        <form
+                            onSubmit={this.hanldeSubmit.bind(this)}
+                            className="form-black d-flex"
                         >
-                            <input
-                                id="repoUrl"
-                                value={this.state.repoUrl}
-                                onChange={this.handleRepoUrlChange.bind(this)}
-                                className="form-control"
-                                placeholder="Repo URL"
-                                style={{'minWidth': '350px', 'height': '38px'}}
-                                />
-                        </div>
-                        <div
-                            className="form-group"
-                            style={{
-                                'marginRight': '15px',
-                            }}
-                        >
-                            <Select
-                                id="repoType"
-                                value={this.state.repoType}
-                                options={this.state.repoTypeOptions}
-                                onChange={this.handleRepoTypeChange.bind(this)}
-                                placeholder="Repo type"
-                                clearable={false}
-                                style={{'minWidth': '150px'}}
-                            />
-                        </div>
-                        <div
-                            className="form-group"
-                            style={{
-                                'marginRight': '15px',
-                            }}
-                        >
-                            <button
-                                className="btn btn-outline-primary"
-                                onClick={this.handleRepoAdd.bind(this)}
+                            <div
+                                className="form-group"
+                                style={{
+                                    'marginRight': '15px',
+                                }}
                             >
-                                Add
-                            </button>
+                                <input
+                                    id="repoUrl"
+                                    value={this.state.repoUrl}
+                                    onChange={this.handleRepoUrlChange.bind(this)}
+                                    className="form-control"
+                                    placeholder="Repo URL"
+                                    />
+                            </div>
+                            <div
+                                className="form-group select-helper"
+                                style={{
+                                    'marginRight': '15px',
+                                }}
+                            >
+                                <Select
+                                    id="repoType"
+                                    value={this.state.repoType}
+                                    options={this.state.repoTypeOptions}
+                                    onChange={this.handleRepoTypeChange.bind(this)}
+                                    placeholder="Repo type"
+                                    clearable={false}
+                                    style={{'minWidth': '150px'}}
+                                />
+                            </div>
+                            <div
+                                className="form-group"
+                                style={{
+                                    'marginRight': '15px',
+                                }}
+                            >
+                                <button
+                                    className="btn btn-black-form"
+                                    onClick={this.handleRepoAdd.bind(this)}
+                                >
+                                    Add
+                                </button>
+                            </div>
+                            {this.state.addStatus &&
+                                <div className="form-group">
+                                    <div className={`status ${this.state.addStatus.class}`}>
+                                        {this.state.addStatus.text}
+                                    </div>
+                                </div>
+                            }
+                        </form>
+                        <div className="list-group repos-admin-list">
+                            {reposList}
                         </div>
-                        {this.state.addStatus &&
-                            <div className="form-group">
-                                <span className={`status ${this.state.addStatus.class}`}>
-                                    {this.state.addStatus.text}
-                                </span>
+                    </div>
+                    <div className="d-flex" style={{'padding': '95px 0 0 0', 'maxWidth': '420px'}}>
+                        {this.state.selectedRepo &&
+                            <div className="d-flex flex-column">
+                                <div className="d-flex">
+                                    <div className="header-4">{this.state.selectedRepo.name}</div>
+                                    <div className={`align-self-center ml-auto type-badge badge-${this.state.selectedRepo.type}`}>{this.state.selectedRepo.type}</div>
+                                </div>
+                                <div className="d-flex justify-content-between">
+                                    <div><b>Cogs: </b>{this.state.cogs.length}</div>
+                                    <div><b>Tags: </b>{this.state.selectedRepo.tags.join(',')}</div>
+                                </div>
+                                <div className="d-flex flex-column" style={{'marginTop': '15px'}}>
+                                    <div className="header-4">Description</div>
+                                    <div>{this.state.selectedRepo.description || this.state.selectedRepo.short}</div>
+                                </div>
+                                <div className="d-flex flex-column" style={{'marginTop': '15px'}}>
+                                    <div className="header-4">Actions</div>
+                                </div>
                             </div>
                         }
-                    </form>
-                    <h4 style={{'marginTop': '20px'}}>Repos list (re-parse both repo and cogs after type change)</h4>
-                    <div className="list-group repos-admin-list">
-                        {reposList}
                     </div>
-                </div>
                 </div>
             </div>
         );

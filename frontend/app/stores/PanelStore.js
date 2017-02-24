@@ -24,6 +24,8 @@ class PanelStore {
         this.user = '';
         this.last_updated = new Date();
         this.parse_text = 'Re-parse everything';
+        this.selectedRepo = null;
+        this.cogs = [];
     }
 
     onRepoUrlChange(value) {
@@ -32,6 +34,13 @@ class PanelStore {
 
     onRepoTypeChange(value) {
         this.repoType = value;
+    }
+
+    onChangeStatus(value) {
+        this.addStatus = {
+            'text': 'Invalid URL!',
+            'class': 'text-danger',
+        };
     }
 
     onAddRepoSuccess(data) {
@@ -111,6 +120,16 @@ class PanelStore {
     }
 
     onParseEverythingFail(jqXhr) {
+        console.error(jqXhr.responseText);
+    }
+
+    onGetCogsSuccess(payload) {
+        this.cogs = !payload.data.error && payload.data.results && payload.data.results.list || [];
+        payload.data = null;
+        this.selectedRepo = payload;
+    }
+
+    onGetCogsFail(jqXhr) {
         console.error(jqXhr.responseText);
     }
 }

@@ -13,6 +13,7 @@ $white: #FBFBFB
 $whiteRGBA: rgba(251,251,251,1)
 $red: #FD2121
 $black: rgba(7,14,22,1)
+$black-hover: rgb(53, 53, 53)
 $dark: #1F3043
 $muted: rgba(255,255,255,0.6)
 
@@ -256,7 +257,25 @@ a.btn-pill
   
   &:hover
     border: 1px solid $whiteRGBA
-
+    
+.btn.btn-black-form
+  background: $black
+  line-height: 40px
+  padding: 0 20px
+  font-size: 13px
+  font-weight: 300
+  color: $muted
+  min-width: 100px
+  cursor: pointer
+  margin: 0
+  border-radius: 0
+  border: none
+  border-left: 1px solid $muted
+  transition: background 300ms ease
+    
+  &:hover
+    background: $black-hover
+    
 // Gradients
 .bg-red
   background-image: $grad-red
@@ -562,7 +581,109 @@ a.btn-pill
   
   .stats-block
     margin-right: 40px
+    
+  .repos-admin-list
+    margin-top: 40px
+    max-height: 350px
+    overflow-y: scroll
+    
+    .list-group-item
+      transition: all 300ms ease
+      border-radius: 0
+      cursor: pointer
+      line-height: 50px
+      margin: 0
+      padding: 0 20px
+      border-top: none
+      flex-shrink: 0
+      
+      &:first-child
+        border-top: 1px solid rgba(0, 0, 0, 0.125)
+    
+      &:hover, &.active
+        background: $black
+        color: $white
 
+        .repo-admin-author a
+            color: $white
+        
+      .repo-admin-name
+        margin-right: 20px
+        font-size: 18px
+        font-weight: 900
+        
+      .repo-admin-author
+        font-size: 14px
+        font-weight: 300
+        
+        a
+          color: $black
+          font-weight: 700
+          transition: color 300ms ease
+    
+// Forms
+
+.form-black
+    
+  .form-group
+    margin-right: 0 !important
+    
+    &.select-helper
+      min-width: 150px
+      
+    .status
+      margin-left: 15px
+      line-height: 40px
+  
+  .form-control
+    background: $black
+    color: $muted
+    line-height: 40px
+    padding: 0 20px
+    border-radius: 0
+    border: none
+    font-size: 13px
+    font-weight: 300
+    min-width: 300px
+    border-left: 1px solid $muted
+     
+  .Select
+    .Select-control
+      background: $black
+      color: $muted
+      line-height: 40px
+      padding: 0 20px
+      border-radius: 0
+      border: none
+      font-size: 13px
+      font-weight: 300
+      min-width: 150px
+      border-left: 1px solid $muted
+
+      .Select-value-label
+        color: $muted !important
+        line-height: 40px
+    
+    .Select-menu-outer
+      background: $black
+      color: $muted 
+      border-radius: 0 
+      border: none
+      min-width: 150px
+      
+      .Select-option
+        background: $black
+        color: $muted 
+        border-radius: 0
+        border: none
+        font-size: 13px
+        font-weight: 300
+        line-height: 30px
+        transition: background 300ms ease
+        
+        &:hover
+          background: $black-hover
+        
 // Footer
 .footer
   width: 100%
