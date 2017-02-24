@@ -34,13 +34,6 @@ import {authorize} from './auth';
  */
 // TODO: replace loops with generators
 router.put('/batch/parse', (req, res) => {
-    if (!req.user) {
-        return res.status(401).send({
-            'error': 'Unauthorized',
-            'error_details': 'Authorization header not provided',
-            'results': {},
-        });
-    }
     res.status(200).send({
         'error': false,
         'results': 'Parsing started',
