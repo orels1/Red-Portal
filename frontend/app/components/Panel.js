@@ -155,7 +155,7 @@ class Panel extends React.Component {
                                     value={this.state.repoUrl}
                                     onChange={this.handleRepoUrlChange.bind(this)}
                                     className="form-control"
-                                    placeholder="Repo URL"
+                                    placeholder="Repo GitHub URL"
                                     />
                             </div>
                             <div
