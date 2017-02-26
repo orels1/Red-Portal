@@ -16,6 +16,7 @@ $black: rgba(7,14,22,1)
 $black-hover: rgb(53, 53, 53)
 $dark: #1F3043
 $muted: rgba(255,255,255,0.6)
+$grayT: rgba(7,14,22,0.2)
 
 $grad-red: linear-gradient(-144deg, #FD2121 0%, #DB1E1E 100%)
 $grad-green: linear-gradient(45deg, #96CE33 0%, #80C4AD 100%)
@@ -278,7 +279,7 @@ a.btn-pill
     
 // Gradients
 .bg-red
-  background-image: $grad-red
+  background-image: $grad-red !important
     
 // Glows
 .glow-red
@@ -583,7 +584,6 @@ a.btn-pill
     margin-right: 40px
     
   .repos-admin-list
-    margin-top: 40px
     max-height: 350px
     overflow-y: scroll
     
@@ -603,6 +603,7 @@ a.btn-pill
       &:hover, &.active
         background: $black
         color: $white
+        border-color: rgba(0,0,0,0.125) 
 
         .repo-admin-author a
             color: $white
@@ -620,6 +621,53 @@ a.btn-pill
           color: $black
           font-weight: 700
           transition: color 300ms ease
+          
+  .repo-block
+    font-weight: 300
+    
+    .header-5
+      font-size: 16px
+      color: $black
+      font-weight: 900
+      margin: 15px 0 10px 0
+    
+    .cogs-list
+      
+      .cogs-list-item
+        min-width: 125px
+        line-height: 30px
+        border: 1px solid $grayT
+        font-size: 14px
+        font-weight: 300
+        color: $dark
+        text-align: center
+        margin-bottom: 10px
+    
+    .action-buttons
+      
+      .action-button
+        min-width: 90px
+        line-height: 25px
+        font-weight: 300
+        margin-bottom: 10px
+        font-size: 12px
+        color: $muted
+        background: $black
+        transition: background 300ms ease
+        text-align: center
+        cursor: pointer
+        
+        &:hover
+          background: $black-hover
+          
+        &.delete
+          background-image: $grad-red
+          font-weight: 700
+          color: $white
+          
+          &:hover
+            background-image: $grad-red
+      
     
 // Forms
 

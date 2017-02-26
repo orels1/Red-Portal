@@ -67,9 +67,9 @@ class PanelStore {
     }
 
     onParseRepoSuccess(payload) {
-        findWhere(this.repos, {'_id': payload.id}).status = {
-            'state': true,
-            'message': 'Parsing started',
+        this.addStatus = {
+            'text': 'Parsing started',
+            'class': 'text-success',
         };
     }
 
@@ -78,9 +78,9 @@ class PanelStore {
     }
 
     onParseCogsSuccess(payload) {
-        findWhere(this.repos, {'_id': payload.id}).status = {
-            'state': true,
-            'message': 'Parsing started',
+        this.addStatus = {
+            'text': 'Parsing started',
+            'class': 'text-success',
         };
     }
 
@@ -89,11 +89,12 @@ class PanelStore {
     }
 
     onMoveRepoSuccess(payload) {
-        findWhere(this.repos, {'_id': payload.id}).status = {
-            'state': true,
-            'message': 'Repo updated',
+        this.addStatus = {
+            'text': 'Repo updated, re-parse cogs now!',
+            'class': 'text-success',
         };
         findWhere(this.repos, {'_id': payload.id}).type = payload.data.results.type;
+        this.selectedRepo.type = payload.data.results.type;
     }
 
     onMoveRepoFail(jqXhr) {
