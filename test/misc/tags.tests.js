@@ -17,32 +17,28 @@ chai.use(chaiAsPromised);
 const apiUrl = '/api/v1';
 
 describe('Tags', () => {
-    before(() => {
-        return Cog.remove({})
-            .catch((err) => {
-                throw err;
-            });
-    });
-
     describe('GET /top', () => {
         before(() => {
-            return Cog.insertMany([
-                {
-                    'tags': ['gaming', 'fun', 'api'],
-                },
-                {
-                    'tags': ['gaming', 'api'],
-                },
-                {
-                    'tags': ['fun', 'api'],
-                },
-                {
-                    'tags': ['fun', 'api'],
-                },
-                {
-                    'tags': ['fun', 'api', 'stats'],
-                },
-            ])
+            return Cog.remove({})
+                .then(() => {
+                    return Cog.insertMany([
+                        {
+                            'tags': ['gaming', 'fun', 'api'],
+                        },
+                        {
+                            'tags': ['gaming', 'api'],
+                        },
+                        {
+                            'tags': ['fun', 'api'],
+                        },
+                        {
+                            'tags': ['fun', 'api'],
+                        },
+                        {
+                            'tags': ['fun', 'api', 'stats'],
+                        },
+                    ]);
+                })
                 .catch((err) => {
                     throw err;
                 });
