@@ -79,6 +79,16 @@ describe('Admin', () => {
                 });
         });
 
+        after(() => {
+            return Repo.remove({})
+                .then(() => {
+                    return Cog.remove({});
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        });
+
         it('it should start parsing all repos and cogs', () => {
             return chai.request(app)
                 .put(`${apiUrl}/admin/batch/parse`)
