@@ -10,8 +10,8 @@ RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app
 # copy source
 WORKDIR /opt/app
 ADD . /opt/app
-RUN gulp build
 RUN bower install --allow-root
+RUN gulp build
 
 EXPOSE 3000
 CMD ["npm", "start"]
