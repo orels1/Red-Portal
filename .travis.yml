@@ -1,6 +1,9 @@
 language: node_js
 node_js:
   - "6.9"
+sudo: required
+services:
+  - docker
 after_success:
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
   - export REPO=orels1/red-portal
