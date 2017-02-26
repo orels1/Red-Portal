@@ -7,5 +7,5 @@ services:
 after_success:
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
   - export IMAGE=orels1/red-portal
-  - docker build -t IMAGE .
+  - docker build -t $IMAGE .
   - docker push $IMAGE
