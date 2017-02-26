@@ -1,15 +1,17 @@
 FROM node:6.9.3-alpine
 
-# build packages first
+# copy dependency jsons
 ADD package.json /tmp/package.json
-RUN cd /tmp && npm install -q
+ADD bower.json /tmp/bower.json
+
+# install tools
 RUN npm install -g gulp -q
 RUN npm install -g bower -q
-RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app
 
-# bower
-RUN cd /
+# install dependencies
+RUN cd /tmp && npm install -q
 RUN bower install --allow-root
+RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app && cp -a /tmp/bower_components /
 
 # copy source
 WORKDIR /opt/app
