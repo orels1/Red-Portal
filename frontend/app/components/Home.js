@@ -14,7 +14,6 @@ class Home extends React.Component {
     componentDidMount() {
         // Will fire once, after markup has been injected
         HomeStore.listen(this.onChange);
-        HomeActions.getStats();
     }
 
     componentWillUnmount() {
@@ -28,21 +27,36 @@ class Home extends React.Component {
     }
 
     render() {
+        let featuresLeft = this.state.featuresLeft.map((item, index) => {
+            return (
+                <li
+                    key={`featureLeft-${index}`}
+                    className={this.state.currentFeatureLeft === index && 'active'}
+                    onClick={HomeActions.changeCurrentFeatureLeft.bind(null, index)}
+                >{item.title}</li>
+            );
+        });
+        let featuresRight = this.state.featuresRight.map((item, index) => {
+            return (
+                <li
+                    key={`featureLeft-${index}`}
+                    className={this.state.currentFeatureRight === index && 'active'}
+                    onClick={HomeActions.changeCurrentFeatureRight.bind(null, index)}
+                >{item.title}</li>
+            );
+        });
         return (
             <div className="home padding d-flex justify-content-center flex-column">
-                <div className="d-flex justify-content-between align-items-xl-center align-items-xl-stretch flex-column flex-xl-row flex-wrap flex-xl-nowrap">
-                    <div className="feature-info">
-                        <h4>Music</h4>
+                <div className="d-flex justify-content-xl-between justify-content-center align-items-xl-center align-items-xl-stretch flex-column flex-xl-row flex-wrap flex-xl-nowrap">
+                    <div className="feature-info align-self-center align-self-xl-auto">
+                        <h4>{this.state.featuresLeft[this.state.currentFeatureLeft].title}</h4>
                         <p>
-                            RED can play music from YouTube, Soundcloud or even from your own hard drive. No more boring silence in the voicechat!
+                            {this.state.featuresLeft[this.state.currentFeatureLeft].text}
                         </p>
                     </div>
                     <div className="features d-flex flex-xl-row justify-content-between flex-column align-self-center flex-wrap flex-xl-nowrap">
                         <ul className="features-list left d-flex flex-column align-items-xl-end align-items-center justify-content-between">
-                            <li>stream alerts</li>
-                            <li className="active">music</li>
-                            <li>gifs</li>
-                            <li>trivia</li>
+                            {featuresLeft}
                         </ul>
                         <div className="d-flex justify-content-center" style={{'height': '176px', 'padding': '0 60px'}}>
                             <h1 className="d-flex align-self-center" >
@@ -50,16 +64,13 @@ class Home extends React.Component {
                             </h1>
                         </div>
                         <ul className="features-list right d-flex flex-column  align-items-xl-start align-items-center justify-content-between">
-                            <li>slots</li>
-                            <li>imgur</li>
-                            <li className="active">moderation</li>
-                            <li>custom commands</li>
+                            {featuresRight}
                         </ul>
                     </div>
-                    <div className="feature-info">
-                        <h4>Moderation</h4>
+                    <div className="feature-info align-self-center align-self-xl-auto">
+                        <h4>{this.state.featuresRight[this.state.currentFeatureRight].title}</h4>
                         <p>
-                            RED is equipped with all the tools you need to keep your community at bay: from simple kick/ban to more advanced filters, and a mod-log to see what your mods are up to.
+                            {this.state.featuresRight[this.state.currentFeatureRight].text}
                         </p>
                     </div>
                 </div>

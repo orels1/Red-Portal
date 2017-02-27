@@ -3,23 +3,9 @@ import alt from '../alt';
 class HomeActions {
     constructor() {
         this.generateActions(
-            'getStatsSuccess',
-            'getStatsFail'
+            'changeCurrentFeatureLeft',
+            'changeCurrentFeatureRight',
         );
-    }
-
-    getStats() {
-        $.ajax({
-            'url': '/api/v1/misc/count',
-            'type': 'GET',
-        })
-            .done((data) => {
-                this.getStatsSuccess(data);
-            })
-            .fail((jqXhr) => {
-                this.getStatsFail(jqXhr);
-            });
-        return false;
     }
 }
 
