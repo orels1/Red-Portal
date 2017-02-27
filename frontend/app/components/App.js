@@ -9,7 +9,7 @@ import Footer from './Footer';
 class App extends React.Component {
     render() {
         return (
-            <div className="app">
+            <div className="app" style={{'flex': 1}}>
                 <div className="container main">
                     <Navbar router={this.props.router} />
                     <div className="contents">

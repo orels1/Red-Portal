@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="d-flex flex-column">
 <head>
     <title>Cogs.Red</title>
     <link rel="stylesheet" href="{{styles}}">
@@ -24,8 +24,8 @@
 
     {{ head|safe }}
 </head>
-<body>
-<div id="app">{{ html|safe }}</div>
+<body class="d-flex" style="flex:1;">
+<div id="app" class="d-flex flex-column" style="flex:1">{{ html|safe }}</div>
 <script
         src="https://code.jquery.com/jquery-3.1.1.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
