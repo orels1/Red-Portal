@@ -12,7 +12,6 @@ RUN apk update && apk upgrade && \
 # install dependencies
 RUN cd /tmp && npm install --silent
 RUN cd /tmp && bower install --allow-root
-RUN ls /tmp
 RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app && cp -a /tmp/bower_components /opt/app
 
 # copy source
