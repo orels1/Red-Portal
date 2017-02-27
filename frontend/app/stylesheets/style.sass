@@ -92,6 +92,17 @@ body
       background: $black
       color: $red
       
+    &:visited
+      color: $white
+
+      &:hover, &.active
+        background: $whiteRGBA
+        color: $red
+
+      &.cogs:hover, &.cogs.active
+        background: $black
+        color: $red
+      
   .navbar-search
     input
       background: transparent
