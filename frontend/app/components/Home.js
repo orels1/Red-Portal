@@ -30,24 +30,26 @@ class Home extends React.Component {
     render() {
         return (
             <div className="home padding d-flex justify-content-center flex-column">
-                <div className="d-flex justify-content-between align-items-center align-items-xl-stretch flex-column flex-xl-row flex-wrap flex-xl-nowrap">
+                <div className="d-flex justify-content-between align-items-xl-center align-items-xl-stretch flex-column flex-xl-row flex-wrap flex-xl-nowrap">
                     <div className="feature-info">
                         <h4>Music</h4>
                         <p>
                             RED can play music from YouTube, Soundcloud or even from your own hard drive. No more boring silence in the voicechat!
                         </p>
                     </div>
-                    <div className="features d-flex align-self-center">
-                        <ul className="features-list left d-flex flex-column align-items-end justify-content-between">
+                    <div className="features d-flex flex-xl-row justify-content-between flex-column align-self-center flex-wrap flex-xl-nowrap">
+                        <ul className="features-list left d-flex flex-column align-items-xl-end align-items-center justify-content-between">
                             <li>stream alerts</li>
                             <li className="active">music</li>
                             <li>gifs</li>
                             <li>trivia</li>
                         </ul>
-                        <h1 className="d-flex align-self-center">
-                            RED
-                        </h1>
-                        <ul className="features-list right d-flex flex-column justify-content-between">
+                        <div className="d-flex justify-content-center" style={{'height': '176px', 'padding': '0 60px'}}>
+                            <h1 className="d-flex align-self-center" >
+                                RED
+                            </h1>
+                        </div>
+                        <ul className="features-list right d-flex flex-column  align-items-xl-start align-items-center justify-content-between">
                             <li>slots</li>
                             <li>imgur</li>
                             <li className="active">moderation</li>
