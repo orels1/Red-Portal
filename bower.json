@@ -10,5 +10,8 @@
     "node"
   ],
   "homepage": "https://github.com/orels1/Red-Portal",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "bootstrap": "v4.0.0-alpha.6"
+  }
 }
