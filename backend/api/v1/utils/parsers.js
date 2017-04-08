@@ -134,6 +134,7 @@ function* getCogs(githubRepo, repo) {
                     '_update': infoJsonContents.updateUrl,
                 },
             },
+            'hidden': infoJsonContents.content.HIDDEN || false,
             'tags': infoJsonContents.content.TAGS || [],
         };
 

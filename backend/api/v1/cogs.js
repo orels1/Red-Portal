@@ -16,7 +16,7 @@ import {authorize} from './auth';
 /**
  * @apiDefine CogRequestSuccess
  *
- * @apiVersion 0.2.0
+ * @apiVersion 0.2.1
  *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
@@ -39,6 +39,8 @@ import {authorize} from './auth';
  * @apiSuccess (200) {Object} results.repo Contains info about cog's repo
  * @apiSuccess (200) {String} results.repo.type Cog's repo type
  * @apiSuccess (200) {String} results.repo.name Cog's repo name
+ * @apiSuccess (200) {Boolean} results.hidden Determines if the cog should be hidden from the API
+ * @apiSuccess (200) {Number} results.votes Amount of votes for the cog
  * @apiSuccess (200) {Boolean} results.voted Cog vote status for request's IP
  * @apiSuccess (200) {Array} results.tags List of cog's tags
  *
@@ -71,6 +73,7 @@ import {authorize} from './auth';
  *                  "name": "ORELS-Cogs"
  *              },
  *              "name": "dota",
+ *              "hidden": false,
  *              "voted": false,
  *              "votes": 0,
  *              "tags": ["gaming"]
@@ -81,7 +84,7 @@ import {authorize} from './auth';
 
 /**
  * @api {get} /cogs/ List all cogs
- * @apiVersion 0.2.0
+ * @apiVersion 0.2.1
  * @apiName getCogList
  * @apiGroup cogs
  *
@@ -122,6 +125,7 @@ import {authorize} from './auth';
  *                            "name": "ORELS-Cogs"
  *                        },
  *                        "name": "dota",
+ *                        "hidden": false,
  *                        "voted": false,
  *                        "votes": 0,
  *                        "tags": ["gaming"]
@@ -131,7 +135,7 @@ import {authorize} from './auth';
  *      }
  */
 router.get('/', (req, res) => {
-    Cog.find({})
+    Cog.find({'hidden': false})
         .exec()
         .then((cogs) => {
             res.status(200).send({
@@ -148,7 +152,7 @@ router.get('/', (req, res) => {
 
 /**
  * @api {get} /cogs/:author/:repoName Get cogs from repo
- * @apiVersion 0.2.0
+ * @apiVersion 0.2.1
  * @apiName getCogFromRepo
  * @apiGroup cogs
  *
@@ -189,6 +193,7 @@ router.get('/', (req, res) => {
  *                            "name": "ORELS-Cogs"
  *                        },
  *                        "name": "dota",
+ *                        "hidden": false,
  *                        "voted": false,
  *                        "votes": 0,
  *                        "tags": ["gaming"]
@@ -201,6 +206,7 @@ router.get('/:author/:repoName', (req, res) => {
     Cog.find({
         'author.username': req.params.author,
         'repo.name': req.params.repoName,
+        'hidden': false,
     }).exec()
         .then((cogs) => {
             if (cogs.length === 0) {
@@ -244,6 +250,7 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
         'name': req.params.cogName,
         'author.username': req.params.author,
         'repo.name': req.params.repoName,
+        'hidden': false,
     }).exec()
         .then((res) => {
             if (!res) {
@@ -376,6 +383,7 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
         'name': req.params.cogName,
         'author.username': req.params.author,
         'repo.name': req.params.repoName,
+        'hidden': false,
     }).exec()
         .then((result) => {
             if (!result) {

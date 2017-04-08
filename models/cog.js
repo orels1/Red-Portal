@@ -23,6 +23,7 @@ let CogSchema = new mongoose.Schema({
             '_update': String, // This cog github api update link
         },
     },
+    'hidden': Boolean, // Determines if cog is hidden from the API
     'votes': {type: Number, default: 0},
     'voted': {type: Boolean, default: false}, // This is constructed for the individual user
     'tags': {default: [], type: [String]},
