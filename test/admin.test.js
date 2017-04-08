@@ -70,6 +70,7 @@ describe('Admin', () => {
                             'type': 'unapproved',
                             'name': 'ORELS-Cogs',
                         },
+                        'hidden': false,
                         'name': 'dota',
                     });
                     return cog.save();

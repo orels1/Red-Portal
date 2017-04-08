@@ -70,6 +70,7 @@ describe('Count', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()
@@ -137,6 +138,7 @@ describe('Count', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()

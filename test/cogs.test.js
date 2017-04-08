@@ -104,6 +104,7 @@ describe('Cogs', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()
@@ -171,6 +172,7 @@ describe('Cogs', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()
@@ -204,6 +206,7 @@ describe('Cogs', () => {
                     res.body.results.tags.should.be.an('array');
                     res.body.results.tags.should.have.lengthOf(0);
                     res.body.results.should.have.property('updated_at');
+                    res.body.results.should.have.property('hidden');
                     res.body.results.should.have.property('votes');
                     res.body.results.should.have.property('voted');
                 })
@@ -265,6 +268,7 @@ describe('Cogs', () => {
                             'type': 'unapproved',
                             'name': 'ORELS-Cogs',
                         },
+                        'hidden': false,
                         'name': 'dota',
                     });
                     return cog.save();
@@ -354,6 +358,7 @@ describe('Cogs', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()
@@ -388,6 +393,7 @@ describe('Cogs', () => {
                     res.body.results.tags.should.be.an('array');
                     res.body.results.tags.should.have.lengthOf(0);
                     res.body.results.should.have.property('updated_at');
+                    res.body.results.should.have.property('hidden');
                     res.body.results.should.have.property('votes');
                     res.body.results.votes.should.equal(1);
                     res.body.results.should.have.property('voted');
@@ -434,6 +440,7 @@ describe('Cogs', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()
@@ -485,6 +492,7 @@ describe('Cogs', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
                 'votes': 1,
             });
@@ -529,6 +537,7 @@ describe('Cogs', () => {
                     res.body.results.tags.should.be.an('array');
                     res.body.results.tags.should.have.lengthOf(0);
                     res.body.results.should.have.property('updated_at');
+                    res.body.results.should.have.property('hidden');
                     res.body.results.should.have.property('votes');
                     res.body.results.votes.should.equal(0);
                     res.body.results.should.have.property('voted');

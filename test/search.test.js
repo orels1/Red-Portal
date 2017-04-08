@@ -78,6 +78,7 @@ describe('Search', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()
@@ -121,6 +122,7 @@ describe('Search', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
                 'tags': ['gaming', 'api'],
             });
@@ -167,6 +169,7 @@ describe('Search', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()
@@ -212,6 +215,7 @@ describe('Search', () => {
                     'type': 'unapproved',
                     'name': 'ORELS-Cogs',
                 },
+                'hidden': false,
                 'name': 'dota',
             });
             return cog.save()
@@ -240,6 +244,7 @@ describe('Search', () => {
                             'type': 'unapproved',
                             'name': 'ORELS-Cogs',
                         },
+                        'hidden': false,
                         'name': 'drawing',
                     });
                     // Save two cogs for limit testing
