@@ -40,6 +40,7 @@ router.get('/cogs/:term', (req, res) => {
             {'name': re},
             {'tags': re},
         ],
+        'hidden': false,
     })
         .exec()
         .then((cogs) => {
@@ -78,6 +79,7 @@ router.get('/cogs/:term', (req, res) => {
  */
 router.get('/random/cog', (req, res) => {
     Cog.aggregate([
+        {'$match': {'hidden': false}},
         {'$sample': {'size': parseInt(req.query.limit || 1, 10)}},
     ])
         .exec()
