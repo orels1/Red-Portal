@@ -17,6 +17,8 @@ import {findWhere, sortBy} from 'underscore';
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains results fo Request
  * @apiSuccess (200) {Array} results.list Contains the list of tags, ascending
+ *
+ * @apiUse EntryNotFound
  */
 router.get('/top', (req, res) => {
     Cog.aggregate([
@@ -30,6 +32,13 @@ router.get('/top', (req, res) => {
     ])
         .exec()
         .then((results) => {
+            if (!results || !results[0] || results[0].length === 0) {
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details': 'There are no tags in DB',
+                    'restults': {},
+                })
+            }
             results = results[0];
             let top10 = [];
             for (let tag of results.tags) {
