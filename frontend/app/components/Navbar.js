@@ -58,8 +58,16 @@ class Navbar extends React.Component {
 
         Mousetrap.bind(['command+shift+p', 'ctrl+shift+p'], (e) => {
             $('.navbar-search .form-control').focus();
+            this.props.onSearchSelect();
             return false;
         });
+
+        Mousetrap().bind(['escape'], (e) => {
+            e.preventDefault();
+            this.props.onSearchDeselect();
+            return false;
+        })
+
     }
 
     componentWillUnmount() {
@@ -142,9 +150,15 @@ class Navbar extends React.Component {
                         </ul>
                     </div>
                     <div className="ml-auto">
-                        <form className="form-inline ml-auto navbar-search" onSubmit={this.handleSubmit.bind(this)}>
+                        <form
+                            className={`"form-inline ml-auto navbar-search ${this.props.searchActive && 'active' || ''}`}
+                            style={{
+                                'left': this.props.searchLeft,
+                            }}
+                            onSubmit={this.handleSubmit.bind(this)}
+                        >
                             <input
-                                className="form-control"
+                                className="form-control mousetrap"
                                 type="text"
                                 placeholder="cmd/ctrl+shift+p"
                                 value={this.state.searchQuery}

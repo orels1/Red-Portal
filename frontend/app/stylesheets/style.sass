@@ -104,6 +104,8 @@ body
         color: $red
       
   .navbar-search
+    display: flex
+
     input
       background: transparent
       border: none !important
@@ -118,6 +120,34 @@ body
       color: $white
       font-size: 18px
       line-height: 35px
+
+    &.active
+      position: fixed
+      top: 20%
+      left: 30%
+      background: $black
+      padding: 20px
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4)
+      display: flex
+      flex-direction: column
+      align-items: flex-start
+      border: 1px solid $white
+      z-index: 1000
+
+      &:before
+        content: 'Search cogs.red'
+        margin-bottom: 10px
+        color: $white
+
+      input
+        font-size: 40px
+        text-align: left
+        color: $white
+        font-weight: 200
+
+      .fa-search
+        display: none
+
       
       
 // Contents
