@@ -90,6 +90,8 @@ function* getInfoJson(repo) {
 function* getCogs(githubRepo, repo) {
     let cogsList = yield where(githubRepo, {'type': 'dir'});
 
+    let missing = [];
+
     let cogs = [];
 
     let index = 0;
@@ -108,8 +110,9 @@ function* getCogs(githubRepo, repo) {
 
         let infoJsonContents = yield* getInfoJson(cogDir);
 
-        // if there is no info.json - ignore cog
+        // if there is no info.json (or no cog at all) - ignore cog / add to missing list
         if (!infoJsonContents.content) {
+            missing.push(cog);
             continue;
         }
 
@@ -141,7 +144,7 @@ function* getCogs(githubRepo, repo) {
         index ++;
     }
 
-    return cogs;
+    return {'parsed': cogs, 'missing': missing};
 }
 
 /**

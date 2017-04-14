@@ -57,7 +57,18 @@ function repoParser() {
                         return co(parseCogs(repo));
                     })
                     .then((cogs) => {
-                        for (let cog of cogs) {
+                        // First - clear old cogs
+                        for (let cog of cogs.missing) {
+                            Cog.findOneAndRemove({
+                                'name': cog.name,
+                                'author.username': cog.author.username,
+                                'repo.name': cog.repo.name,
+                            }).exec();
+                        }
+                        return cogs;
+                    })
+                    .then((cogs) => {
+                        for (let cog of cogs.parsed) {
                             // check if we have such cog
                             Cog.findOne({
                                 'name': cog.name,
