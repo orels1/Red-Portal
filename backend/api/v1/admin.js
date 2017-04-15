@@ -44,6 +44,7 @@ router.put('/batch/parse', (req, res) => {
 /**
  * Parses all repos and cogs in batch
  */
+// TODO: Refactor this mess
 function repoParser() {
     Repo.find({})
         .exec()
@@ -54,7 +55,25 @@ function repoParser() {
             for (let repo of repos) {
                 repo.save()
                     .then((repo) => {
-                        return co(parseCogs(repo));
+                        // Get cogs for current repo to filter missing cogs
+                        return Cog.find({
+                            'author.username': repo.author.username,
+                            'repo.name': repo.name,
+                        })
+                            .exec()
+                            .then((cogs) => {
+                                // Remove unnecessary info from the cog we only need essentials
+                                return {'repo': repo, 'cogs': cogs.length > 0 && cogs.map((cog) => {
+                                    return {
+                                        'name': cog.name,
+                                        'author': {'username': cog.author.username},
+                                        'repo': {'name': cog.repo.name}
+                                    }
+                                }) || false};
+                            });
+                    })
+                    .then((data) => {
+                        return co(parseCogs(data.repo, data.cogs));
                     })
                     .then((cogs) => {
                         // First - clear old cogs

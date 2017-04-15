@@ -87,9 +87,8 @@ function* getInfoJson(repo) {
  * @param repo mongoDb repo object
  * @returns {Array} Array of cogs
  */
-function* getCogs(githubRepo, repo) {
+function* getCogs(githubRepo, repo, currentCogs) {
     let cogsList = yield where(githubRepo, {'type': 'dir'});
-
     let missing = [];
 
     let cogs = [];
@@ -112,7 +111,6 @@ function* getCogs(githubRepo, repo) {
 
         // if there is no info.json (or no cog at all) - ignore cog / add to missing list
         if (!infoJsonContents.content) {
-            missing.push(cog);
             continue;
         }
 
@@ -142,6 +140,16 @@ function* getCogs(githubRepo, repo) {
         };
 
         index ++;
+    }
+
+    // check for missing
+    if (currentCogs) {
+        for (let cog of currentCogs) {
+            // if cog is missing in the new array
+            if (!findWhere(cogs, {'name': cog.name})) {
+                missing.push(cog);
+            }
+        }
     }
 
     return {'parsed': cogs, 'missing': missing};
@@ -203,7 +211,7 @@ function* parseRepos(repos) {
  * @param repo Repo for cogs to parse from DB
  * @returns {Array} Parsed cogs
  */
-function* parseCogs(repo) {
+function* parseCogs(repo, currentCogs) {
     // get repo object from github
     let githubRepo;
 
@@ -217,7 +225,7 @@ function* parseCogs(repo) {
     let cogs;
 
     try {
-        cogs = yield* getCogs(githubRepo, repo);
+        cogs = yield* getCogs(githubRepo, repo, currentCogs);
     } catch (e) {
         throw e;
     }

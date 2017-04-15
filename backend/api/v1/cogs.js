@@ -309,6 +309,8 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
  *          "results": 'Parsing started',
  *      }
  */
+
+//TODO: Refactor this mess
 router.put('/:author/:repoName/parse', authorize, (req, res) => {
     if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
         return res.status(401).send({
@@ -323,7 +325,25 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
     })
         .exec()
         .then((repo) => {
-            return co(parseCogs(repo));
+            // Get cogs for current repo to filter missing cogs
+            return Cog.find({
+                'author.username': req.params.author,
+                'repo.name': req.params.repoName,
+            })
+                .exec()
+                .then((cogs) => {
+                    // Remove unnecessary info from the cog we only need essentials
+                    return {'repo': repo, 'cogs': cogs.length > 0 && cogs.map((cog) => {
+                        return {
+                            'name': cog.name,
+                            'author': {'username': cog.author.username},
+                            'repo': {'name': cog.repo.name}
+                        }
+                    }) || false};
+                })
+        })
+        .then((data) => {
+            return co(parseCogs(data.repo, data.cogs));
         })
         .then((cogs) => {
             // First - clear old cogs
