@@ -362,6 +362,14 @@ router.put('/:id', authorize, (req, res) => {
             'results': {},
         });
     }
+    // check if the ID is valid
+    if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(500).send({
+        'error': 'WrongIdFormat',
+        'error_details': 'The provided string is not a valid mongo ID',
+        'results': {},
+      });
+    }
     // Check if we have that entry already
     return Repo.findById(req.params.id, (err, entry) => {
         if (err) {
@@ -419,6 +427,14 @@ router.delete('/:id', authorize, (req, res) => {
             'error_details': 'Authorization header not provided',
             'results': {},
         });
+    }
+    // check if the ID is valid
+    if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(500).send({
+        'error': 'WrongIdFormat',
+        'error_details': 'The provided string is not a valid mongo ID',
+        'results': {},
+      });
     }
     return Repo.findByIdAndRemove(req.params.id, (err, entry) => {
         if (err) {

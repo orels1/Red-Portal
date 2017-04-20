@@ -34,6 +34,7 @@
   "homepage": "https://github.com/orels1/Red-Portal#readme",
   "devDependencies": {
     "apidoc": "^0.16.1",
+    "babel-eslint": "^7.2.2",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "dockerode": "^2.3.1",
