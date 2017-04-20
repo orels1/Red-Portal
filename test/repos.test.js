@@ -228,7 +228,7 @@ describe('Repositories', () => {
                 })
                 .catch((err) => {
                     err.should.have.status(500);
-                    err.response.body.error.should.equal('DBError');
+                    err.response.body.error.should.equal('WrongIdFormat');
                     err.response.body.should.have.property('error_details');
                 });
         });
@@ -358,7 +358,7 @@ describe('Repositories', () => {
                 })
                 .catch((err) => {
                     err.should.have.status(500);
-                    err.response.body.error.should.equal('DBError');
+                    err.response.body.error.should.equal('WrongIdFormat');
                     err.response.body.should.have.property('error_details');
                 });
         });
