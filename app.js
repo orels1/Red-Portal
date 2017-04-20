@@ -17,6 +17,7 @@ var app = express();
 var Raven = require('raven');
 if (process.env.NODE_ENV === 'production') {
     Raven.config(process.env.DSN).install();
+    app.use(Raven.requestHandler());
 }
 
 /*
@@ -24,7 +25,6 @@ if (process.env.NODE_ENV === 'production') {
 * */
 app.set('port', process.env.PORT || 3000);
 app.set('trust proxy', process.env.NODE_ENV === 'production' || false);
-app.use(Raven.requestHandler());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ 'extended': false }));

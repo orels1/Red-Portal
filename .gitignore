@@ -57,3 +57,5 @@ public/css/*
 
 # credentials
 config.json
+.kube
+.swarm-join
