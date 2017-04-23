@@ -14,11 +14,11 @@ var path = require('path'),
 var app = express();
 
 // Sentry
-var Raven = require('raven');
-if (process.env.NODE_ENV === 'production') {
-    Raven.config(process.env.DSN).install();
-    app.use(Raven.requestHandler());
-}
+// var Raven = require('raven');
+// if (process.env.NODE_ENV === 'production') {
+//     Raven.config(process.env.DSN).install();
+//     app.use(Raven.requestHandler());
+// }
 
 /*
 * App Middleware
@@ -195,9 +195,9 @@ app.use(function(req, res) {
 });
 
 // Error handler
-if (process.env.NODE_ENV === 'production') {
-    app.use(Raven.errorHandler());
-}
+// if (process.env.NODE_ENV === 'production') {
+//     app.use(Raven.errorHandler());
+// }
 
 // Optional fallthrough error handler
 app.use(function onError(err, req, res, next) {
