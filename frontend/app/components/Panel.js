@@ -80,6 +80,14 @@ class Panel extends React.Component {
         PanelActions.moveRepo({'url': `/api/v1/repos/${item._id}`, 'type': type, 'id': item._id});
     }
 
+    handleHideRepo(item) {
+        PanelActions.hideRepo({'url': `/api/v1/admin/hide/${item.author.usernamme}/${item.name}`, 'id': item._id});
+    }
+
+    handleUnHideRepo(item) {
+        PanelActions.unHideRepo({'url': `/api/v1/admin/unhide/${item.author.usernamme}/${item.name}`, 'id': item._id});
+    }
+
     handleParseEverything() {
         PanelActions.parseEverything();
     }
@@ -105,6 +113,9 @@ class Panel extends React.Component {
                             </small>
                         </div>
                         <div className={`align-self-center ml-auto type-badge badge-${item.type}`}>{item.type}</div>
+                        {item.hidden &&
+                          <div className={'align-self-center ml-auto type-badge badge-unapproved'}>hidden</div>
+                        }
                     </div>
                 </div>
             );
@@ -255,11 +266,17 @@ class Panel extends React.Component {
                                             className="action-button"
                                             onClick={this.handleMoveRepo.bind(null, this.state.selectedRepo, 'unapproved')}
                                         >unapproved</div>
-                                        {false && this.checkAccess() &&
+                                        {this.checkAccess() &&
                                             <div
                                                 className="action-button delete"
-                                                onClick={this.handleMoveRepo.bind(null, this.state.selectedRepo, 'unapproved')}
-                                            >delete</div>
+                                                onClick={this.handleHideRepo.bind(null, this.state.selectedRepo)}
+                                            >hide</div>
+                                        }
+                                        {this.checkAccess() &&
+                                            <div
+                                                className="action-button delete"
+                                                onClick={this.handleUnHideRepo.bind(null, this.state.selectedRepo)}
+                                            >unhide</div>
                                         }
                                     </div>
                                 </div>

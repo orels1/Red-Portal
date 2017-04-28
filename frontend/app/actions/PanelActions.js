@@ -3,7 +3,7 @@
  */
 import alt from '../alt';
 
-class HomeActions {
+class PanelActions {
     constructor() {
         this.generateActions(
             'repoUrlChange',
@@ -26,6 +26,10 @@ class HomeActions {
             'changeStatus',
             'getCogsSuccess',
             'getCogsFail',
+            'hideRepoSuccess',
+            'hideRepoFail',
+            'unHideRepoSuccess',
+            'unHideRepoFail'
         );
     }
 
@@ -149,6 +153,42 @@ class HomeActions {
             });
         return false;
     }
+
+    hideRepo(payload) {
+        $.ajax({
+            'url': payload.url,
+            'type': 'PUT',
+            'headers': {
+                'Content-Type': 'application/json',
+            },
+        })
+            .done((data) => {
+                payload.data = data;
+                this.hideRepoSuccess(payload);
+            })
+            .fail((jqXhr) => {
+                this.hideRepoFail(jqXhr);
+            });
+        return false;
+    }
+
+    unHideRepo(payload) {
+        $.ajax({
+            'url': payload.url,
+            'type': 'PUT',
+            'headers': {
+                'Content-Type': 'application/json',
+            },
+        })
+            .done((data) => {
+                payload.data = data;
+                this.unHideRepoSuccess(payload);
+            })
+            .fail((jqXhr) => {
+                this.unHideRepoFail(jqXhr);
+            });
+        return false;
+    }
 }
 
-export default alt.createActions(HomeActions);
+export default alt.createActions(PanelActions);

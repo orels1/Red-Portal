@@ -9,9 +9,9 @@ let RepoSchema = new mongoose.Schema({
     },
     'short': String,
     'description': String,
-    'cogs': {default: [], type: Array},
-    'parsed': {default: false, type: Boolean},
-    'type': {default: 'approved', type: String},
+    'cogs': { 'default': [], 'type': Array },
+    'parsed': { 'default': false, 'type': Boolean },
+    'type': { 'default': 'approved', 'type': String },
     'links': { // All the API endpoints have _ in the name
         '_self': String, // This object api endpoint
         '_update': String, // This object's update api handler (uses PUT, requires access-token)
@@ -22,7 +22,8 @@ let RepoSchema = new mongoose.Schema({
             '_update': String, // This object's github api update link
         },
     },
-    'tags': {default: [], type: [String]},
+    'tags': { 'default': [], 'type': [String] },
+    'hidden': { 'default': false, 'type': Boolean },
 });
 
 module.exports = mongoose.model('Repo', RepoSchema);

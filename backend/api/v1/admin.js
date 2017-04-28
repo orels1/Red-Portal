@@ -129,4 +129,66 @@ function repoParser() {
         });
 }
 
+router.put('/hide/:author/:repoName', (req, res) => {
+    Repo.findOne({
+        'author.username': req.params.author,
+        'name': req.params.repoName,
+    })
+    .exec()
+    .then((repo) => {
+        repo.hidden = true;
+        return repo.save().exec();
+    })
+    .then(() => {
+        return Cog.find({
+            'author.username': req.params.author,
+            'repo.name': req.params.repoName,
+        }).exec();
+    })
+    .then((cogs) => {
+        cogs.forEach((cog, index) => {
+            cog.hidden = true;
+            cog.save().exec();
+        });
+        res.status(200).send({
+            'error': false,
+            'results': 'Repo hidden',
+        });
+    })
+    .catch((err) => {
+        throw err;
+    });
+});
+
+router.put('/unhide/:author/:repoName', (req, res) => {
+    Repo.findOne({
+        'author.username': req.params.author,
+        'name': req.params.repoName,
+    })
+    .exec()
+    .then((repo) => {
+        repo.hidden = false;
+        return repo.save().exec();
+    })
+    .then(() => {
+        return Cog.find({
+            'author.username': req.params.author,
+            'repo.name': req.params.repoName,
+        }).exec();
+    })
+    .then((cogs) => {
+        cogs.forEach((cog, index) => {
+            cog.hidden = false;
+            cog.save().exec();
+            res.status(200).send({
+                'error': false,
+                'results': 'Repo will be shown now',
+            });
+        });
+    })
+    .catch((err) => {
+        throw err;
+    });
+});
+
 export {router, repoParser};

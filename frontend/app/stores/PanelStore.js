@@ -133,6 +133,32 @@ class PanelStore {
     onGetCogsFail(jqXhr) {
         console.error(jqXhr.responseText);
     }
+
+    onHideRepoSuccess(payload) {
+        this.addStatus = {
+            'text': 'Repo hidden with all it\'s cogs',
+            'class': 'text-success',
+        };
+        findWhere(this.repos, {'_id': payload.id}).hidden = true;
+        this.selectedRepo.hidden = true;
+    }
+
+    onHideRepoFail(jqXhr) {
+        console.error(jqXhr.responseText);
+    }
+
+    onUnHideRepoSuccess(payload) {
+        this.addStatus = {
+            'text': 'Repo will be shown again',
+            'class': 'text-success',
+        };
+        findWhere(this.repos, {'_id': payload.id}).hidden = false;
+        this.selectedRepo.hidden = false;
+    }
+
+    onUnHideRepoFail(jqXhr) {
+        console.error(jqXhr.responseText);
+    }
 }
 
 export default alt.createStore(PanelStore);
