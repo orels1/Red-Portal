@@ -23,21 +23,15 @@ describe('Count', () => {
             .then(() => {
                 return Cog.remove({});
             })
-            .then(() => {
-                return null;
-            })
             .catch((err) => {
                 throw err;
             });
     });
 
-    after(() => {
+    afterEach(() => {
         return Repo.remove({})
             .then(() => {
                 return Cog.remove({});
-            })
-            .then(() => {
-                return null;
             })
             .catch((err) => {
                 throw err;
@@ -105,6 +99,7 @@ describe('Count', () => {
                     res.body.results.count.repos.should.be.equal(1);
                     res.body.results.count.should.have.property('cogs');
                     res.body.results.count.cogs.should.be.equal(1);
+                    return true;
                 })
                 .catch((err) => {
                     throw err;
@@ -151,6 +146,7 @@ describe('Count', () => {
                     res.body.error.should.be.false;
                     res.body.results.should.have.property('count');
                     res.body.results.count.should.be.equal(1);
+                    return true;
                 })
                 .catch((err) => {
                     throw err;
@@ -186,6 +182,7 @@ describe('Count', () => {
                     res.body.error.should.be.false;
                     res.body.results.should.have.property('count');
                     res.body.results.count.should.be.equal(1);
+                    return true;
                 })
                 .catch((err) => {
                     throw err;
