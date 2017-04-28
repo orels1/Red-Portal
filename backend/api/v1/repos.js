@@ -127,7 +127,7 @@ import {authorize} from './auth';
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.find(req.query.unparsed === '1' && {} || {'parsed': true})
+    Repo.find(req.query.unparsed === '1' && {'hidden': false} || {'parsed': true, 'hidden': false})
         .sort({'type': 1})
         .exec((err, entries) => {
             if (err) {
@@ -252,6 +252,7 @@ router.post('/', checkOwnership, (req, res) => {
 router.get('/:author/:repoName', (req, res) => {
     Repo.findOne({
         'name': req.params.repoName,
+        'hidden': false,
     }, (err, entry) => {
         if (err) {
             throw err;
@@ -364,11 +365,11 @@ router.put('/:id', authorize, (req, res) => {
     }
     // check if the ID is valid
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(500).send({
-        'error': 'WrongIdFormat',
-        'error_details': 'The provided string is not a valid mongo ID',
-        'results': {},
-      });
+        return res.status(500).send({
+            'error': 'WrongIdFormat',
+            'error_details': 'The provided string is not a valid mongo ID',
+            'results': {},
+        });
     }
     // Check if we have that entry already
     return Repo.findById(req.params.id, (err, entry) => {
@@ -430,11 +431,11 @@ router.delete('/:id', authorize, (req, res) => {
     }
     // check if the ID is valid
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(500).send({
-        'error': 'WrongIdFormat',
-        'error_details': 'The provided string is not a valid mongo ID',
-        'results': {},
-      });
+        return res.status(500).send({
+            'error': 'WrongIdFormat',
+            'error_details': 'The provided string is not a valid mongo ID',
+            'results': {},
+        });
     }
     return Repo.findByIdAndRemove(req.params.id, (err, entry) => {
         if (err) {
