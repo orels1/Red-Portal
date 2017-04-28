@@ -85,7 +85,7 @@ class Panel extends React.Component {
     }
 
     handleUnHideRepo(item) {
-        PanelActions.unHideRepo({'url': `/api/v1/admin/unhide/${item.author.usernamme}/${item.name}`, 'id': item._id});
+        PanelActions.unHideRepo({'url': `/api/v1/admin/unhide/${item.author.username}/${item.name}`, 'id': item._id});
     }
 
     handleParseEverything() {
