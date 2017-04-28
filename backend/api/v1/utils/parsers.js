@@ -196,6 +196,7 @@ function* parseRepos(repos) {
                 }),
             }),
             'tags': repoInfoJson.content.TAGS || [],
+            'hidden': repo.hidden || false,
         };
 
         result.parsed = true;

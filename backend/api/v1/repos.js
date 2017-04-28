@@ -127,7 +127,7 @@ import {authorize} from './auth';
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.find(req.query.unparsed === '1' && {'hidden': false} || {'parsed': true, 'hidden': false})
+    Repo.find(req.query.unparsed === '1' && {} || {'parsed': true, 'hidden': false})
         .sort({'type': 1})
         .exec((err, entries) => {
             if (err) {
