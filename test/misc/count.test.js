@@ -39,6 +39,15 @@ describe('Count', () => {
     });
 
     describe('GET /count/', () => {
+        before(() => {
+            return Repo.remove({})
+                .then(() => {
+                    return Cog.remove({});
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        });
         it('it should return cogs and repos count', () => {
             let cog = new Cog({
                 'links': {
