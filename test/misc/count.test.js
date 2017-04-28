@@ -18,65 +18,42 @@ chai.use(chaiAsPromised);
 const apiUrl = '/api/v1';
 
 describe('Count', () => {
-    beforeEach(() => {
-        return Repo.remove({})
-            .then(() => {
-                return Cog.remove({});
-            })
-            .catch((err) => {
-                throw err;
-            });
-    });
-
-    afterEach(() => {
-        return Repo.remove({})
-            .then(() => {
-                return Cog.remove({});
-            })
-            .catch((err) => {
-                throw err;
-            });
-    });
-
     describe('GET /count/', () => {
         before(() => {
             return Repo.remove({})
                 .then(() => {
                     return Cog.remove({});
                 })
-                .catch((err) => {
-                    throw err;
-                });
-        });
-        it('it should return cogs and repos count', () => {
-            let cog = new Cog({
-                'links': {
-                    'github': {
-                        '_update': 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master',
-                        'repo': 'https://github.com/orels1/ORELS-Cogs',
-                        'self': 'https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py',
-                    },
-                    'repo': 'cogs/orels1/ORELS-Cogs/',
-                    'self': '/cogs/orels1/ORELS-Cogs/dota/',
-                    '_update': '/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch',
-                    '_repo': '/api/v1/repos/orels1/ORELS-Cogs',
-                    '_self': '/api/v1/cogs/orels1/ORELS-Cogs/dota',
-                },
-                'description': 'Requires tabulate, dota2py and beautfulSoup\n',
-                'short': 'test',
-                'author': {
-                    'url': 'https://github.com/orels1',
-                    'name': 'orels',
-                    'username': 'orels1',
-                },
-                'repo': {
-                    'type': 'unapproved',
-                    'name': 'ORELS-Cogs',
-                },
-                'hidden': false,
-                'name': 'dota',
-            });
-            return cog.save()
+                .then(() => {
+                    let cog = new Cog({
+                        'links': {
+                            'github': {
+                                '_update': 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master',
+                                'repo': 'https://github.com/orels1/ORELS-Cogs',
+                                'self': 'https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py',
+                            },
+                            'repo': 'cogs/orels1/ORELS-Cogs/',
+                            'self': '/cogs/orels1/ORELS-Cogs/dota/',
+                            '_update': '/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch',
+                            '_repo': '/api/v1/repos/orels1/ORELS-Cogs',
+                            '_self': '/api/v1/cogs/orels1/ORELS-Cogs/dota',
+                        },
+                        'description': 'Requires tabulate, dota2py and beautfulSoup\n',
+                        'short': 'test',
+                        'author': {
+                            'url': 'https://github.com/orels1',
+                            'name': 'orels',
+                            'username': 'orels1',
+                        },
+                        'repo': {
+                            'type': 'unapproved',
+                            'name': 'ORELS-Cogs',
+                        },
+                        'hidden': false,
+                        'name': 'dota',
+                    });
+                    return cog.save();
+                })
                 .then(() => {
                     let repo = new Repo({
                         'name': 'ORELS-Cogs',
@@ -96,10 +73,13 @@ describe('Count', () => {
                     });
                     return repo.save();
                 })
-                .then(() => {
-                    return chai.request(app)
-                        .get(`${apiUrl}/misc/count`);
-                })
+                .catch((err) => {
+                    throw err;
+                });
+        });
+        it('it should return cogs and repos count', () => {
+            return chai.request(app)
+                .get(`${apiUrl}/misc/count`)
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.error.should.be.false;
@@ -114,42 +94,106 @@ describe('Count', () => {
                     throw err;
                 });
         });
+
+        after(() => {
+            return Repo.remove({})
+                .then(() => {
+                    return Cog.remove({});
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        });
     });
 
     describe('GET /count/cogs', () => {
-        it('it should return cogs count', () => {
-            let cog = new Cog({
-                'links': {
-                    'github': {
-                        '_update': 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master',
-                        'repo': 'https://github.com/orels1/ORELS-Cogs',
-                        'self': 'https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py',
+        before(() => {
+            return Cog.remove({})
+            .then(() => {
+                let cog = new Cog({
+                    'links': {
+                        'github': {
+                            '_update': 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master',
+                            'repo': 'https://github.com/orels1/ORELS-Cogs',
+                            'self': 'https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py',
+                        },
+                        'repo': 'cogs/orels1/ORELS-Cogs/',
+                        'self': '/cogs/orels1/ORELS-Cogs/dota/',
+                        '_update': '/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch',
+                        '_repo': '/api/v1/repos/orels1/ORELS-Cogs',
+                        '_self': '/api/v1/cogs/orels1/ORELS-Cogs/dota',
                     },
-                    'repo': 'cogs/orels1/ORELS-Cogs/',
-                    'self': '/cogs/orels1/ORELS-Cogs/dota/',
-                    '_update': '/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch',
-                    '_repo': '/api/v1/repos/orels1/ORELS-Cogs',
-                    '_self': '/api/v1/cogs/orels1/ORELS-Cogs/dota',
-                },
-                'description': 'Requires tabulate, dota2py and beautfulSoup\n',
-                'short': 'test',
-                'author': {
-                    'url': 'https://github.com/orels1',
-                    'name': 'orels',
-                    'username': 'orels1',
-                },
-                'repo': {
-                    'type': 'unapproved',
-                    'name': 'ORELS-Cogs',
-                },
-                'hidden': false,
-                'name': 'dota',
+                    'description': 'Requires tabulate, dota2py and beautfulSoup\n',
+                    'short': 'test',
+                    'author': {
+                        'url': 'https://github.com/orels1',
+                        'name': 'orels',
+                        'username': 'orels1',
+                    },
+                    'repo': {
+                        'type': 'unapproved',
+                        'name': 'ORELS-Cogs',
+                    },
+                    'hidden': false,
+                    'name': 'dota',
+                });
+                return cog.save();
             });
-            return cog.save()
-                .then(() => {
-                    return chai.request(app)
-                        .get(`${apiUrl}/misc/count/cogs`);
-                })
+        });
+
+        it('it should return cogs count', () => {
+            return chai.request(app)
+                .get(`${apiUrl}/misc/count/cogs`)
+              .then((res) => {
+                  res.should.have.status(200);
+                  res.body.error.should.be.false;
+                  res.body.results.should.have.property('count');
+                  res.body.results.count.should.be.equal(1);
+                  return true;
+              })
+              .catch((err) => {
+                  throw err;
+              });
+        });
+
+        after(() => {
+            return Cog.remove({})
+            .catch((err) => {
+                throw err;
+            });
+        });
+    });
+
+    describe('GET /count/repos', () => {
+        before(() => {
+            return Repo.remove({})
+            .then(() => {
+                let repo = new Repo({
+                    'name': 'ORELS-Cogs',
+                    'author': {
+                        'username': 'orels1',
+                        'url': 'https://github.com/orels1',
+                    },
+                    'links': {
+                        '_self': '/api/v1/repos/orels1/ORELS-Cogs',
+                        '_update': '/api/v1/repos/orels1/ORELS-Cogs/fetch',
+                        '_cogs': '/api/v1/cogs/orels1/ORELS-Cogs',
+                        'self': '/cogs/orels1/ORELS-Cogs',
+                        'github': {
+                            'self': 'https://github.com/orels1/ORELS-Cogs',
+                        },
+                    },
+                });
+                return repo.save();
+            })
+            .catch((err) => {
+                throw err;
+            });
+        });
+
+        it('it should return repos count', () => {
+            return chai.request(app)
+                .get(`${apiUrl}/misc/count/repos`)
                 .then((res) => {
                     res.should.have.status(200);
                     res.body.error.should.be.false;
@@ -161,41 +205,12 @@ describe('Count', () => {
                     throw err;
                 });
         });
-    });
 
-    describe('GET /count/repos', () => {
-        it('it should return repos count', () => {
-            let repo = new Repo({
-                'name': 'ORELS-Cogs',
-                'author': {
-                    'username': 'orels1',
-                    'url': 'https://github.com/orels1',
-                },
-                'links': {
-                    '_self': '/api/v1/repos/orels1/ORELS-Cogs',
-                    '_update': '/api/v1/repos/orels1/ORELS-Cogs/fetch',
-                    '_cogs': '/api/v1/cogs/orels1/ORELS-Cogs',
-                    'self': '/cogs/orels1/ORELS-Cogs',
-                    'github': {
-                        'self': 'https://github.com/orels1/ORELS-Cogs',
-                    },
-                },
+        after(() => {
+            return Repo.remove({})
+            .catch((err) => {
+                throw err;
             });
-            return repo.save()
-                .then(() => {
-                    return chai.request(app)
-                        .get(`${apiUrl}/misc/count/repos`);
-                })
-                .then((res) => {
-                    res.should.have.status(200);
-                    res.body.error.should.be.false;
-                    res.body.results.should.have.property('count');
-                    res.body.results.count.should.be.equal(1);
-                    return true;
-                })
-                .catch((err) => {
-                    throw err;
-                });
         });
     });
 });
