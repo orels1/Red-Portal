@@ -81,7 +81,7 @@ class Panel extends React.Component {
     }
 
     handleHideRepo(item) {
-        PanelActions.hideRepo({'url': `/api/v1/admin/hide/${item.author.usernamme}/${item.name}`, 'id': item._id});
+        PanelActions.hideRepo({'url': `/api/v1/admin/hide/${item.author.username}/${item.name}`, 'id': item._id});
     }
 
     handleUnHideRepo(item) {
