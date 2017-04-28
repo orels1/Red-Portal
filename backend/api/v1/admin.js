@@ -137,7 +137,7 @@ router.put('/hide/:author/:repoName', (req, res) => {
     .exec()
     .then((repo) => {
         repo.hidden = true;
-        return repo.save().exec();
+        return repo.save();
     })
     .then(() => {
         return Cog.find({
@@ -148,7 +148,7 @@ router.put('/hide/:author/:repoName', (req, res) => {
     .then((cogs) => {
         cogs.forEach((cog, index) => {
             cog.hidden = true;
-            cog.save().exec();
+            cog.save();
         });
         res.status(200).send({
             'error': false,
@@ -168,7 +168,7 @@ router.put('/unhide/:author/:repoName', (req, res) => {
     .exec()
     .then((repo) => {
         repo.hidden = false;
-        return repo.save().exec();
+        return repo.save();
     })
     .then(() => {
         return Cog.find({
@@ -179,7 +179,7 @@ router.put('/unhide/:author/:repoName', (req, res) => {
     .then((cogs) => {
         cogs.forEach((cog, index) => {
             cog.hidden = false;
-            cog.save().exec();
+            cog.save();
             res.status(200).send({
                 'error': false,
                 'results': 'Repo will be shown now',
