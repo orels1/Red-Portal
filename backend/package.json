@@ -1,0 +1,19 @@
+{
+  "name": "red-portal-v3-backend",
+  "version": "0.1.0",
+  "description": "A cogs.red website backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha test/*",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "nodejs"
+  ],
+  "author": "orels1",
+  "license": "MIT",
+  "repository": "https://github.com/orels1/Red-Portal",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
