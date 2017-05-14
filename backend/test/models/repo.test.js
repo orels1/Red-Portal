@@ -46,7 +46,7 @@ describe('Repo Schema', async () => {
   });
   it('Should create new repo in DB', async () => {
     const repoData = prepareRepo(repo);
-    const newRepo = await Repo.createRepo(repoData);
+    const newRepo = await Repo.create(repoData);
     const repoCount = await Repo.count({});
     // check that we added the repo
     expect(repoCount).to.equal(1);
@@ -54,5 +54,28 @@ describe('Repo Schema', async () => {
     expect(newRepo).to.have.property('readme', null);
     expect(newRepo).to.have.property('type', 'unapproved');
     expect(newRepo).to.have.property('hidden', false);
-  })
+  });
+  it('Should get repo by path', async () => {
+    const repoData = prepareRepo(repo);
+    await Repo.create(repoData);
+    const testPath = 'orels1/ORELS-Cogs';
+    const results = await Repo.getByPath(testPath);
+    expect(results).to.have.lengthOf(1);
+    expect(results[0]).to.have.property('path', testPath);
+  });
+  // Checking hidden flag
+  it('Should not get any repos', async () => {
+    const repoData = prepareRepo(Object.assign(repo, { hidden: true }));
+    await Repo.create(repoData);
+    const testPath = 'orels1/ORELS-Cogs';
+    const results = await Repo.getByPath(testPath);
+    expect(results).to.have.lengthOf(0);
+  });
+  it('Should get hidden repo', async () => {
+    const repoData = prepareRepo(Object.assign(repo, { hidden: true }));
+    await Repo.create(repoData);
+    const testPath = 'orels1/ORELS-Cogs';
+    const results = await Repo.getByPath(testPath, hidden = true);
+    expect(results).to.have.lengthOf(1);
+  });
 });

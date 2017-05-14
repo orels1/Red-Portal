@@ -55,9 +55,22 @@ exports.prepareRepo = prepareRepo;
  * @param  {Object} data Parsed repo object
  * @returns {Promise} DB save promise
  */
-RepoSchema.statics.createRepo = (data) => {
-  return new Repo(prepareRepo(data)).save();
-};
+RepoSchema.statics.create = data => (
+  new Repo(prepareRepo(data)).save()
+);
+
+/**
+ * Gets repo by indexed path
+ * @param {String} path Repo path
+ * @param {Boolean} hidden Search through hidden repos flag
+ * @return {Promise|Array} DB find promise
+ */
+RepoSchema.statics.getByPath = (path, hidden = false) => (
+  Repo.find({
+    path,
+    hidden,
+  }).exec()
+);
 
 const Repo = mongoose.model('Repo', RepoSchema);
 
