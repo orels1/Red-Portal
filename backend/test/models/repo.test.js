@@ -116,7 +116,7 @@ describe('Repo Schema', async () => {
     it('Should get all visible repos for username', async () => {
       await Repo.create(repo);
       await Repo.create(Object.assign({}, repo, { author: Object.assign({}, repo.author, { username: 'orels2' }) }));
-      const results = await Repo.getByName(username = 'orels1');
+      const results = await Repo.getByName('orels1');
       expect(results).to.have.lengthOf(1);
     });
     // Checking hidden flag
@@ -126,7 +126,7 @@ describe('Repo Schema', async () => {
         author: Object.assign({}, repo.author, { username: 'orels2' }),
         hidden: true,
       }));
-      const results = await Repo.getByName(username = 'orels1', hidden = true);
+      const results = await Repo.getByName('orels1', hidden = true);
       expect(results).to.have.lengthOf(1);
     });
     it('Should not get any repos for username', async () => {
@@ -135,7 +135,7 @@ describe('Repo Schema', async () => {
         author: Object.assign({}, repo.author, { username: 'orels2' }),
         hidden: true,
       }));
-      const results = await Repo.getByName(username = 'orels1');
+      const results = await Repo.getByName('orels1');
       expect(results).to.have.lengthOf(0);
     });
   })

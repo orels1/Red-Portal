@@ -89,9 +89,9 @@ RepoSchema.statics.getAll = (hidden = false) => (
  * @param {Boolean} hidden Search through hidden repos flag
  * @return {Promise|Array} DB find promise
  */
-RepoSchema.statics.getByName = (username = '.*', hidden = false) => (
+RepoSchema.statics.getByName = (username, hidden = false) => (
   Repo.find({
-    'author.username': { '$regex': username },
+    'author.username': username,
     hidden,
   }).exec()
 );
