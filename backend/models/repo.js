@@ -72,6 +72,17 @@ RepoSchema.statics.getByPath = (path, hidden = false) => (
   }).exec()
 );
 
+/**
+ * Gets all the repos
+ * @param {Boolean} hidden Search through hidden repos flag
+ * @return {Promise|Array} DB find promise
+ */
+RepoSchema.statics.getAll = (hidden = false) => (
+  Repo.find({
+    hidden,
+  }).exec()
+);
+
 const Repo = mongoose.model('Repo', RepoSchema);
 
 exports.Repo = Repo;
