@@ -58,24 +58,22 @@ describe('Repo Schema', async () => {
   it('Should get repo by path', async () => {
     const repoData = prepareRepo(repo);
     await Repo.create(repoData);
-    const testPath = 'orels1/ORELS-Cogs';
-    const results = await Repo.getByPath(testPath);
+    const results = await Repo.getByPath(path);
     expect(results).to.have.lengthOf(1);
-    expect(results[0]).to.have.property('path', testPath);
+    expect(results[0]).to.have.property('path', path);
   });
   // Checking hidden flag
   it('Should not get any repos', async () => {
     const repoData = prepareRepo(Object.assign(repo, { hidden: true }));
     await Repo.create(repoData);
-    const testPath = 'orels1/ORELS-Cogs';
-    const results = await Repo.getByPath(testPath);
+    const results = await Repo.getByPath(path);
     expect(results).to.have.lengthOf(0);
   });
   it('Should get hidden repo', async () => {
     const repoData = prepareRepo(Object.assign(repo, { hidden: true }));
     await Repo.create(repoData);
-    const testPath = 'orels1/ORELS-Cogs';
-    const results = await Repo.getByPath(testPath, hidden = true);
+    const results = await Repo.getByPath(path, hidden = true);
     expect(results).to.have.lengthOf(1);
+    expect(results[0]).to.have.property('path', path);
   });
 });
