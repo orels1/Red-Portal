@@ -57,7 +57,7 @@ describe('Repo Schema', async () => {
     });
   });
 
-  describe('Path-based repo handler', async () => {
+  describe('Path-specific repo', async () => {
     beforeEach(async () => {
       await Repo.remove({});
     });
@@ -82,7 +82,7 @@ describe('Repo Schema', async () => {
     });
   });
 
-  describe('All repos handler', async () => {
+  describe('All repos', async () => {
     beforeEach(async () => {
       await Repo.remove({});
     });
@@ -104,6 +104,38 @@ describe('Repo Schema', async () => {
       await Repo.create(Object.assign({}, repo, { hidden: true }));
       await Repo.create(Object.assign({}, repo, { hidden: true }));
       const results = await Repo.getAll();
+      expect(results).to.have.lengthOf(0);
+    });
+  });
+
+  describe('All repos for username', async () => {
+    beforeEach(async () => {
+      await Repo.remove({});
+    });
+
+    it('Should get all visible repos for username', async () => {
+      await Repo.create(repo);
+      await Repo.create(Object.assign({}, repo, { author: Object.assign({}, repo.author, { username: 'orels2' }) }));
+      const results = await Repo.getByName(username = 'orels1');
+      expect(results).to.have.lengthOf(1);
+    });
+    // Checking hidden flag
+    it('Should get all hidden repos for username', async () => {
+      await Repo.create(Object.assign({}, repo, { hidden: true }));
+      await Repo.create(Object.assign({}, repo, {
+        author: Object.assign({}, repo.author, { username: 'orels2' }),
+        hidden: true,
+      }));
+      const results = await Repo.getByName(username = 'orels1', hidden = true);
+      expect(results).to.have.lengthOf(1);
+    });
+    it('Should not get any repos for username', async () => {
+      await Repo.create(Object.assign({}, repo, { hidden: true }));
+      await Repo.create(Object.assign({}, repo, {
+        author: Object.assign({}, repo.author, { username: 'orels2' }),
+        hidden: true,
+      }));
+      const results = await Repo.getByName(username = 'orels1');
       expect(results).to.have.lengthOf(0);
     });
   })

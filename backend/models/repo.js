@@ -83,6 +83,19 @@ RepoSchema.statics.getAll = (hidden = false) => (
   }).exec()
 );
 
+/**
+ * Gets all the repos for username
+ * @param {String} username GH username to search for
+ * @param {Boolean} hidden Search through hidden repos flag
+ * @return {Promise|Array} DB find promise
+ */
+RepoSchema.statics.getByName = (username = '.*', hidden = false) => (
+  Repo.find({
+    'author.username': { '$regex': username },
+    hidden,
+  }).exec()
+);
+
 const Repo = mongoose.model('Repo', RepoSchema);
 
 exports.Repo = Repo;
