@@ -106,12 +106,14 @@ CogsSchema.statics.getAll = (hidden = false) => (
 
 /**
  * Gets all the cogs for repo
+ * @param {String} username Repo's author GH username
  * @param {String} repo Repo name to search for
  * @param {Boolean} hidden Search through hidden cogs flag
  * @return {Promise|Array} DB find promise
  */
-CogsSchema.statics.getByRepo = (repo, hidden = false) => (
+CogsSchema.statics.getByRepo = (username, repo, hidden = false) => (
   Cog.find({
+    'author.username': username,
     'repo.name': repo,
     hidden,
   }).exec()

@@ -128,7 +128,7 @@ describe('Cog Schema', async () => {
     it('Should get all visible cogs for repo', async () => {
       await Cog.create(repo, cog);
       await Cog.create(Object.assign({}, repo, { name: 'ORELS2-Cogs' }), cog);
-      const results = await Cog.getByRepo('ORELS-Cogs');
+      const results = await Cog.getByRepo('orels1', 'ORELS-Cogs');
       expect(results).to.have.lengthOf(1);
     });
     // Checking hidden flag
@@ -136,14 +136,14 @@ describe('Cog Schema', async () => {
       await Cog.create(repo, Object.assign({}, cog, { hidden: true }));
       await Cog.create(Object.assign({}, repo, { name: 'ORELS2-Cogs' }),
                        Object.assign({}, cog, { hidden: true }));
-      const results = await Cog.getByRepo('ORELS-Cogs', hidden = true);
+      const results = await Cog.getByRepo('orels1', 'ORELS-Cogs', hidden = true);
       expect(results).to.have.lengthOf(1);
     });
     it('Should not get any cogs for username', async () => {
       await Cog.create(repo, Object.assign({}, cog, { hidden: true }));
       await Cog.create(Object.assign({}, repo, { name: 'ORELS2-Cogs' }),
                        Object.assign({}, cog, { hidden: true }));
-      const results = await Cog.getByRepo('ORELS-Cogs');
+      const results = await Cog.getByRepo('orels1', 'ORELS-Cogs');
       expect(results).to.have.lengthOf(0);
     });
   })
