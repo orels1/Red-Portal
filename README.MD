@@ -6,6 +6,12 @@
 
 Ever thought "it'd be cool if there was a place, where you can see a list of all the cogs and repos for Red"? Well, there is such a place now!
 
+**This project is divided into two big parts: the backend (api) and frontend (built with react/redux):**
+
+[Backend](backend)
+
+[Frontend](frontend)
+
 ## API
 
 In dev
