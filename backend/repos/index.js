@@ -43,4 +43,16 @@ router.get('/:authorUsername/:repoName', catchAsync(async (req, res) => {
   });
 }));
 
+/**
+ * Update single repo by path
+ */
+router.put('/:authorUsername/:repoName', catchAsync(async (req, res) => {
+  const path = `${req.params.authorUsername}/${req.params.repoName}`;
+  const results = await Repo.updateByPath(path, req.body);
+  return res.status(200).send({
+    status: 'OK',
+    results,
+  });
+}));
+
 module.exports = router;
