@@ -181,6 +181,6 @@ describe('Cog Schema', async () => {
       expect(updatedCog).to.have.property('hidden', true);
       expect(updatedCog).to.have.property('type', 'SHARED_LIBRARY');
     });
-  })
+  });
 
 });
