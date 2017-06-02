@@ -173,6 +173,14 @@ describe('Cog Schema', async () => {
       expect(updatedCog).to.have.property('hidden', true);
       expect(updatedCog.author).to.have.property('name', 'orels2');
     });
+
+    it('Should change the type to SHARED_LIBRARY and hide the cog', async () => {
+      const newCog = await Cog.create(repo, cog);
+      const newData = { type: 'SHARED_LIBRARY' };
+      const updatedCog = await Cog.updateByPath(newCog.path, newData);
+      expect(updatedCog).to.have.property('hidden', true);
+      expect(updatedCog).to.have.property('type', 'SHARED_LIBRARY');
+    });
   })
 
 });
