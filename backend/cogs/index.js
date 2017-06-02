@@ -35,8 +35,21 @@ router.get('/:authorUsername/:repoName', catchAsync(async (req, res) => {
  * Get single cog by path
  */
 router.get('/:authorUsername/:repoName/:cogName', catchAsync(async (req, res) => {
-  const results = await Cog.getByPath(`${req.params.authorUsername}/${req.params.repoName}/${req.params.cogName}`);
+  const path = `${req.params.authorUsername}/${req.params.repoName}/${req.params.cogName}`;
+  const results = await Cog.getByPath(path);
   if (results.length === 0) throw new Error('NotFound');
+  return res.status(200).send({
+    status: 'OK',
+    results,
+  });
+}));
+
+/**
+ * Update single cog by path
+ */
+router.put('/:authorUsername/:repoName/:cogName', catchAsync(async (req, res) => {
+  const path = `${req.params.authorUsername}/${req.params.repoName}/${req.params.cogName}`;
+  const results = await Cog.updateByPath(path, req.body);
   return res.status(200).send({
     status: 'OK',
     results,
