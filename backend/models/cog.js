@@ -126,7 +126,7 @@ CogsSchema.statics.getByRepo = (username, repo, hidden = false) => {
  * @return {Promise} Cog save promise
  */
 CogsSchema.statics.updateByPath = async (path, data) => {
-  const cog = await Cog.findOne({path: path}).exec();
+  const cog = await Cog.findOne({ path }).exec();
   merge(cog, data);
   return cog.save();
 };
