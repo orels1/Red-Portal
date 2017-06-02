@@ -146,6 +146,20 @@ describe('Cog Schema', async () => {
       const results = await Cog.getByRepo('orels1', 'ORELS-Cogs');
       expect(results).to.have.lengthOf(0);
     });
+  });
+
+  describe('Cog updates', async () => {
+    beforeEach(async () => {
+      await Cog.remove({});
+    });
+
+    it('Should find a cog by path and update it', async () => {
+      const newCog = await Cog.create(repo, cog);
+      const newData = { hidden: true, author: { name: 'orels2' } };
+      const updatedCog = await Cog.updateByPath(newCog.path, newData);
+      expect(updatedCog).to.have.property('hidden', true);
+      expect(updatedCog.author).to.have.property('name', 'orels2');
+    });
   })
 
 });

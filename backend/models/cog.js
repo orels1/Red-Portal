@@ -2,7 +2,9 @@
  * Created by orel- on 27/May/17.
  */
 const mongoose = require('mongoose');
+const { merge } = require('lodash');
 const { COGS_PATH } = require('../paths');
+
 
 const CogsSchema = new mongoose.Schema({
   path: { type: String, index: 1 }, // Cog's path <username>/<repo>/<cog>
@@ -115,6 +117,18 @@ CogsSchema.statics.getByRepo = (username, repo, hidden = false) => (
     hidden,
   }).exec()
 );
+
+/**
+ * Updates cog matching the path
+ * @param {String} path Cog path
+ * @param {Object} data New data to be assigned
+ * @return {Promise} Cog save promise
+ */
+CogsSchema.statics.updateByPath = async (path, data) => {
+  const cog = await Cog.findOne({path: path}).exec();
+  merge(cog, data);
+  return cog.save();
+};
 
 const Cog = mongoose.model('Cog', CogsSchema);
 
