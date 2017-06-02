@@ -85,23 +85,20 @@ CogsSchema.statics.create = (repo, cog) => (
  * @param {Boolean} hidden Search through hidden cog flag
  * @return {Promise|Array} DB find promise
  */
-CogsSchema.statics.getByPath = (path, hidden = false) => (
-  Cog.find({
-    path,
-    hidden,
-  }).exec()
-);
+CogsSchema.statics.getByPath = (path, hidden = false) => {
+  const query = hidden ? { path } : { path, hidden };
+  return Cog.find(query).exec()
+};
 
 /**
  * Gets all the cogs
  * @param {Boolean} hidden Search through hidden cogs flag
  * @return {Promise|Array} DB find promise
  */
-CogsSchema.statics.getAll = (hidden = false) => (
-  Cog.find({
-    hidden,
-  }).exec()
-);
+CogsSchema.statics.getAll = (hidden = false) => {
+  const query = hidden ? {} : { hidden };
+  return Cog.find(query).exec();
+};
 
 /**
  * Gets all the cogs for repo
@@ -110,13 +107,17 @@ CogsSchema.statics.getAll = (hidden = false) => (
  * @param {Boolean} hidden Search through hidden cogs flag
  * @return {Promise|Array} DB find promise
  */
-CogsSchema.statics.getByRepo = (username, repo, hidden = false) => (
-  Cog.find({
+CogsSchema.statics.getByRepo = (username, repo, hidden = false) => {
+  const query = hidden ? {
+    'author.username': username,
+    'repo.name': repo,
+  } : {
     'author.username': username,
     'repo.name': repo,
     hidden,
-  }).exec()
-);
+  };
+  return Cog.find(query).exec();
+};
 
 /**
  * Updates cog matching the path

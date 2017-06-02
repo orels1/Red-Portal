@@ -72,23 +72,20 @@ RepoSchema.statics.create = data => (
  * @param {Boolean} hidden Search through hidden repos flag
  * @return {Promise|Array} DB find promise
  */
-RepoSchema.statics.getByPath = (path, hidden = false) => (
-  Repo.find({
-    path,
-    hidden,
-  }).exec()
-);
+RepoSchema.statics.getByPath = (path, hidden = false) => {
+  const query = hidden ? { path } : { path, hidden };
+  return Repo.find(query).exec();
+};
 
 /**
  * Gets all the repos
  * @param {Boolean} hidden Search through hidden repos flag
  * @return {Promise|Array} DB find promise
  */
-RepoSchema.statics.getAll = (hidden = false) => (
-  Repo.find({
-    hidden,
-  }).exec()
-);
+RepoSchema.statics.getAll = (hidden = false) => {
+  const query = hidden ? {} : { hidden };
+  return Repo.find(query).exec();
+};
 
 /**
  * Gets all the repos for username
@@ -96,12 +93,10 @@ RepoSchema.statics.getAll = (hidden = false) => (
  * @param {Boolean} hidden Search through hidden repos flag
  * @return {Promise|Array} DB find promise
  */
-RepoSchema.statics.getByName = (username, hidden = false) => (
-  Repo.find({
-    'author.username': username,
-    hidden,
-  }).exec()
-);
+RepoSchema.statics.getByName = (username, hidden = false) => {
+  const query = hidden ? { 'author.username': username } : { 'author.username': username, hidden };
+  return Repo.find(query).exec();
+};
 
 const Repo = mongoose.model('Repo', RepoSchema);
 
