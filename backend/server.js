@@ -30,6 +30,11 @@ app.use((err, req, res, next) => {
         status: 'ERROR',
         error: err.message,
       });
+    case 'DevEndpointCalledInProduction':
+      return res.status(400).send({
+        status: 'ERROR',
+        error: err.message,
+      });
     default:
       return res.status(500).send({
         status: 'ERROR',
