@@ -12,7 +12,7 @@ mongoose.connect(process.env.mongoURL || 'localhost/testportal');
 
 // Minimal repo structure to be used in tests
 const repo = {
-  id: '58f93c645e9279000f45b83a',
+  _id: '58f93c645e9279000f45b83a',
   name: 'ORELS-Cogs',
   author: {
     name: 'orels1',
@@ -24,6 +24,7 @@ const repo = {
   type: 'unapproved',
   links: {
     _self: '/api/v2/repos/orels1/ORELS-Cogs',
+    self: '/repos/orels1/ORELS-Cogs',
     github: {
       self: 'https://github.com/orels1/ORELS-Cogs',
     },
@@ -37,7 +38,8 @@ const cog = {
   description: 'Cog for interaction with Cogs.Red\\n\\nCommands:\\n[p]redportal search <search_term> - searches through cogs listed on cogs.red (alias - redp)',
   links: {
     github: {
-      _info: 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master',
+      _self: 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/',
+      _info: 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master',
     },
   },
   tags: ['tools', 'search'],
@@ -54,9 +56,20 @@ describe('Cog Schema', async () => {
     it('Should prepare data for the cog', () => {
       const cogData = prepareCog(repo, cog);
       expect(cogData).to.have.property('path', path);
+      expect(cogData).to.have.property('repo');
+      expect(cogData.repo).to.deep.equal({
+        name: repo.name,
+        id: repo._id,
+        type: repo.type,
+      });
+      expect(cogData).to.have.property('hidden', false);
+      expect(cogData).to.have.property('author', repo.author);
       expect(cogData.links).to.have.property('_self', COGS_PATH + path);
       expect(cogData.links).to.have.property('self', `/cogs/${path}`);
       expect(cogData.links).to.have.property('_repo',  repo.links._self);
+      expect(cogData.links).to.have.property('repo',  repo.links.self);
+      expect(cogData.links.github).to.have.property('self',
+        `${repo.links.github.self}/blob/master/${cog.name}/`);
     });
     it('Should create new cog in DB', async () => {
       const newCog = await Cog.create(repo, cog);

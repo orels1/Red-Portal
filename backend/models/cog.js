@@ -57,13 +57,13 @@ const prepareCog = (repo, cog) => {
       id: repo._id,
       type: repo.type,
     },
-    hidden: repo.hidden || cog.type === 'SHARED_LIBRARY' ? true : cog.hidden,
+    hidden: repo.hidden || cog.type === 'SHARED_LIBRARY' ? true : cog.hidden || false,
     author: repo.author,
     links: Object.assign(cog.links, {
       _self: COGS_PATH + path,
       _repo: repo.links._self,
       self: `/cogs/${path}`,
-      repo: `/repos/${repo.author.username}/${repo.name}`,
+      repo: repo.links.self,
       github: Object.assign(cog.links.github, {
         self: `${repo.links.github.self}/blob/master/${cog.name}/`,
       }),
