@@ -12,8 +12,8 @@ const RepoSchema = new mongoose.Schema({
     url: String, // Author's github url
     username: String, // Author's github username
   },
-  short: String, // Short repo description from info.json
-  description: String, // Full repo description from info.json,
+  short: { default: '', type: String }, // Short repo description from info.json
+  description: { default: '', type: String }, // Full repo description from info.json,
   readme: { default: null, type: String }, // Escaped readme.md file contents
   type: { default: 'unapproved', type: String }, // Repo type: approved/beta/unapproved
   links: { // All the API endpoints have _ in the name
@@ -32,6 +32,7 @@ const RepoSchema = new mongoose.Schema({
 
 /**
  * Prepares repo data to be inserted into the DB
+ * Minimal fields required: name, author.username, author.name, links.github._self, links.github._info
  * @param {Object} data Parsed repo object
  * @returns {Object} Prepared repo data
  */
@@ -40,10 +41,16 @@ const prepareRepo = (data) => {
   // construct repo data
   return Object.assign(data, {
     path,
+    author: Object.assign(data.author, {
+      url: `https://github.com/${data.author.username}`
+    }),
     links: Object.assign(data.links, {
       _self: REPOS_PATH + path,
       self: `/repos/${path}`,
       _cogs: COGS_PATH + path,
+      github: Object.assign(data.links.github, {
+        self: `https://github.com/${path}`,
+      }),
     }),
   });
 };

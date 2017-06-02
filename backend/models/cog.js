@@ -1,9 +1,6 @@
 /**
  * Created by orel- on 27/May/17.
  */
-/**
- * Created by orel- on 14/May/17.
- */
 const mongoose = require('mongoose');
 const { COGS_PATH } = require('../paths');
 
@@ -20,8 +17,8 @@ const CogsSchema = new mongoose.Schema({
     id: String,
     type: { type: String },
   },
-  short: String, // Short repo description from info.json
-  description: String, // Full repo description from info.json,
+  short: { default: '', type: String }, // Short repo description from info.json
+  description: { default: '', type: String }, // Full repo description from info.json,
   readme: { default: null, type: String }, // Escaped readme.md file contents
   links: { // All the API endpoints have _ in the name
     _self: String, // Cogs's api endpoint
@@ -40,6 +37,7 @@ const CogsSchema = new mongoose.Schema({
 
 /**
  * Prepares cog data to be inserted into the DB
+ * Minimal fields required: name, links.github._self, links.github._info
  * @param {Object} repo Parent repo object
  * @param {Object} cog Parsed cog object
  * @returns {Object} Prepared cog data
@@ -62,7 +60,6 @@ const prepareCog = (repo, cog) => {
       repo: `/repos/${repo.author.username}/${repo.name}`,
       github: Object.assign(cog.links.github, {
         self: `${repo.links.github.self}/blob/master/${cog.name}/`,
-        repo: repo.links.github.self,
       }),
     }),
   });
