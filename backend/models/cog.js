@@ -9,6 +9,9 @@ const { COGS_PATH } = require('../paths');
 const CogsSchema = new mongoose.Schema({
   path: { type: String, index: 1 }, // Cog's path <username>/<repo>/<cog>
   name: String, // Cog's name on github
+  bot_version: { default: [2, 0, 0], type: [Number] }, // Minimal bot's version required for the cog to run
+  required_cogs: { default: {}, type: Object }, // Map ( name: repoURL ) of required cogs that this cog depends on
+  type: { default: 'COG', type: String }, // Defines a type of cog, if SHARED_LIBRARY - then hidden should be true
   author: {
     name: String, // Author's name from info.json
     url: String, // Author's github url
@@ -54,6 +57,7 @@ const prepareCog = (repo, cog) => {
       id: repo._id,
       type: repo.type,
     },
+    hidden: repo.hidden || cog.type === 'SHARED_LIBRARY' ? true : cog.hidden,
     author: repo.author,
     links: Object.assign(cog.links, {
       _self: COGS_PATH + path,
