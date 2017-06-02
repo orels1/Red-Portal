@@ -2,7 +2,9 @@
  * Created by orel- on 14/May/17.
  */
 const mongoose = require('mongoose');
+const { merge } = require('lodash');
 const { REPOS_PATH, COGS_PATH } = require('../paths');
+const { Cog } = require('./cog');
 
 const RepoSchema = new mongoose.Schema({
   path: { type: String, index: 1 }, // Repo's path <username>/<repo>
@@ -97,6 +99,23 @@ RepoSchema.statics.getByName = (username, hidden = false) => {
   const query = hidden ? { 'author.username': username } : { 'author.username': username, hidden };
   return Repo.find(query).exec();
 };
+
+/**
+ * Updates cog matching the path
+ * @param {String} path Cog path
+ * @param {Object} data New data to be assigned
+ * @return {Promise} Cog save promise
+ */
+RepoSchema.statics.updateByPath = async (path, data) => {
+  const repo = await Repo.findOne({ path }).exec();
+  // check if we're hiding the repo - and hide all the cogs
+  if (data.hidden) {
+    await Cog.updateMany({ 'repo.name': repo.name }, { hidden: true });
+  }
+  merge(repo, data);
+  return repo.save();
+};
+
 
 const Repo = mongoose.model('Repo', RepoSchema);
 

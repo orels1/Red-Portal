@@ -3,6 +3,7 @@
  */
 const { expect } = require('chai');
 const { Repo, prepareRepo } = require('../../models/repo');
+const { Cog } = require('../../models/cog');
 const { REPOS_PATH, COGS_PATH } = require('../../paths');
 
 // Connect to a test db
@@ -28,6 +29,20 @@ const repo = {
     },
   },
   tags: ['tools', 'gaming'],
+};
+
+// Minimal cog structure to be used in tests
+const cog = {
+  name: 'redportal',
+  short: 'Cog for interaction with Cogs.Red',
+  description: 'Cog for interaction with Cogs.Red\\n\\nCommands:\\n[p]redportal search <search_term> - searches through cogs listed on cogs.red (alias - redp)',
+  links: {
+    github: {
+      _self: 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/',
+      _info: 'https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master',
+    },
+  },
+  tags: ['tools', 'search'],
 };
 
 const path = `${repo.author.username}/${repo.name}`;
@@ -138,6 +153,31 @@ describe('Repo Schema', async () => {
       const results = await Repo.getByName('orels1');
       expect(results).to.have.lengthOf(0);
     });
-  })
+  });
+
+  describe('Repo updates', async () => {
+    beforeEach(async () => {
+      await Repo.remove({});
+      await Cog.remove({});
+    });
+
+    it('Should find a repo by path and update it', async () => {
+      const newRepo = await Repo.create(repo);
+      const newData = { author: { name: 'orels2' } };
+      const updatedRepo = await Repo.updateByPath(newRepo.path, newData);
+      expect(updatedRepo.author).to.have.property('name', 'orels2');
+    });
+
+    it('Should hide the repo and all its cogs', async () => {
+      const newRepo = await Repo.create(repo);
+      const newCog = await Cog.create(repo, cog);
+      const newData = { hidden: true };
+      const updatedRepo = await Repo.updateByPath(newRepo.path, newData);
+      const updatedCog = await Cog.getByPath(newCog.path, true);
+      expect(updatedRepo).to.have.property('hidden', true);
+      expect(updatedCog).to.have.lengthOf(1);
+      expect(updatedCog[0]).to.have.property('hidden', true);
+    });
+  });
 
 });
