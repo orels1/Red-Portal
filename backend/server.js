@@ -10,6 +10,7 @@ mongoose.connect(process.env.mongoURL || 'localhost/redportal');
 // Routes
 app.use('/repos', require('./repos'));
 app.use('/cogs', require('./cogs'));
+app.use('/github', require('./github').router);
 
 app.get('/', (req, res) => {
   res.status(200).send({
