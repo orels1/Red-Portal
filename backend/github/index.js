@@ -62,6 +62,7 @@ router.get('/repos/:username', catchAsync(async (req, res) => {
  */
 const listCogs = async(username, repo) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents`);
+  if (response.status === 404) { throw new Error('NotFound') }
   const json = await response.json();
   const cogs = filter(json, { type: 'dir' });
   return map(cogs, cog => cog.name);
@@ -132,6 +133,29 @@ exports.cogInfo = cogInfo;
 
 router.get('/info/:username/:repo/:cog', catchAsync(async (req, res) => {
   const results = await cogInfo(req.params.username, req.params.repo, req.params.cog);
+  res.send({
+    status: 'OK',
+    results,
+  });
+}));
+
+const repoReadme = async(username, repo, tree = 'master') => {
+  const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/README.MD?ref=${tree}`);
+  if (response.status === 404) { throw new Error('NotFound') }
+  const json = await response.json();
+  let readme = {};
+  try {
+    readme = atob(json.content);
+  } catch (e) {
+    throw new Error('ReadmeDecodeFailed');
+  }
+  return readme;
+};
+
+exports.repoReadme = repoReadme;
+
+router.get('/readme/:username/:repo', catchAsync(async (req, res) => {
+  const results = await repoReadme(req.params.username, req.params.repo);
   res.send({
     status: 'OK',
     results,
