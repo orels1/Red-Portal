@@ -78,6 +78,36 @@ router.get('/cogs/:username/:repo', catchAsync(async (req, res) => {
 }));
 
 /**
+ * Get repo's info.json contents
+ * @param username GitHub username
+ * @param repo Repo to get the cog from
+ * @param tree Tree to look for
+ * @return {Object} info.json contents
+ */
+const repoInfo = async(username, repo, tree = 'master') => {
+  const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/info.json?ref=${tree}`);
+  if (response.status === 404) { throw new Error('NotFound') }
+  const json = await response.json();
+  let info = {};
+  try {
+    info = JSON.parse(atob(json.content));
+  } catch (e) {
+    throw new Error('InfoJsonDecodeFailed');
+  }
+  return info;
+};
+
+exports.repoInfo = repoInfo;
+
+router.get('/info/:username/:repo', catchAsync(async (req, res) => {
+  const results = await repoInfo(req.params.username, req.params.repo);
+  res.send({
+    status: 'OK',
+    results,
+  });
+}));
+
+/**
  * Get cog's info.json contents
  * @param username GitHub username
  * @param repo Repo to get the cog from
