@@ -17,7 +17,8 @@
     "bluebird": "^3.5.0",
     "express": "^4.15.2",
     "lodash": "^4.17.4",
-    "mongoose": "^4.9.8"
+    "mongoose": "^4.9.8",
+    "node-fetch": "^1.7.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
