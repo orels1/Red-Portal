@@ -169,4 +169,35 @@ router.get('/readme/:username/:repo', catchAsync(async (req, res) => {
   });
 }));
 
+/**
+ * Get cogs's readme
+ * @param username GitHub username
+ * @param repo Repo to get the cog from
+ * @param cog Cog to get the readme for
+ * @param tree Tree to look for
+ * @return {String} Repo's readme
+ */
+const cogReadme = async(username, repo, cog, tree = 'master') => {
+  const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/${cog}/README.MD?ref=${tree}`);
+  if (response.status === 404) { throw new Error('NotFound') }
+  const json = await response.json();
+  let readme = {};
+  try {
+    readme = atob(json.content);
+  } catch (e) {
+    throw new Error('ReadmeDecodeFailed');
+  }
+  return readme;
+};
+
+exports.cogReadme = cogReadme;
+
+router.get('/readme/:username/:repo/:cog', catchAsync(async (req, res) => {
+  const results = await cogReadme(req.params.username, req.params.repo, req.params.cog);
+  res.send({
+    status: 'OK',
+    results,
+  });
+}));
+
 exports.router = router;

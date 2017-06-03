@@ -2,7 +2,14 @@
  * Created by orel- on 04/Jun/17.
  */
 const { expect } = require('chai');
-const { listRepos, listCogs, cogInfo, repoInfo, repoReadme } = require('../github');
+const {
+  listRepos,
+  listCogs,
+  cogInfo,
+  repoInfo,
+  repoReadme,
+  cogReadme
+} = require('../github');
 
 describe('Github module', async () => {
   describe('List repos', async () => {
@@ -69,6 +76,21 @@ describe('Github module', async () => {
     it('Should fail to find readme for a repo', async() => {
       try {
         await repoReadme('orels1', 'NoSuchRepoHere');
+      } catch (e) {
+        expect(e).to.have.property('message', 'NotFound');
+      }
+    });
+  });
+
+  describe('Cog readme', async() => {
+    it('Should get readme contents for a cog', async() => {
+      const readme = await cogReadme('orels1', 'ORELS-Cogs', 'apitools');
+      expect(readme).to.not.have.lengthOf(0);
+    });
+
+    it('Should fail to find readme for a cog', async() => {
+      try {
+        await cogReadme('orels1', 'ORELS-Cogs', 'NoSuchCogThere');
       } catch (e) {
         expect(e).to.have.property('message', 'NotFound');
       }
