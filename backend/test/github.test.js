@@ -8,8 +8,12 @@ const {
   cogInfo,
   repoInfo,
   repoReadme,
-  cogReadme
+  cogReadme,
+  createHook,
+  deleteHook,
 } = require('../github');
+
+let hookId = 0;
 
 describe('Github module', async () => {
   describe('List repos', async () => {
@@ -36,13 +40,13 @@ describe('Github module', async () => {
   });
 
   describe('Repo info', async () => {
-    it('Should get info.json contents for a repo', async() => {
+    it('Should get info.json contents for a repo', async () => {
       const info = await repoInfo('orels1', 'ORELS-Cogs');
       expect(info).to.have.property('AUTHOR', 'orels');
       expect(info).to.have.property('NAME', 'ORELS-Cogs');
     });
 
-    it('Should fail to find info for a repo', async() => {
+    it('Should fail to find info for a repo', async () => {
       try {
         await repoInfo('orels1', 'NoSuchRepoHere');
       } catch (e) {
@@ -52,13 +56,13 @@ describe('Github module', async () => {
   });
 
   describe('Cog info', async () => {
-    it('Should get info.json contents for a cog', async() => {
+    it('Should get info.json contents for a cog', async () => {
       const info = await cogInfo('orels1', 'ORELS-Cogs', 'apitools');
       expect(info).to.have.property('AUTHOR', 'orels1');
       expect(info).to.have.property('NAME', 'Apitools');
     });
 
-    it('Should fail to find info for a cog', async() => {
+    it('Should fail to find info for a cog', async () => {
       try {
         await cogInfo('orels1', 'ORELS-Cogs', 'NoSuchCogThere');
       } catch (e) {
@@ -67,13 +71,13 @@ describe('Github module', async () => {
     });
   });
 
-  describe('Repo readme', async() => {
-    it('Should get readme contents for a repo', async() => {
+  describe('Repo readme', async () => {
+    it('Should get readme contents for a repo', async () => {
       const readme = await repoReadme('orels1', 'ORELS-Cogs');
       expect(readme).to.not.have.lengthOf(0);
     });
 
-    it('Should fail to find readme for a repo', async() => {
+    it('Should fail to find readme for a repo', async () => {
       try {
         await repoReadme('orels1', 'NoSuchRepoHere');
       } catch (e) {
@@ -82,19 +86,67 @@ describe('Github module', async () => {
     });
   });
 
-  describe('Cog readme', async() => {
-    it('Should get readme contents for a cog', async() => {
+  describe('Cog readme', async () => {
+    it('Should get readme contents for a cog', async () => {
       const readme = await cogReadme('orels1', 'ORELS-Cogs', 'apitools');
       expect(readme).to.not.have.lengthOf(0);
     });
 
-    it('Should fail to find readme for a cog', async() => {
+    it('Should fail to find readme for a cog', async () => {
       try {
         await cogReadme('orels1', 'ORELS-Cogs', 'NoSuchCogThere');
       } catch (e) {
         expect(e).to.have.property('message', 'NotFound');
       }
     });
-  })
+  });
+
+  describe('Repo webhooks', async() => {
+    afterEach(async () => {
+      if (hookId !== 0) {
+        await deleteHook('orels1', 'ORELS-Cogs', hookId);
+      }
+    });
+
+    it('Should create a new webhook', async () => {
+      const hook = await createHook('orels1', 'ORELS-Cogs', 'web', '123');
+      expect(hook).to.have.property('name', 'web');
+      expect(hook).to.have.property('active', true);
+      // save hookId for deletion
+      hookId = hook.id;
+    });
+
+    it('Should fail to create a new webhook with a mailformed name', async () => {
+      try {
+        await createHook('orels1', 'ORELS-Cogs', 'web_mailformed', '123');
+      } catch (e) {
+        expect(e).to.have.property('message', 'HookNameInvalid');
+      }
+      // prevent from forced deletion
+      hookId = 0;
+    });
+
+    it('Should fail to create an existing webhook', async () => {
+      try {
+        const hook = await createHook('orels1', 'ORELS-Cogs', 'web', '123');
+        // save hookId for deletion
+        hookId = hook.id;
+        await createHook('orels1', 'ORELS-Cogs', 'web', '123');
+      } catch (e) {
+        expect(e).to.have.property('message', 'HookExists');
+      }
+    });
+
+    it('Should delete webhook', async () => {
+      const hook = await createHook('orels1', 'ORELS-Cogs', 'web', '123');
+      try {
+        await deleteHook('orels1', 'ORELS-Cogs', hook.id);
+      } catch (e) {
+        throw e;
+      }
+      // prevent from forced deletion
+      hookId = 0;
+    });
+  });
 });
 

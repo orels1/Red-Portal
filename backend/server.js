@@ -7,6 +7,8 @@ const app = express();
 mongoose.Promise = require('bluebird');
 mongoose.connect(process.env.mongoURL || 'localhost/redportal');
 
+app.use(require('body-parser').json());
+
 // Routes
 app.use('/repos', require('./repos'));
 app.use('/cogs', require('./cogs'));
@@ -37,11 +39,26 @@ app.use((err, req, res, next) => {
         error: err.message,
       });
     case 'InfoJsonDecodeFailed':
-      return res.status(400).send({
+      return res.status(500).send({
         status: 'ERROR',
         error: err.message,
       });
     case 'ReadmeDecodeFailed':
+      return res.status(500).send({
+        status: 'ERROR',
+        error: err.message,
+      });
+    case 'HookNameInvalid':
+      return res.status(400).send({
+        status: 'ERROR',
+        error: err.message,
+      });
+    case 'HookExists':
+      return res.status(400).send({
+        status: 'ERROR',
+        error: err.message,
+      });
+    case 'InsufficientData':
       return res.status(400).send({
         status: 'ERROR',
         error: err.message,
