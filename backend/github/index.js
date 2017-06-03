@@ -3,6 +3,7 @@
  */
 const express = require('express');
 const fetch = require('node-fetch');
+const atob = require('atob');
 const { map, filter } = require('lodash');
 const { catchAsync } = require('../utils');
 
@@ -70,6 +71,37 @@ exports.listCogs = listCogs;
 
 router.get('/cogs/:username/:repo', catchAsync(async (req, res) => {
   const results = await listCogs(req.params.username, req.params.repo);
+  res.send({
+    status: 'OK',
+    results,
+  });
+}));
+
+/**
+ * Get cog's info.json contents
+ * @param username GitHub username
+ * @param repo Repo to get the cog from
+ * @param cog Cog to get the info for
+ * @param tree Tree to look for
+ * @return {Object} info.json contents
+ */
+const cogInfo = async(username, repo, cog, tree = 'master') => {
+  const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/${cog}/info.json?ref=${tree}`);
+  if (response.status === 404) { throw new Error('NotFound') }
+  const json = await response.json();
+  let info = {};
+  try {
+    info = JSON.parse(atob(json.content));
+  } catch (e) {
+    throw new Error('InfoJsonDecodeFailed');
+  }
+  return info;
+};
+
+exports.cogInfo = cogInfo;
+
+router.get('/info/:username/:repo/:cog', catchAsync(async (req, res) => {
+  const results = await cogInfo(req.params.username, req.params.repo, req.params.cog);
   res.send({
     status: 'OK',
     results,
