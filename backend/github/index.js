@@ -139,6 +139,13 @@ router.get('/info/:username/:repo/:cog', catchAsync(async (req, res) => {
   });
 }));
 
+/**
+ * Get repo's readme
+ * @param username GitHub username
+ * @param repo Repo to get the readme for
+ * @param tree Tree to look for
+ * @return {String} Repo's readme
+ */
 const repoReadme = async(username, repo, tree = 'master') => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/README.MD?ref=${tree}`);
   if (response.status === 404) { throw new Error('NotFound') }
