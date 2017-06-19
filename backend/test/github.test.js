@@ -109,7 +109,7 @@ describe('Github module', async () => {
     });
 
     it('Should create a new webhook', async () => {
-      const hook = await createHook('orels1', 'ORELS-Cogs', 'web', '123');
+      const hook = await createHook('orels1', 'ORELS-Cogs', 'web');
       expect(hook).to.have.property('name', 'web');
       expect(hook).to.have.property('active', true);
       // save hookId for deletion
@@ -128,17 +128,17 @@ describe('Github module', async () => {
 
     it('Should fail to create an existing webhook', async () => {
       try {
-        const hook = await createHook('orels1', 'ORELS-Cogs', 'web', '123');
+        const hook = await createHook('orels1', 'ORELS-Cogs', 'web');
         // save hookId for deletion
         hookId = hook.id;
-        await createHook('orels1', 'ORELS-Cogs', 'web', '123');
+        await createHook('orels1', 'ORELS-Cogs', 'web');
       } catch (e) {
         expect(e).to.have.property('message', 'HookExists');
       }
     });
 
     it('Should delete webhook', async () => {
-      const hook = await createHook('orels1', 'ORELS-Cogs', 'web', '123');
+      const hook = await createHook('orels1', 'ORELS-Cogs', 'web');
       try {
         await deleteHook('orels1', 'ORELS-Cogs', hook.id);
       } catch (e) {

@@ -201,7 +201,7 @@ router.get('/readme/:username/:repo/:cog', catchAsync(async (req, res) => {
   });
 }));
 
-const createHook = async (username, repo, hookName, hookId) => {
+const createHook = async (username, repo, hookName) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/hooks`, {
     method: 'POST',
     headers,
@@ -210,7 +210,7 @@ const createHook = async (username, repo, hookName, hookId) => {
       active: true,
       events: ['push'],
       config: {
-        url: `${HOOK_URL}/${hookId}`,
+        url: `${HOOK_URL}/${username}/${repo}`,
         content_type: 'json',
       },
     }),
@@ -227,8 +227,8 @@ const createHook = async (username, repo, hookName, hookId) => {
 exports.createHook = createHook;
 
 router.post('/hook/:username/:repo', catchAsync(async (req, res) => {
-  if (!req.body || !req.body.hookName || !req.body.hookId) { throw new Error('InsufficientData')}
-  const results = await createHook(req.params.username, req.params.repo, req.body.hookName, req.body.hookId);
+  if (!req.body || !req.body.hookName) { throw new Error('InsufficientData')}
+  const results = await createHook(req.params.username, req.params.repo, req.body.hookName);
   res.send({
     status: 'OK',
     results,
