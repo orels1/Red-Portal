@@ -2,7 +2,7 @@
  * Created by orel- on 14/May/17.
  * Stores all the api paths for use inside modules and schemas
  */
-const API_PATH = '/api/v2/';
+const API_PATH = '/api/v3/';
 
 exports.API_PATH = API_PATH;
 
