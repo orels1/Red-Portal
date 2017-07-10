@@ -131,6 +131,9 @@ CogsSchema.statics.getByRepo = (username, repo, hidden = false) => {
  */
 CogsSchema.statics.updateByPath = async (path, data) => {
   const cog = await Cog.findOne({ path }).exec();
+  if (!cog) {
+    throw new Error('NotFound');
+  }
   // check if type is changing to SHARED_LIBRARY
   if (data.type === 'SHARED_LIBRARY') data.hidden = true;
   merge(cog, data);
