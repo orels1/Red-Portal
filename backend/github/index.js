@@ -6,13 +6,13 @@ const fetch = require('node-fetch');
 const atob = require('atob');
 const { map, filter } = require('lodash');
 const { catchAsync } = require('../utils');
+const { WEBHOOKS_PATH } = require('../paths');
 
 const router = express.Router();
 
 const TOKEN = process.env.GITHUB_TOKEN;
 const API_GRAPH_ROOT = 'https://api.github.com/graphql';
 const API_ROOT = 'https://api.github.com';
-const HOOK_URL = 'http://cogs.red/api/v3/wh';
 const headers = {
   Authorization: `bearer ${TOKEN}`,
   'Content-Type': 'application/json',
@@ -201,16 +201,16 @@ router.get('/readme/:username/:repo/:cog', catchAsync(async (req, res) => {
   });
 }));
 
-const createHook = async (username, repo, hookName) => {
+const createHook = async (username, repo) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/hooks`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
-      name: hookName,
+      name: 'web',
       active: true,
       events: ['push'],
       config: {
-        url: `${HOOK_URL}/${username}/${repo}`,
+        url: `https://cogs.red${WEBHOOKS_PATH}${username}/${repo}`,
         content_type: 'json',
       },
     }),

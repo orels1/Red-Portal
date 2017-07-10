@@ -12,6 +12,7 @@ const {
   createHook,
   deleteHook,
 } = require('../github');
+const { WEBHOOKS_PATH } = require('../paths');
 
 let hookId = 0;
 
@@ -109,21 +110,13 @@ describe('Github module', async () => {
     });
 
     it('Should create a new webhook', async () => {
-      const hook = await createHook('orels1', 'ORELS-Cogs', 'web');
+      const hook = await createHook('orels1', 'ORELS-Cogs');
       expect(hook).to.have.property('name', 'web');
       expect(hook).to.have.property('active', true);
+      expect(hook).to.have.property('config');
+      expect(hook.config).to.have.property('url', `https://cogs.red${WEBHOOKS_PATH}orels1/ORELS-Cogs`);
       // save hookId for deletion
       hookId = hook.id;
-    });
-
-    it('Should fail to create a new webhook with a mailformed name', async () => {
-      try {
-        await createHook('orels1', 'ORELS-Cogs', 'web_mailformed', '123');
-      } catch (e) {
-        expect(e).to.have.property('message', 'HookNameInvalid');
-      }
-      // prevent from forced deletion
-      hookId = 0;
     });
 
     it('Should fail to create an existing webhook', async () => {
