@@ -108,6 +108,9 @@ RepoSchema.statics.getByName = (username, hidden = false) => {
  */
 RepoSchema.statics.updateByPath = async (path, data) => {
   const repo = await Repo.findOne({ path }).exec();
+  if (!repo) {
+    throw new Error('NotFound');
+  }
   // check if we're hiding the repo - and hide all the cogs
   if (data.hidden) {
     await Cog.updateMany({ 'repo.name': repo.name }, { hidden: true });
