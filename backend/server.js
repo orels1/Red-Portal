@@ -13,6 +13,8 @@ app.use(require('body-parser').json());
 app.use('/repos', require('./repos'));
 app.use('/cogs', require('./cogs'));
 app.use('/github', require('./github').router);
+app.use('/wh', require('./wh').router);
+app.use('/auth', require('./auth').router);
 
 app.get('/', (req, res) => {
   res.status(200).send({
@@ -60,6 +62,11 @@ app.use((err, req, res, next) => {
       });
     case 'InsufficientData':
       return res.status(400).send({
+        status: 'ERROR',
+        error: err.message,
+      });
+    case 'AccessDenied':
+      return res.status(401).send({
         status: 'ERROR',
         error: err.message,
       });

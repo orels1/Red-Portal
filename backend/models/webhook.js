@@ -2,7 +2,7 @@
  * Created by orel- on 19/Jun/17.
  */
 const mongoose = require('mongoose');
-const { createHook, deleteHook } = require('../github');
+const { createGhHook, deleteGhHook } = require('../github');
 const { WEBHOOKS_PATH } = require('../paths');
 
 const WebhookSchema = new mongoose.Schema({
@@ -27,7 +27,7 @@ const WebhookSchema = new mongoose.Schema({
  * @returns {Object} A constructed webhook object to be saved
  */
 const prepareData = async (username, repo) => {
-  const hook = await createHook(username, repo);
+  const hook = await createGhHook(username, repo);
 
   return {
     path: `${username}/${repo}`,
@@ -74,10 +74,10 @@ WebhookSchema.statics.deleteByPath = async (path) => {
   if (!hook) {
     throw new Error('NotFound');
   }
-  await deleteHook(hook.repo.author, hook.repo.name, hook.hookId);
+  await deleteGhHook(hook.repo.author, hook.repo.name, hook.hookId);
   return Webhook.remove({ path });
 };
 
-const Webhook = mongoose.model('Cog', WebhookSchema);
+const Webhook = mongoose.model('Webhook', WebhookSchema);
 
 exports.Webhook = Webhook;
