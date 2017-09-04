@@ -4,6 +4,9 @@
 const express = require('express');
 const { Cog } = require('../models/cog');
 const { catchAsync } = require('../utils');
+const { listCogs, cogInfo } = require('../github');
+const { parseCogs } = require('../parser');
+const { hasRole, isRepoOwner } = require('../auth');
 
 const router = express.Router();
 
@@ -18,6 +21,26 @@ router.get('/', catchAsync(async (req, res) => {
     results,
   });
 }));
+
+/**
+ * Checks cogs to be valid
+ */
+router.get('/validate/:authorUsername/:repoName', hasRole('member'), isRepoOwner, catchAsync(async (req, res) => {
+  const branch = req.query && req.query.branch || 'master';
+  const { broken } = await parseCogs(
+    req.params.authorUsername,
+    req.params.repoName,
+    req.user.github.access_token,
+    branch
+  );
+  res.send({
+    status: 'OK',
+    results: {
+      valid: broken.length === 0,
+      broken
+    }
+  })
+}))
 
 /**
  * Get all cogs by repo
