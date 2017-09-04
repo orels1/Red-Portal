@@ -4,6 +4,8 @@
 const express = require('express');
 const { Repo } = require('../models/repo');
 const { catchAsync } = require('../utils');
+const { repoInfo } = require('../github');
+const { hasRole, isRepoOwner } = require('../auth');
 
 const router = express.Router();
 
@@ -16,6 +18,20 @@ router.get('/', catchAsync(async (req, res) => {
   return res.status(200).send({
     status: 'OK',
     results,
+  });
+}));
+
+/**
+ * Checks repo to be valid
+ */
+router.get('/validate/:authorUsername/:repoName', hasRole('member'), isRepoOwner, catchAsync(async (req, res) => {
+  const branch = req.query && req.query.branch || 'master';
+  const valid = await repoInfo(req.params.authorUsername, req.params.repoName, branch);
+  res.send({
+    status: 'OK',
+    results: {
+      valid: valid !== null 
+    }
   });
 }));
 
@@ -46,7 +62,7 @@ router.get('/:authorUsername/:repoName', catchAsync(async (req, res) => {
 /**
  * Update single repo by path
  */
-router.put('/:authorUsername/:repoName', catchAsync(async (req, res) => {
+router.put('/:authorUsername/:repoName', hasRole('admin'), catchAsync(async (req, res) => {
   const path = `${req.params.authorUsername}/${req.params.repoName}`;
   const results = await Repo.updateByPath(path, req.body);
   return res.status(200).send({
