@@ -61,7 +61,7 @@ router.get('/repos/:username', catchAsync(async (req, res) => {
  * @param repo Repo to show the cogs from
  * @return {Array} List of cogs for the repo
  */
-const listCogs = async (username, repo) => {
+const listCogs = async (username, repo, token = TOKEN) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents`, { headers });
   if (response.status === 404) { throw new Error('NotFound') }
   const json = await response.json();
@@ -86,7 +86,7 @@ router.get('/cogs/:username/:repo', catchAsync(async (req, res) => {
  * @param tree Tree to look for
  * @return {Object} info.json contents
  */
-const repoInfo = async (username, repo, tree = 'master') => {
+const repoInfo = async (username, repo, tree = 'master', token = TOKEN) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/info.json?ref=${tree}`, { headers });
   if (response.status === 404) { throw new Error('NotFound') }
   const json = await response.json();
@@ -94,7 +94,7 @@ const repoInfo = async (username, repo, tree = 'master') => {
   try {
     info = JSON.parse(atob(json.content));
   } catch (e) {
-    throw new Error('InfoJsonDecodeFailed');
+    return null;
   }
   return info;
 };
@@ -117,7 +117,7 @@ router.get('/info/:username/:repo', catchAsync(async (req, res) => {
  * @param tree Tree to look for
  * @return {Object} info.json contents
  */
-const cogInfo = async (username, repo, cog, tree = 'master') => {
+const cogInfo = async (username, repo, cog, tree = 'master', token = TOKEN) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/${cog}/info.json?ref=${tree}`, { headers });
   if (response.status === 404) { throw new Error('NotFound') }
   const json = await response.json();
@@ -125,7 +125,7 @@ const cogInfo = async (username, repo, cog, tree = 'master') => {
   try {
     info = JSON.parse(atob(json.content));
   } catch (e) {
-    throw new Error('InfoJsonDecodeFailed');
+    return null;
   }
   return info;
 };
@@ -147,9 +147,9 @@ router.get('/info/:username/:repo/:cog', catchAsync(async (req, res) => {
  * @param tree Tree to look for
  * @return {String} Repo's readme
  */
-const repoReadme = async (username, repo, tree = 'master') => {
+const repoReadme = async (username, repo, tree = 'master', token = TOKEN) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/README.MD?ref=${tree}`, { headers });
-  if (response.status === 404) { throw new Error('NotFound') }
+  if (response.status === 404) return null;
   const json = await response.json();
   let readme = {};
   try {
@@ -178,9 +178,9 @@ router.get('/readme/:username/:repo', catchAsync(async (req, res) => {
  * @param tree Tree to look for
  * @return {String} Repo's readme
  */
-const cogReadme = async (username, repo, cog, tree = 'master') => {
+const cogReadme = async (username, repo, cog, tree = 'master', token = TOKEN) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/${cog}/README.MD?ref=${tree}`, { headers });
-  if (response.status === 404) { throw new Error('NotFound') }
+  if (response.status === 404) return null
   const json = await response.json();
   let readme = {};
   try {
@@ -201,7 +201,7 @@ router.get('/readme/:username/:repo/:cog', catchAsync(async (req, res) => {
   });
 }));
 
-const createHook = async (username, repo) => {
+const createGhHook = async (username, repo) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/hooks`, {
     method: 'POST',
     headers,
@@ -224,18 +224,17 @@ const createHook = async (username, repo) => {
   return json;
 };
 
-exports.createHook = createHook;
+exports.createGhHook = createGhHook;
 
 router.post('/hook/:username/:repo', catchAsync(async (req, res) => {
-  if (!req.body || !req.body.hookName) { throw new Error('InsufficientData')}
-  const results = await createHook(req.params.username, req.params.repo, req.body.hookName);
+  const results = await createGhHook(req.params.username, req.params.repo);
   res.send({
     status: 'OK',
     results,
   });
 }));
 
-const deleteHook = async (username, repo, hookId) => {
+const deleteGhHook = async (username, repo, hookId) => {
   const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/hooks/${hookId}`, {
     method: 'DELETE',
     headers,
@@ -244,10 +243,10 @@ const deleteHook = async (username, repo, hookId) => {
   return true;
 };
 
-exports.deleteHook = deleteHook;
+exports.deleteHook = deleteGhHook;
 
 router.delete('/hook/:username/:repo/:hookId', catchAsync(async (req, res) => {
-  const results = await deleteHook(req.params.username, req.params.repo, req.params.hookId);
+  const results = await deleteGhHook(req.params.username, req.params.repo, req.params.hookId);
   res.send({
     status: 'OK',
     results,
