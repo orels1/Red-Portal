@@ -23,8 +23,8 @@ router.post('/', catchAsync(async (req, res) => {
  * @param {String} repo GH repo to trigger parsing for
  */
 const triggerParse = async (username, repo) => {
-    // const repos = await Repo.getByPath(`${username}/${repo}`);
-    // if (repos.length === 0) throw new Error('WebhookRepoNotFound');
+    const repos = await Repo.getByPath(`${username}/${repo}`);
+    if (repos.length === 0) throw new Error('WebhookRepoNotFound');
     return parseRepo(username, repo);
 };
 
@@ -35,9 +35,10 @@ const triggerParse = async (username, repo) => {
 router.post('/:authorUsername/:repoName', catchAsync(async (req, res) => {
     res.status(201).end();
     try {
-        await triggerParse(req.params.authorUsername, req.params.repoName);
+        const data = await triggerParse(req.params.authorUsername, req.params.repoName);
+        await Repo.updateByPath(`${req.params.authorUsername}/${req.params.repoName}`, data.repo);
     } catch (e) {
-        return false;
+        throw e;
     }
 }));
 
