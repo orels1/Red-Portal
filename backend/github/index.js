@@ -87,7 +87,8 @@ router.get('/cogs/:username/:repo', catchAsync(async (req, res) => {
  * @return {Object} info.json contents
  */
 const repoInfo = async (username, repo, tree = 'master', token = TOKEN) => {
-  const response = await fetch(`${API_ROOT}/repos/${username}/${repo}/contents/info.json?ref=${tree}`, { headers });
+  const url = `${API_ROOT}/repos/${username}/${repo}/contents/info.json?ref=${tree}`;
+  const response = await fetch(url, { headers });
   if (response.status === 404) { throw new Error('NotFound') }
   const json = await response.json();
   let info = {};
@@ -96,7 +97,7 @@ const repoInfo = async (username, repo, tree = 'master', token = TOKEN) => {
   } catch (e) {
     return null;
   }
-  return info;
+  return Object.assign(info, { GITHUB: { _self: url } });
 };
 
 exports.repoInfo = repoInfo;
