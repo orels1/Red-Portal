@@ -29,6 +29,7 @@ app.listen(3000, () => {
 });
 
 app.use((err, req, res, next) => {
+  console.error(err.stack);
   switch (err.message) {
     case 'NotFound':
       return res.status(404).send({
