@@ -21,9 +21,10 @@ const parseRepo = async (username, repo, token = TOKEN, branch = 'master') => {
         readme: cogsReadme[index]
     }));
 
+    const repoData = formatRepoData(repoJson, repo, username, readme);
+
     return {
-        repo: repoJson,
-        readme: readme,
+        repo: repoData,
         cogs,
         broken
     };
@@ -57,3 +58,19 @@ const parseCogs = async (username, repo, token = TOKEN, branch = 'master') => {
 }
 
 exports.parseCogs = parseCogs;
+
+const formatRepoData = (repoData, repoName, username, readme) => ({
+    name: repoName,
+    author: {
+        username,
+        name: repoData.AUTHOR
+    },
+    short: repoData.SHORT,
+    description: repoData.DESCRIPTION,
+    readme: readme,
+    links: {
+        github: repoData.GITHUB
+    },
+    tags: repoData.TAGS,
+    hidden: repoData.HIDDEN,
+});
