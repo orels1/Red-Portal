@@ -25,7 +25,6 @@ const RepoSchema = new mongoose.Schema({
     github: {
       self: String, // Repo's github url
       _self: String, // Repo's github api url
-      _info: String, // Repo's info.json github api url
     },
   },
   tags: { default: [], type: [String], index: true }, // List of tags from info.json

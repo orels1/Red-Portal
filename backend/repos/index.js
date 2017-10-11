@@ -5,6 +5,7 @@ const express = require('express');
 const { Repo } = require('../models/repo');
 const { catchAsync } = require('../utils');
 const { repoInfo } = require('../github');
+const { parseRepo } = require('../parser');
 const { hasRole, isRepoOwner } = require('../auth');
 
 const router = express.Router();
@@ -18,6 +19,18 @@ router.get('/', catchAsync(async (req, res) => {
   return res.status(200).send({
     status: 'OK',
     results,
+  });
+}));
+
+/**
+ * Adds a repo
+ */
+router.post('/:authorUsername/:repoName', catchAsync(async (req, res) => {
+  const data = await parseRepo(req.params.authorUsername, req.params.repoName);
+  const savedRepo = await Repo.create(data.repo);
+  res.send({
+    status: 'OK',
+    results: savedRepo
   });
 }));
 
