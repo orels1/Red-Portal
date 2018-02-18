@@ -171,7 +171,9 @@ function* parseRepos(repos) {
         try {
             githubRepo = yield* getGithubRepo(repo.links.github.self);
         } catch (e) {
-            throw e;
+            console.error('Could not get repo from github: ', repo.name, 'when parsing repos');
+            console.error(e.message, e.stack);
+            continue;
         }
 
         // find, get and parse info.json for the repo
@@ -219,6 +221,7 @@ function* parseCogs(repo, currentCogs) {
     try {
         githubRepo = yield* getGithubRepo(repo.links.github.self);
     } catch (e) {
+        console.error('Could not get repo from github: ', repo.name, 'when parsing cogs');
         throw e;
     }
 

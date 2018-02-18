@@ -110,7 +110,7 @@ function repoParser() {
                         }
                     })
                     .catch((err) => {
-                        throw err;
+                        console.error('error when parsing cogs for repo', repo, err);
                     });
             }
         })
@@ -125,7 +125,7 @@ function repoParser() {
             return entry.save();
         })
         .catch((err) => {
-            throw err;
+            console.error(err);
         });
 }
 
