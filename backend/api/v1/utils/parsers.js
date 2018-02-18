@@ -111,6 +111,7 @@ function* getCogs(githubRepo, repo, currentCogs) {
 
         // if there is no info.json (or no cog at all) - ignore cog / add to missing list
         if (!infoJsonContents.content) {
+            console.log('Could not parse info.json for', cog.name, 'cog');
             continue;
         }
 
@@ -174,12 +175,11 @@ function* parseRepos(repos) {
         }
 
         // find, get and parse info.json for the repo
-        let repoInfoJson;
+        let repoInfoJson = yield* getInfoJson(githubRepo);
 
-        try {
-            repoInfoJson = yield* getInfoJson(githubRepo);
-        } catch (e) {
-            throw e;
+        if (!repoInfoJson.content) {
+            console.log('Could not parse info.json for', repo.name, 'repo');
+            continue;
         }
 
         // save repo info

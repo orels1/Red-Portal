@@ -25,7 +25,7 @@ var app = express();
 * */
 app.set('port', process.env.PORT || 3000);
 app.set('trust proxy', process.env.NODE_ENV === 'production' || false);
-app.use(logger('dev'));
+app.use(logger('tiny'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ 'extended': false }));
 app.use(express.static(path.join(__dirname, 'public')));
