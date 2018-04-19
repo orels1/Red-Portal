@@ -18,6 +18,8 @@ RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app && cp -a /tmp/bower_co
 WORKDIR /opt/app
 ADD . /opt/app
 RUN gulp build
+# jQuery fix
+RUN cp /opt/app/bower_components/jquery/dist/jquery.min.js /opt/app/public/js
 
 EXPOSE 3000
 CMD ["npm", "start"]
