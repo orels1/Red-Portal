@@ -57,6 +57,7 @@ var dependencies = [
     'underscore',
     'jsonwebtoken',
     'react-select',
+    'jquery'
 ];
 
 /**
