@@ -82,6 +82,7 @@ import { authorize } from './auth';
  * @apiUse DBError
  *
  * @apiParam {Boolean} [hidden] Return hidden repos
+ * @apiParam {Number=1} [unparsed] Return unparsed repos
  *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
@@ -128,10 +129,14 @@ import { authorize } from './auth';
  *      }
  */
 router.get('/', (req, res) => {
-    const hidden = !!req.query.hidden;
-    Repo.find(
-        req.query.unparsed === '1' && {} || { 'parsed': true, 'hidden': hidden }
-    )
+    const hidden = req.query.hidden === 'true';
+    const unparsed = req.query.unparsed === '1';
+    const params = Object.assign(
+        {},
+        unparsed ? {} : { 'parsed': true },
+        hidden ? {} : { 'hidden': false }
+    );
+    Repo.find(params)
         .sort({ 'type': 1 })
         .exec((err, entries) => {
             if (err) {
