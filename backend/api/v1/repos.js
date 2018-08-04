@@ -4,13 +4,12 @@
 
 import express from 'express';
 let router = express.Router();
-import {extend} from 'underscore';
-import {parseRepos} from './utils/parsers';
+import { extend } from 'underscore';
+import { parseRepos } from './utils/parsers';
 import Repo from 'models/repo';
 import co from 'co';
-import {checkOwnership} from './users';
-import {authorize} from './auth';
-
+import { checkOwnership } from './users';
+import { authorize } from './auth';
 
 /**
  * @apiDefine RepoRequestSuccess
@@ -76,11 +75,13 @@ import {authorize} from './auth';
 
 /**
  * @api {get} /repos/ List all repos
- * @apiVersion 0.2.0
+ * @apiVersion 0.2.1
  * @apiName getRepoList
  * @apiGroup repos
  *
  * @apiUse DBError
+ *
+ * @apiParam {Boolean} [hidden] Return hidden repos
  *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
@@ -127,8 +128,11 @@ import {authorize} from './auth';
  *      }
  */
 router.get('/', (req, res) => {
-    Repo.find(req.query.unparsed === '1' && {} || {'parsed': true, 'hidden': false})
-        .sort({'type': 1})
+    const hidden = !!req.query.hidden;
+    Repo.find(
+        req.query.unparsed === '1' && {} || { 'parsed': true, 'hidden': hidden }
+    )
+        .sort({ 'type': 1 })
         .exec((err, entries) => {
             if (err) {
                 throw err;
@@ -190,50 +194,56 @@ router.get('/', (req, res) => {
  */
 router.post('/', checkOwnership, (req, res) => {
     // Check if we have that entry already
-    Repo.findOne({
-        'links.github.self': req.body.url,
-    }, (err, entry) => {
-        if (err) {
-            throw err;
-        }
-        if (entry) {
-            // if exists return id for future requests
-            return res.status(400).send({
-                'error': 'EntryExists',
-                'error_details': 'This repo already exists',
-                'results': {'_self': entry.links._self},
-            });
-        }
-
-        let name = req.body.url.substr(req.body.url.lastIndexOf('/') + 1),
-            authorUrl = req.body.url.substr(0, req.body.url.lastIndexOf('/')),
-            username = authorUrl.substr(authorUrl.lastIndexOf('/') + 1);
-        return new Repo({
-            'name': name,
-            'author': {
-                'url': authorUrl,
-                'username': username,
-            },
-            'links': {
-                '_self': `/api/v1/repos/${username}/${name}`,
-                '_update': `/api/v1/repos/${username}/${name}/parse`,
-                '_cogs': `/api/v1/cogs/${username}/${name}`,
-                'self': `/cogs/${username}/${name}/`,
-                'github': {
-                    'self': req.body.url,
-                },
-            },
-            'type': req.body.type,
-        }).save((err, entry) => {
+    Repo.findOne(
+        {
+            'links.github.self': req.body.url,
+        },
+        (err, entry) => {
             if (err) {
                 throw err;
             }
-            return res.status(200).send({
-                'error': false,
-                'results': entry,
+            if (entry) {
+                // if exists return id for future requests
+                return res.status(400).send({
+                    'error': 'EntryExists',
+                    'error_details': 'This repo already exists',
+                    'results': { '_self': entry.links._self },
+                });
+            }
+
+            let name = req.body.url.substr(req.body.url.lastIndexOf('/') + 1),
+                authorUrl = req.body.url.substr(
+                    0,
+                    req.body.url.lastIndexOf('/')
+                ),
+                username = authorUrl.substr(authorUrl.lastIndexOf('/') + 1);
+            return new Repo({
+                'name': name,
+                'author': {
+                    'url': authorUrl,
+                    'username': username,
+                },
+                'links': {
+                    '_self': `/api/v1/repos/${username}/${name}`,
+                    '_update': `/api/v1/repos/${username}/${name}/parse`,
+                    '_cogs': `/api/v1/cogs/${username}/${name}`,
+                    'self': `/cogs/${username}/${name}/`,
+                    'github': {
+                        'self': req.body.url,
+                    },
+                },
+                'type': req.body.type,
+            }).save((err, entry) => {
+                if (err) {
+                    throw err;
+                }
+                return res.status(200).send({
+                    'error': false,
+                    'results': entry,
+                });
             });
-        });
-    });
+        }
+    );
 });
 
 /**
@@ -250,26 +260,30 @@ router.post('/', checkOwnership, (req, res) => {
  * @apiUse EntryNotFound
  */
 router.get('/:author/:repoName', (req, res) => {
-    Repo.findOne({
-        'name': req.params.repoName,
-        'hidden': false,
-    }, (err, entry) => {
-        if (err) {
-            throw err;
-        }
-        if (!entry) {
-            // if does not exist - return NotFound
-            return res.status(404).send({
-                'error': 'EntryNotFound',
-                'error_details': 'There is no such repo, or it is being parsed currently',
-                'results': {},
+    Repo.findOne(
+        {
+            'name': req.params.repoName,
+            'hidden': false,
+        },
+        (err, entry) => {
+            if (err) {
+                throw err;
+            }
+            if (!entry) {
+                // if does not exist - return NotFound
+                return res.status(404).send({
+                    'error': 'EntryNotFound',
+                    'error_details':
+                        'There is no such repo, or it is being parsed currently',
+                    'results': {},
+                });
+            }
+            return res.status(200).send({
+                'error': false,
+                'results': entry,
             });
         }
-        return res.status(200).send({
-            'error': false,
-            'results': entry,
-        });
-    });
+    );
 });
 
 /**
@@ -296,7 +310,12 @@ router.get('/:author/:repoName', (req, res) => {
  *      }
  */
 router.put('/:author/:repoName/parse', authorize, (req, res) => {
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
+    if (
+        req.user &&
+            !req.user.roles.includes('admin') &&
+            !req.user.roles.includes('staff') ||
+        !req.user && req.get('Service-Token') !== process.env.serviceToken
+    ) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
@@ -309,20 +328,21 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
         'name': req.params.repoName,
     })
         .exec()
-        .then((repos) => {
+        .then(repos => {
             return co(parseRepos(repos))
-                .then((repos) => {
+                .then(repos => {
                     for (let repo of repos) {
-                        return repo.save()
-                            .then((repo) => {
+                        return repo
+                            .save()
+                            .then(repo => {
                                 return repo;
                             })
-                            .catch((err) => {
+                            .catch(err => {
                                 throw err;
                             });
                     }
                 })
-                .catch((err) => {
+                .catch(err => {
                     throw err;
                 });
         });
@@ -356,7 +376,12 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
  * @apiUse EntryNotFound
  */
 router.put('/:id', authorize, (req, res) => {
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
+    if (
+        req.user &&
+            !req.user.roles.includes('admin') &&
+            !req.user.roles.includes('staff') ||
+        !req.user && req.get('Service-Token') !== process.env.serviceToken
+    ) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
@@ -422,7 +447,12 @@ router.put('/:id', authorize, (req, res) => {
  *      }
  */
 router.delete('/:id', authorize, (req, res) => {
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
+    if (
+        req.user &&
+            !req.user.roles.includes('admin') &&
+            !req.user.roles.includes('staff') ||
+        !req.user && req.get('Service-Token') !== process.env.serviceToken
+    ) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
@@ -457,4 +487,4 @@ router.delete('/:id', authorize, (req, res) => {
     });
 });
 
-export {router};
+export { router };

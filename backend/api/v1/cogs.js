@@ -4,14 +4,14 @@
 
 import express from 'express';
 let router = express.Router();
-import {eachLimit} from 'async';
-import {findWhere, where, extend, filter} from 'underscore';
+import { eachLimit } from 'async';
+import { findWhere, where, extend, filter } from 'underscore';
 import Repo from 'models/repo';
 import Cog from 'models/cog';
 import Vote from 'models/vote';
-import {parseCogs} from './utils/parsers';
+import { parseCogs } from './utils/parsers';
 import co from 'co';
-import {authorize} from './auth';
+import { authorize } from './auth';
 
 /**
  * @apiDefine CogRequestSuccess
@@ -90,6 +90,8 @@ import {authorize} from './auth';
  *
  * @apiUse DBError
  *
+ * @apiParam {Boolean} [hidden] Return hidden cogs
+ *
  * @apiSuccess (200) {Boolean} error Should always be false
  * @apiSuccess (200) {Object} results Contains the results of Request
  * @apiSuccess (200) {Array} results.list List of entries
@@ -135,9 +137,10 @@ import {authorize} from './auth';
  *      }
  */
 router.get('/', (req, res) => {
-    Cog.find({'hidden': false})
+    const hidden = !!req.query.hidden;
+    Cog.find({ 'hidden': hidden })
         .exec()
-        .then((cogs) => {
+        .then(cogs => {
             res.status(200).send({
                 'error': false,
                 'results': {
@@ -145,7 +148,7 @@ router.get('/', (req, res) => {
                 },
             });
         })
-        .catch((err) => {
+        .catch(err => {
             throw err;
         });
 });
@@ -207,13 +210,15 @@ router.get('/:author/:repoName', (req, res) => {
         'author.username': req.params.author,
         'repo.name': req.params.repoName,
         'hidden': false,
-    }).exec()
-        .then((cogs) => {
+    })
+        .exec()
+        .then(cogs => {
             if (cogs.length === 0) {
                 // if does not exist - return NotFound
                 return res.status(404).send({
                     'error': 'EntryNotFound',
-                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'error_details':
+                        'There is no such cog, or it is being parsed currently',
                     'results': {},
                 });
             }
@@ -225,7 +230,7 @@ router.get('/:author/:repoName', (req, res) => {
                 },
             });
         })
-        .catch((err) => {
+        .catch(err => {
             throw err;
         });
 });
@@ -251,8 +256,9 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
         'author.username': req.params.author,
         'repo.name': req.params.repoName,
         'hidden': false,
-    }).exec()
-        .then((res) => {
+    })
+        .exec()
+        .then(res => {
             if (!res) {
                 // if does not exist - return NotFound
                 throw new Error('EntryNotFound');
@@ -266,7 +272,7 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
                 'cog': req.params.cogName,
             }).exec();
         })
-        .then((vote) => {
+        .then(vote => {
             cog.voted = vote && vote.IPs.indexOf(req.ip) !== -1;
 
             return res.status(200).send({
@@ -274,11 +280,12 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
                 'results': cog,
             });
         })
-        .catch((err) => {
+        .catch(err => {
             if (err.message === 'EntryNotFound') {
                 return res.status(404).send({
                     'error': 'EntryNotFound',
-                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'error_details':
+                        'There is no such cog, or it is being parsed currently',
                     'results': {},
                 });
             }
@@ -310,9 +317,14 @@ router.get('/:author/:repoName/:cogName', (req, res) => {
  *      }
  */
 
-//TODO: Refactor this mess
+// TODO: Refactor this mess
 router.put('/:author/:repoName/parse', authorize, (req, res) => {
-    if (req.user && !req.user.roles.includes('admin') && !req.user.roles.includes('staff') || !req.user && req.get('Service-Token') !== process.env.serviceToken) {
+    if (
+        req.user &&
+            !req.user.roles.includes('admin') &&
+            !req.user.roles.includes('staff') ||
+        !req.user && req.get('Service-Token') !== process.env.serviceToken
+    ) {
         return res.status(401).send({
             'error': 'Unauthorized',
             'error_details': 'Authorization header not provided',
@@ -324,28 +336,36 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
         'name': req.params.repoName,
     })
         .exec()
-        .then((repo) => {
+        .then(repo => {
             // Get cogs for current repo to filter missing cogs
             return Cog.find({
                 'author.username': req.params.author,
                 'repo.name': req.params.repoName,
             })
                 .exec()
-                .then((cogs) => {
+                .then(cogs => {
                     // Remove unnecessary info from the cog we only need essentials
-                    return {'repo': repo, 'cogs': cogs.length > 0 && cogs.map((cog) => {
-                        return {
-                            'name': cog.name,
-                            'author': {'username': cog.author.username},
-                            'repo': {'name': cog.repo.name}
-                        }
-                    }) || false};
-                })
+                    return {
+                        'repo': repo,
+                        'cogs':
+                            cogs.length > 0 &&
+                                cogs.map(cog => {
+                                    return {
+                                        'name': cog.name,
+                                        'author': {
+                                            'username': cog.author.username,
+                                        },
+                                        'repo': { 'name': cog.repo.name },
+                                    };
+                                }) ||
+                            false,
+                    };
+                });
         })
-        .then((data) => {
+        .then(data => {
             return co(parseCogs(data.repo, data.cogs));
         })
-        .then((cogs) => {
+        .then(cogs => {
             // First - clear old cogs
             for (let cog of cogs.missing) {
                 Cog.findOneAndRemove({
@@ -356,7 +376,7 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
             }
             return cogs;
         })
-        .then((cogs) => {
+        .then(cogs => {
             for (let cog of cogs.parsed) {
                 // check if we have such cog
                 Cog.findOne({
@@ -365,7 +385,7 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
                     'repo.name': cog.repo.name,
                 })
                     .exec()
-                    .then((dbCog) => {
+                    .then(dbCog => {
                         if (!dbCog) {
                             cog = new Cog(cog);
                         } else {
@@ -375,15 +395,15 @@ router.put('/:author/:repoName/parse', authorize, (req, res) => {
 
                         return cog.save();
                     })
-                    .then((cog) => {
+                    .then(cog => {
                         return cog;
                     })
-                    .catch((err) => {
+                    .catch(err => {
                         throw err;
                     });
             }
         })
-        .catch((err) => {
+        .catch(err => {
             throw err;
         });
     return res.status(200).send({
@@ -415,8 +435,9 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
         'author.username': req.params.author,
         'repo.name': req.params.repoName,
         'hidden': false,
-    }).exec()
-        .then((result) => {
+    })
+        .exec()
+        .then(result => {
             if (!result) {
                 // if does not exist - return NotFound
                 throw new Error('EntryNotFound');
@@ -430,7 +451,7 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
                 'cog': req.params.cogName,
             }).exec();
         })
-        .then((result) => {
+        .then(result => {
             let vote = null;
 
             if (!result) {
@@ -469,18 +490,19 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
         .then(() => {
             return cog.save();
         })
-        .then((cogSaved) => {
+        .then(cogSaved => {
             cogSaved.voted = voted;
             return res.status(200).send({
                 'error': false,
                 'results': cogSaved,
             });
         })
-        .catch((err) => {
+        .catch(err => {
             if (err.message === 'EntryNotFound') {
                 return res.status(404).send({
                     'error': 'EntryNotFound',
-                    'error_details': 'There is no such cog, or it is being parsed currently',
+                    'error_details':
+                        'There is no such cog, or it is being parsed currently',
                     'results': {},
                 });
             }
@@ -496,4 +518,4 @@ router.get('/:author/:repoName/:cogName/vote', (req, res) => {
         });
 });
 
-export {router};
+export { router };

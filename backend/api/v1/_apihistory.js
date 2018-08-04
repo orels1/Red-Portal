@@ -360,7 +360,6 @@
  * @apiUse EntryNotFound
  */
 
-
 /**
  * @apiDefine RepoRequestSuccess
  *
@@ -577,6 +576,112 @@
  *                            "name": "ORELS-Cogs"
  *                        },
  *                        "name": "dota",
+ *                        "voted": false,
+ *                        "votes": 0,
+ *                        "tags": ["gaming"]
+ *                   }
+ *               ]
+ *           }
+ *      }
+ */
+
+/**
+ * @api {get} /repos/ List all repos
+ * @apiVersion 0.2.0
+ * @apiName getRepoList
+ * @apiGroup repos
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ * @apiSuccess (200) {Array} results.list List of entries
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {
+ *               "list": [
+ *                   {
+ *                       "_id": "587d62b4c54cad51845ae101",
+ *                       "name": "ORELS-Cogs",
+ *                       "__v": 4,
+ *                       "description": "Repository of mainly gaming/data based cogs, with a bit of some fun stuff. Use as you like.",
+ *                       "short": "Data scraping cogs with a bit of extra",
+ *                       "links": {
+ *                           "_self": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                           "_update": "/api/v1/repos/orels1/ORELS-Cogs/parse",
+ *                           "_cogs": "/api/v1/cogs/orels1/ORELS-Cogs
+ *                           "self": "/cogs/orels1/ORELS-Cogs/",
+ *                           "github": {
+ *                               "self": "https://github.com/orels1/ORELS-Cogs",
+ *                               "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/info.json?ref=master"
+ *                           }
+ *                       },
+ *                       "type": "unapproved",
+ *                       "parsed": false,
+ *                       "cogs": [],
+ *                       "author": {
+ *                           "name": "orels",
+ *                           "url": "https://github.com/orels1"
+ *                       },
+ *                       "tags": [
+ *                          "api",
+ *                          "tools",
+ *                          "fun",
+ *                          "gaming"
+ *                       ]
+ *                   }
+ *               ]
+ *           }
+ *      }
+ */
+
+/**
+ * @api {get} /cogs/ List all cogs
+ * @apiVersion 0.2.0
+ * @apiName getCogList
+ * @apiGroup cogs
+ *
+ * @apiUse DBError
+ *
+ * @apiSuccess (200) {Boolean} error Should always be false
+ * @apiSuccess (200) {Object} results Contains the results of Request
+ * @apiSuccess (200) {Array} results.list List of entries
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+ *          "error": false,
+ *          "results": {
+ *               "list": [
+ *                   {
+ *                       "links": {
+ *                           "github": {
+ *                               "_update": "https://api.github.com/repos/orels1/ORELS-Cogs/contents/dota/info.json?ref=master",
+ *                               "repo": "https://github.com/orels1/ORELS-Cogs",
+ *                               "self": "https://github.com/orels1/ORELS-Cogs/blob/master/dota/dota.py"
+ *                           },
+ *                           "repo": "cogs/orels1/ORELS-Cogs/",
+ *                           "self": "/cogs/orels1/ORELS-Cogs/dota/",
+ *                           "_update": "/api/v1/cogs/orels1/ORELS-Cogs/dota/fetch",
+ *                           "_repo": "/api/v1/repos/orels1/ORELS-Cogs",
+ *                           "_self": "/api/v1/cogs/orels1/ORELS-Cogs/dota"
+ *                        },
+ *                        "description": "Requires tabulate, dota2py and beautfulSoup\nInstall with:\npip3 install bs4\npip3 install dota2py\npip3 install tabulate\n\nAlso requires dota 2 api key, which you can get here: http://steamcommunity.com/dev/apikey\nYou will need to set your key with [p]dota setkey command in PM\n\nUsage:\n[p]dota hero <hero>\n Shows info about hero\n[p]dota build <hero>\n Shows most popular skillbuild\n[p]dota items <hero>\n Shows most popular items\n[p]dota online\n Shows amount of players online\n[p]dota recent <steamID>\n Shows info about the latest dota match",
+ *                        "short": null,
+ *                        "updated_at": "Fri Jan 27 2017 00:10:15 GMT+0300",
+ *                        "author": {
+ *                            "url": "https://github.com/orels1",
+ *                            "name": "orels"
+ *                        },
+ *                        "repo": {
+ *                            "type": "unapproved",
+ *                            "name": "ORELS-Cogs"
+ *                        },
+ *                        "name": "dota",
+ *                        "hidden": false,
  *                        "voted": false,
  *                        "votes": 0,
  *                        "tags": ["gaming"]
