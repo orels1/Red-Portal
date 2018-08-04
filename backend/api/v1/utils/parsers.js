@@ -3,15 +3,13 @@
  */
 
 import rp from 'request-promise';
-import {eachLimit} from 'async';
-import {findWhere, where, extend} from 'underscore';
+import { eachLimit } from 'async';
+import { findWhere, where, extend } from 'underscore';
 import atob from 'atob';
-
 
 let config = {
     'githubToken': process.env.githubToken,
 };
-
 
 // Repo parsing
 
@@ -45,7 +43,7 @@ function* getGithubRepo(url) {
  * @returns {Object} content info.json contents
  */
 function* getInfoJson(repo) {
-    let infoJsonDescription = findWhere(repo, {'name': 'info.json'});
+    let infoJsonDescription = findWhere(repo, { 'name': 'info.json' });
 
     // check if info.json is present, if it's not - skip cog
     if (!infoJsonDescription) {
@@ -88,7 +86,7 @@ function* getInfoJson(repo) {
  * @returns {Array} Array of cogs
  */
 function* getCogs(githubRepo, repo, currentCogs) {
-    let cogsList = yield where(githubRepo, {'type': 'dir'});
+    let cogsList = yield where(githubRepo, { 'type': 'dir' });
     let missing = [];
 
     let cogs = [];
@@ -115,6 +113,8 @@ function* getCogs(githubRepo, repo, currentCogs) {
             continue;
         }
 
+        const oldCog = findWhere(currentCogs, { 'name': cog.name }) || {};
+
         cogs[index] = {
             'name': cog.name,
             'repo': {
@@ -125,35 +125,41 @@ function* getCogs(githubRepo, repo, currentCogs) {
             'short': infoJsonContents.content.SHORT || null,
             'description': infoJsonContents.content.DESCRIPTION || null,
             'links': {
-                '_self': `/api/v1/cogs/${repo.author.username}/${repo.name}/${cog.name}`,
+                '_self': `/api/v1/cogs/${repo.author.username}/${repo.name}/${
+                    cog.name
+                }`,
                 '_repo': repo.links._self,
-                '_update': `/api/v1/cogs/${repo.author.username}/${repo.name}/${cog.name}/parse`,
+                '_update': `/api/v1/cogs/${repo.author.username}/${repo.name}/${
+                    cog.name
+                }/parse`,
                 'self': `/cogs/${repo.author.username}/${repo.name}/${cog.name}/`,
                 'repo': repo.links.self,
                 'github': {
-                    'self': `${repo.links.github.self}/blob/master/${cog.name}/${cog.name}.py`,
+                    'self': `${repo.links.github.self}/blob/master/${cog.name}/${
+                        cog.name
+                    }.py`,
                     'repo': repo.links.github.self,
                     '_update': infoJsonContents.updateUrl,
                 },
             },
-            'hidden': infoJsonContents.content.HIDDEN || false,
+            'hidden': oldCog.hidden || infoJsonContents.content.HIDDEN || false,
             'tags': infoJsonContents.content.TAGS || [],
         };
 
-        index ++;
+        index++;
     }
 
     // check for missing
     if (currentCogs) {
         for (let cog of currentCogs) {
             // if cog is missing in the new array
-            if (!findWhere(cogs, {'name': cog.name})) {
+            if (!findWhere(cogs, { 'name': cog.name })) {
                 missing.push(cog);
             }
         }
     }
 
-    return {'parsed': cogs, 'missing': missing};
+    return { 'parsed': cogs, 'missing': missing };
 }
 
 /**
@@ -171,7 +177,11 @@ function* parseRepos(repos) {
         try {
             githubRepo = yield* getGithubRepo(repo.links.github.self);
         } catch (e) {
-            console.error('Could not get repo from github: ', repo.name, 'when parsing repos');
+            console.error(
+                'Could not get repo from github: ',
+                repo.name,
+                'when parsing repos'
+            );
             console.error(e.message, e.stack);
             continue;
         }
@@ -192,7 +202,9 @@ function* parseRepos(repos) {
             'short': repoInfoJson.content.SHORT || undefined,
             'description': repoInfoJson.content.DESCRIPTION || undefined,
             'links': extend(repo.links, {
-                '_update': `/api/v1/repos/${repo.author.username}/${repo.name}/parse`,
+                '_update': `/api/v1/repos/${repo.author.username}/${
+                    repo.name
+                }/parse`,
                 'github': extend(repo.links.github, {
                     '_update': repoInfoJson.updateUrl,
                 }),
@@ -221,7 +233,11 @@ function* parseCogs(repo, currentCogs) {
     try {
         githubRepo = yield* getGithubRepo(repo.links.github.self);
     } catch (e) {
-        console.error('Could not get repo from github: ', repo.name, 'when parsing cogs');
+        console.error(
+            'Could not get repo from github: ',
+            repo.name,
+            'when parsing cogs'
+        );
         throw e;
     }
 
@@ -237,4 +253,4 @@ function* parseCogs(repo, currentCogs) {
     return cogs;
 }
 
-export {getGithubRepo, getInfoJson, getCogs, parseRepos, parseCogs};
+export { getGithubRepo, getInfoJson, getCogs, parseRepos, parseCogs };

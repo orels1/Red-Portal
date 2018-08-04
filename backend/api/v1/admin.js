@@ -67,8 +67,9 @@ function repoParser() {
                                     return {
                                         'name': cog.name,
                                         'author': {'username': cog.author.username},
-                                        'repo': {'name': cog.repo.name}
-                                    }
+                                        'repo': {'name': cog.repo.name},
+                                        'hidden': cog.hidden,
+                                    };
                                 }) || false};
                             });
                     })
