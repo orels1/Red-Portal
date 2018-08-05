@@ -138,7 +138,7 @@ import { authorize } from './auth';
  */
 router.get('/', (req, res) => {
     const hidden = req.query.hidden === 'true';
-    const params = hidden ? { hidden } : {};
+    const params = hidden ? {} : { 'hidden': false };
     Cog.find(params)
         .exec()
         .then(cogs => {
