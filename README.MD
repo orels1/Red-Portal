@@ -7,6 +7,10 @@
 
 Ever thought "it'd be cool if there was a place, where you can see a list of all the cogs and repos for Red"? Well, there is such a place now!
 
+## ⚠️ THIS REPO IS NOT SUPPORTED ANYMORE ##
+
+The v3 version is being developed [over here](https://github.com/orels1/v3.cogs.red). This repo will be still up for legacy puproses and occasional bugfixes while I'm preparing to switch to v3.
+
 ## API
 
 [API docs are here](https://orels1.github.io/Red-Portal/)
